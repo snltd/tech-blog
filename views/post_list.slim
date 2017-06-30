@@ -1,0 +1,14 @@
+h2
+  - if @tag
+    | Posts tagged '#{@tag}'
+
+- if @posts.empty?
+  .error
+    | no matching posts
+- else
+  ul.post_list
+    - @posts.sort.each do |k, post|
+      li
+        a href=post[:link]
+          => post[:title]
+        = "(#{post[:date].strftime("%d %B %Y")})"

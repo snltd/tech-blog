@@ -1,0 +1,26 @@
+#post_title
+  = @meta[:title]
+
+#post_date
+  => @meta[:date].strftime('%d %B %Y')
+  - if @meta[:category]
+    ' //
+    = @meta[:category]
+  - if @meta[:author]
+    ' //
+    = @meta[:author]
+
+== @content
+
+- if @meta[:tags]
+  #post_tags
+    ' Tags:
+    ul
+      - @meta[:tags].each_with_index do |tag, index|
+        li
+          a href="/tag/#{tag}"
+            - if index < @meta[:tags].length - 1
+              = tag
+              ' ,
+            - else
+              = tag

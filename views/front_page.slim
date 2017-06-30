@@ -1,0 +1,10 @@
+h2 Recent Posts
+
+ul.big_list
+  - @posts.sort.reverse[0..4].each do |k, page|
+    li
+      a href=page[:link]
+        = page[:title]
+      .date_big_list
+        = "(#{page[:date].strftime('%d %b %y')})"
+

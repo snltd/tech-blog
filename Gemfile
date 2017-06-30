@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+gem 'sinatra', '>=1.3'
+gem 'puma'
+gem 'slim'
+gem 'kramdown', '1.11.1'
+gem 'rouge', '1.10.1'

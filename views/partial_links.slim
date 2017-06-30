@@ -1,0 +1,11 @@
+- if @posts && @posts.is_a?(Hash) && @posts.length > 0
+  h3 other pages
+  ul
+    - @posts.sort.reverse.each do |k, post|
+      li
+        - if post == @meta
+          #this_post
+            = post[:title]
+        -else
+          a href=post[:link] => post[:title]
+          = "(#{post[:date].strftime('%d %b %y')})"
