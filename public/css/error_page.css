@@ -1,0 +1,11 @@
+#error_code {
+    font-size: 10em;
+    display: block;
+    text-align: center;
+    padding: 1.5em 0;
+}
+
+#message {
+    text-align: center;
+}
+
