@@ -84,6 +84,8 @@ Usage:
           [-t token] [-T time] <id>
   wf alert unsnooze [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] <id>
+  wf alert search [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-l] <condition>...
   wf alert tags [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
   wf alert tag set [-DnV] [-c file] [-P profile] [-E endpoint]
@@ -166,6 +168,32 @@ like `wf proxy list | wc -l` will.
 
 You can also `list -l`, which more-or-less dumps all of every
 resource into your terminal. I don't often use that.
+
+We can also `search` for alerts. You can define multiple conditions,
+which the Wavefront engine will `AND` together to refine a query.
+Conditions are specified as `key=value`. Or, if you wish to search
+for objects where the `key` field merely *contains* `value`, use
+`key~value`.  If you want objects where the field *starts with* the
+value, use `key^value`. The default display mode for `search`
+subcommands is one object per line, and the fields will be the
+object's `id`, plus whichever other keys you used in your
+conditions.
+
+```cmd
+$ wf alert search name~JPC
+1497275466684  JPC Failed Services
+1463413760189  JPC Memory Shortage
+1490980663852  JPC: no metrics
+$ wf alert search name~JPC id^149
+1497275466684  JPC Failed Services
+1490980663852  JPC: no metrics
+$ wf alert search name~JPC id^149 severity=SMOKE
+1497275466684  JPC Failed Services  SMOKE
+$ wf alert search status=SNOOZED
+1481553823153  SNOOZED
+$ wf alert search status=SNOOZED name~' '
+1481553823153  SNOOZED  JVM Memory
+```
 
 Getting more detail is best done in a more targeted way. Let's have
 a proper look at that the
