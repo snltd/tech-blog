@@ -19,6 +19,8 @@ with them, the sooner they'll hopefully go away.
 
 Rant over. Get the gem.
 
+## Installation and Basics
+
 ```cmd
 $ gem install wavefront-cli
 ```
@@ -64,6 +66,8 @@ Use 'wf <command> --help' for further information.
 
 Looks pretty simple. Let's start with some alerts. Wavefront is
 great at alerts.
+
+## Alert
 
 ```cmd
 $ wf alert --help
@@ -436,6 +440,8 @@ an indefinitely snoozed alert.
 $ wf alert unsnooze 1497276280057
 ```
 
+## Dashboards, Proxies, and Sources
+
 `dashboard` commands are pretty much a subset of the `alert` ones.
 Obviously you can't `snooze` a dashboard, but most of the others
 work just the same. Dashboard descriptions can be h-u-g-e, so quite
@@ -448,6 +454,8 @@ And speaking of tagging, the `source` command lets you tag and untag
 your hosts with exactly the same interface as we just saw for
 alerts. You can also set a description for a host. (At the moment
 you can't clear a description, due to a bug in the API.)
+
+## Events
 
 The CLI is able to interact more with events than with alerts, or
 proxies, or dashboards, so we gain a couple of new subcommands in
@@ -592,6 +600,63 @@ $ wf event show
 No open events.
 ```
 
+My most common use of `wf event` is to wrap some command or other in
+an event. I did this so often, I made a subcommand specifically for
+it.
+
+```cmd
+$ wf event wrap -C 'stress --cpu 3 --timeout 1m' -T example "pointless busy work"
+Event state recorded at
+/var/tmp/wavefront/rob/1501109228938:pointless busy work.
+Command output follows, on STDERR:
+----------------------------------------------------------------------------
+stress: info: [2041] dispatching hogs: 3 cpu, 0 io, 0 vm, 0 hdd
+stress: info: [2041] successful run completed in 60s
+----------------------------------------------------------------------------
+Command exited 0
+$ echo $?
+0
+```
+
+Note that "output follows, on STDERR". `wf` takes all output,
+standard out and standard error, from the wrapped command, and
+dumps it to stderr. This is so, should you need to, you can separate
+out the command output. In `event wrap` mode, `wf` exits whatever
+the wrapped command exited. Here's a chart showing the event.
+
+<script src="https://metrics.wavefront.com/embedded/ZMdvhTfgG7/js"
+id="wavefront-embedded-ZMdvhTfgG7" width="700"
+height="300"></script>
+
+```cmd
+$ wf event describe "1501109228938:pointless busy work"
+id                  1501109228938:pointless busy work
+name                pointless busy work
+annotations
+  type              example
+  details           stress --cpu 3 --timeout 1m
+table               sysdef
+startTime           2017-07-26 23:47:08.938
+endTime             2017-07-26 23:48:10.492
+createdAt           2017-07-26 23:47:09.721
+createdEpochMillis  2017-07-26 23:47:09.721
+updatedEpochMillis  2017-07-26 23:48:10.492
+updaterId           slackboy@gmail.com
+creatorId           slackboy@gmail.com
+updatedAt           2017-07-26 23:48:10.492
+isUserEvent         true
+runningState        ENDED
+canDelete           true
+canClose            true
+creatorType         USER
+```
+
+You can see that `wf` has put the command it wrapped into the
+`details` field. If I had supplied an event description with `-d`,
+that would have been used instead.
+
+## Cloud Integrations, Webhooks, Maintenance Windows, External Links
+
 The `integration`, `webhook`, `window`, and `link` commands are
 simpler than those we've seen so far, becaue the API doesn't allow
 tagging or soft-deleting of those types of resource. The CLI still
@@ -599,6 +664,8 @@ lets you list, describe, delete and import them though, and each has
 properties you can `update`.
 
 Now let's look at the three "oddball" commands.
+
+## Metric
 
 `metric` lets you find out when a metric was last reported. The
 output is sorted on the time, with the most recent first.
@@ -629,6 +696,8 @@ i-05f8817d3ac61bfab  2017-06-07 17:27:49.000
 The `/metric` API seems a little brittle at the moment, and throws a
 500 if you search for a metric which does not exist. The CLI
 dutifully reports this error.
+
+## Query
 
 The `query` command has quite a lot of options (common options removed for
 brevity.)
@@ -712,6 +781,8 @@ $ wf query raw 'lab.dev.host.nfs.server.v4.read' -H shark -s 13:00 -e 13:01
 
 ```
 
+## Write
+
 Finally we get to the `write` command. This is different from all
 the other commands because it talks to a Wavefront proxy, not the
 API. At the moment there's no way to send metrics to Wavefront via
@@ -786,9 +857,10 @@ There's a more in-depth look at the `write` command
 that was written for a previous version of the CLI, the interface
 remains the same.
 
-That completes our tour through the Wavefront CLI. I hope you find
-it useful, and if you find bugs, omissions, or have any great ideas
-for features, please [raise an
+## End
+
+That, in a nutshell, is my Wavefront CLI. I hope you find it useful,
+and if you find bugs, omissions, or have any great ideas for
+features, please [raise an
 issue](https://github.com/snltd/wavefront-cli/issues). Pull requests
 are even more welcome!
-
