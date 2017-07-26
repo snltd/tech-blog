@@ -1,6 +1,6 @@
 ---
 title: "A New Wavefront CLI"
-date: "2017-06-11"
+date: "2017-07-26"
 tags: [Wavefront, Ruby]
 layout: post
 category: Wavefront
