@@ -623,6 +623,7 @@ standard out and standard error, from the wrapped command, and
 dumps it to stderr. This is so, should you need to, you can separate
 out the command output. In `event wrap` mode, `wf` exits whatever
 the wrapped command exited. Here's a chart showing the event.
+(You have to hover over the event to see it.)
 
 <script src="https://metrics.wavefront.com/embedded/ZMdvhTfgG7/js"
 id="wavefront-embedded-ZMdvhTfgG7" width="700"
