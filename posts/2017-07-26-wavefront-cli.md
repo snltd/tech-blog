@@ -510,7 +510,7 @@ $ wf event delete "1497313265697:Alert Edited: No discogs update"
 API 400: Can only delete user events.
 ```
 
-Let's create an event. First, a couple of instantaneous evenst,
+Let's create an event. First, a couple of instantaneous events,
 occuring right this minute, because they're the simplest kind.
 
 ```cmd
