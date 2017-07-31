@@ -6,20 +6,40 @@ layout: post
 category: Wavefront
 ---
 
-If you have five minutes, I'd like to introduce you to [my new
-Wavefront CLI](https://github.com/snltd/wavefront-cli).
+The [Wavefront](https://wavefront.com) console is excellent, and its
+API coverage is complete and simple to use. At my client's
+site, we put *everything* in Wavefront, and actively use the data
+for alerts, webhooks, and other automated behaviour. The easier it
+is to do this, the more it will be done, and the more benefit we all
+get.
 
-It's written in Ruby, so all of the following assumes you have Ruby
-installed. If you don't (or even if you do) I recommend [setting up
-`rbenv`](https://github.com/rbenv/rbenv). It makes all your Rubying
-so much nicer. The CLI and SDK both require Ruby 2.2 or later.
-There's no technical reason why they couldn't have been written to
-work with older Rubies, but the sooner we stop our software working
-with them, the sooner they'll hopefully go away.
+There is already [a Wavefront
+CLI and Ruby SDK](https://github.com/wavefrontHQ/ruby-client), to
+which I was a core contributor. But that tool uses API version 1,
+which is somewhat limited. It's also, because it evolved in a "we
+have a problem right now - fix it!" kind of way, it's a bit messy
+and WET.
 
-Rant over. Get the gem.
+As Wavefront's API uses [Swagger](https://swagger.io/) it is pretty
+easy to generate an SDK for whatever language you like. But I find
+these machine-genrated SDKs hard work to use, and I wanted a nice
+little project to work on in my spare time, so I wrote [yet another
+Wavefront SDK](https://github.com/snltd/wavefront-sdk), in Ruby.
+This is more has more features, and around 40,000 less lines of code
+than its generated equivalent, and I've tried hard to hide the
+differences in various API paths behind a consistent interface,
+which Swagger would not have done.
+
+Built on top of the SDK is a new [Wavefront
+CLI](https://github.com/snltd/wavefront-cli), which I'm going to run
+through in this article.
 
 ## Installation and Basics
+
+The CLI and SDK both require Ruby 2.2 or later.  There's no
+technical reason why they couldn't have been written to work with
+older Rubies, but the sooner we stop our software working with them,
+the sooner they'll hopefully go away.
 
 ```cmd
 $ gem install wavefront-cli
@@ -33,7 +53,8 @@ painless on any host.
 
 Following the model of [the best designed CLI I
 know](https://illumos.org/man/1M/zfs), there's a single command, with
-subcommands.
+subcommands. I chose `wf` to avoid a clash with `wavefront` from
+the old `wavefront-client` gem.
 
 ```cmd
 $ wf --help
@@ -168,7 +189,7 @@ you a one-item-per-line listing by default, where the first column
 is the unique identifer of the resource. Despite what I
 said earlier about wrapping lines to fit the terminal, brief
 listings don't do that. That's so you can always trust a command
-like `wf proxy list | wc -l` will.
+like `wf proxy list | wc -l` to give the answer you expect.
 
 You can also `list -l`, which more-or-less dumps all of every
 resource into your terminal. I don't often use that.
@@ -601,7 +622,7 @@ No open events.
 ```
 
 My most common use of `wf event` is to wrap some command or other in
-an event. I did this so often, I made a subcommand specifically for
+an event. I do this so often, I made a subcommand specifically for
 it.
 
 ```cmd
@@ -864,4 +885,4 @@ That, in a nutshell, is my Wavefront CLI. I hope you find it useful,
 and if you find bugs, omissions, or have any great ideas for
 features, please [raise an
 issue](https://github.com/snltd/wavefront-cli/issues). Pull requests
-are even more welcome!
+are even more welcome. Don't forget the tests!
