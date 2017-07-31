@@ -25,8 +25,8 @@ easy to generate an SDK for whatever language you like. But I find
 these machine-genrated SDKs hard work to use, and I wanted a nice
 little project to work on in my spare time, so I wrote [yet another
 Wavefront SDK](https://github.com/snltd/wavefront-sdk), in Ruby.
-This is more has more features, and around 40,000 less lines of code
-than its generated equivalent, and I've tried hard to hide the
+This has more features, and around 40,000 less lines of code than
+its generated equivalent, and I've tried hard to hide the
 differences in various API paths behind a consistent interface,
 which Swagger would not have done.
 
