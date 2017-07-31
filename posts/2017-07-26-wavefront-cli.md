@@ -45,11 +45,11 @@ the sooner they'll hopefully go away.
 $ gem install wavefront-cli
 ```
 
-This installs the CLI and [the SDK on which it
-depends](https://github.com/snltd/wavefront-sdk). A lot of care has
+This installs the CLI and all its dependencies.  A lot of care has
 been taken to ensure there are no "native extension" gems anywhere
-in the dependency chain, so installation should be quick and
-painless on any host.
+in the chain, so installation should be quick and painless on any
+host. I *hate* people thinking it's fine to expect me to install C
+compiler to run a hundred line tool written in a scripting language.
 
 Following the model of [the best designed CLI I
 know](https://illumos.org/man/1M/zfs), there's a single command, with
