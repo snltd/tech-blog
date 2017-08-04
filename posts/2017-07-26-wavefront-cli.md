@@ -738,11 +738,11 @@ $ wf window describe 1501844960880 | grep endTime
 endTimeInSeconds      2017-08-04 14:00:00
 ```
 
-Or just close it right now.
+Or just close it immediately.
 
 ```cmd
-$ wf window close 1501844960880         id
-1501844960880
+$ wf window close 1501844960880
+id                    1501844960880
 reason                demonstrating the CLI
 customerId            sysdef
 createdEpochMillis    1501844960880
