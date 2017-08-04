@@ -677,7 +677,90 @@ You can see that `wf` has put the command it wrapped into the
 `details` field. If I had supplied an event description with `-d`,
 that would have been used instead.
 
-## Cloud Integrations, Webhooks, Maintenance Windows, External Links
+## Maintenance Windows
+
+I don't use maintenance windows, as the systems I work on are built
+to tolerate the removal of pretty much any component. But, Wavefront
+does have good support for them, which the CLI covers. Creating a
+window is fairly simple:
+
+```cmd
+$ wf window create -d 'demonstrating the CLI' -H shark 'example window'
+```
+
+You must supply a reason the window exists (with `-d`) and a title
+for the window, which is the final argument. You also have to give
+Wavefront some way to connect a window to some sources. This can be
+done with alert tags (using `-A`), source tags (`-T`), or host name
+patterns (`-H`). These aren't the CLI's constraints, they're the
+Wavefront engine's. So, the window above will stop any alerts firing
+on any host whose name *matches* the string `shark`. That's nice for
+me, because all the zones on that server have `shark` as their
+hostname prefix. (Yes, `shark` is a pet: it lives in a cupboard in
+my house.) You can mix and match tags and source names, and
+Wavefront will `AND` them all together.
+
+Note that I didn't supply a start or end time for my window.
+Wavefront requires a start and end time when you create a window,
+and the CLI has filled them in for me, opening the window right now,
+and closing it in one hour.
+
+```cmd
+$ wf window describe 1501844960880
+id                    1501844960880
+reason                demonstrating the CLI
+customerId            sysdef
+createdEpochMillis    2017-08-04 12:09:20.880
+updatedEpochMillis    2017-08-04 12:09:20.880
+updaterId             slackboy@gmail.com
+creatorId             slackboy@gmail.com
+title                 example window
+startTimeInSeconds    2017-08-04 12:09:20
+endTimeInSeconds      2017-08-04 13:09:20
+relevantHostNames     shark
+eventName             Maintenance Window: example window
+runningState          ONGOING
+```
+
+If I wish, I can extend it. Let's give ourselves another hour.
+
+```
+$ wf window extend by 1h 1501844960880
+$ wf window describe 1501844960880 | grep endTime
+endTimeInSeconds      2017-08-04 14:09:20
+```
+
+Or we can close it bang on 2pm
+
+```
+$ wf window extend to 14:00 1501844960880
+$ wf window describe 1501844960880 | grep endTime
+endTimeInSeconds      2017-08-04 14:00:00
+```
+
+Or just close it right now.
+
+```
+$ ./wf window close 1501844960880         id
+1501844960880
+reason                demonstrating the CLI
+customerId            sysdef
+createdEpochMillis    1501844960880
+updatedEpochMillis    1501845460225
+updaterId             slackboy@gmail.com
+creatorId             slackboy@gmail.com
+eventName             Maintenance Window: example window
+title                 example window
+startTimeInSeconds    1501844960
+endTimeInSeconds      1501845458
+relevantHostNames     shark
+runningState          ENDED
+```
+
+You can import also import and export windows, just like everything
+else.
+
+## Cloud Integrations, Webhooks, External Links
 
 The `integration`, `webhook`, `window`, and `link` commands are
 simpler than those we've seen so far, becaue the API doesn't allow
