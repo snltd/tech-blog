@@ -724,7 +724,7 @@ runningState          ONGOING
 
 If I wish, I can extend it. Let's give ourselves another hour.
 
-```
+```cmd
 $ wf window extend by 1h 1501844960880
 $ wf window describe 1501844960880 | grep endTime
 endTimeInSeconds      2017-08-04 14:09:20
@@ -732,7 +732,7 @@ endTimeInSeconds      2017-08-04 14:09:20
 
 Or we can close it bang on 2pm
 
-```
+```cmd
 $ wf window extend to 14:00 1501844960880
 $ wf window describe 1501844960880 | grep endTime
 endTimeInSeconds      2017-08-04 14:00:00
@@ -740,8 +740,8 @@ endTimeInSeconds      2017-08-04 14:00:00
 
 Or just close it right now.
 
-```
-$ ./wf window close 1501844960880         id
+```cmd
+$ wf window close 1501844960880         id
 1501844960880
 reason                demonstrating the CLI
 customerId            sysdef
