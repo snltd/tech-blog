@@ -294,7 +294,7 @@ are different, and though it supports various operating systems,
 I've only run it, so far, on
 [SmartOS](https://www.joyent.com/smartos). If you're running
 masterless Puppet, [check out the code and give it a
-go](https://github.com/snltd/joyent-puppet/blob/master/modules/basenode/lib/puppet/reports/wavefront.rb).
+go](https://github.com/snltd/wavefront-puppet-reporter).
 If you're on some other config management system, it shouldn't be a
 hard thing to port. It would certainly make a nice little Chef
 handler without a lot of effort.  Contribute to the community and
