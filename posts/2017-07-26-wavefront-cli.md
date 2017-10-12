@@ -888,8 +888,8 @@ $ wf query raw 'lab.dev.host.nfs.server.v4.read' -H shark -s 13:00 -e 13:01
 
 Start and end times don't have to be absolute. As of version 2.1.0
 of the CLI, you can specify relative times. So you can run a query
-over a window from "two hours ago" to "one hour ago", with " -s -2h
--e -1h". Valid time units are `s`, `m`, `h`, `d`, `w`, and `y` which
+over a window from "two hours ago" to "one hour ago", with `-s -2h
+-e -1h`. Valid time units are `s`, `m`, `h`, `d`, `w`, and `y` which
 I hope are self-explanatory. Because these are relative ranges, the
 CLI makes no attempt to compensate for any daylight saving or
 calendar changes.
