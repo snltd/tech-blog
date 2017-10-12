@@ -886,6 +886,18 @@ $ wf query raw 'lab.dev.host.nfs.server.v4.read' -H shark -s 13:00 -e 13:01
 
 ```
 
+Start and end times don't have to be absolute. As of version 2.1.0
+of the CLI, you can specify relative times. So you can run a query
+over a window from "two hours ago" to "one hour ago", with " -s -2h
+-e -1h". Valid time units are `s`, `m`, `h`, `d`, `w`, and `y` which
+I hope are self-explanatory. Because these are relative ranges, the
+CLI makes no attempt to compensate for any daylight saving or
+calendar changes.
+
+You can specify future times as `+2.5h` or similar. This is useful
+for maintenance windows, but if you try to see into the future on a
+query, the Wavefront API will, not unreasonably, throw an exception.
+
 ## Write
 
 Finally we get to the `write` command. This is different from all
