@@ -1,7 +1,7 @@
 ---
 title: "Why I Hate DevOps"
 date: "2015-05-05"
-tags: [DevOps, Rant]
+tags: [DevOps, Rant, "Professsional Suicide"]
 layout: post
 category: articles
 ---
@@ -90,13 +90,12 @@ non-terrible sys-admin. Up to this point, I felt I had a new job
 title (and a better day-rate), nothing more.
 
 Next, "DevOps" seemed to mean Ops people starting to work like devs.
-Some of this is good: writing better code, written with proper
-languages, infrastructure as code, and version control are all
+Some of this is good: writing better code; using languages which
+are not shell; infrastructure as code; and version control are all
 great. (If not necessarily new: I worked at sites in the 90s which
 keps all host configuration files in CSV.) Things like scrums, story
-points, Jenkins, and unit tests make a whole lot less sense in an
-ops environment than a dev one, but it seemed we had to take the
-rough with the smooth.
+points, Jenkins, and unit tests make a lot less sense in an ops
+context, but it seemed we had to take the rough with the smooth.
 
 After that, "DevOps" began to become closely tied to particular
 tools and technologies. First it was the ubiquitous "Puppet/Chef"
@@ -119,7 +118,7 @@ from Github, written in languages with a major version number of
 zero. Everything works first time. There are no repercussions. Set
 it, forget it, automate more of the things, freeing up more time to
 get craft beer froth in your moustache at the [next
-meetup](http://meetup.rdfisher.co.uk).
+meetup](http://meetup.sysdef.xyz).
 
 The DevOps blogger never talks about failure, and hard lessons
 learnt. He (and it, depressingly, almost always is a he) never talks
@@ -160,17 +159,18 @@ about it.
 
 ## 3. Reinvented Wheels. But More Complicated.
 
-Back in 1998, I got my first contract. My job was to create a
-system, with a GUI, for self-service deployment of infrastructure. A
-user clicked a button, and got a whole bunch of machines, fully
-configured as databases, cluster nodes, web servers, application
-servers, whatever. It took me three months to do this, on my own. I
-used Solaris and Jumpstart and, because I understood those
-technologies, it was simple to make them perform in the way I
-required. I wrote a thin layer of PHP (I never claimed to be
-perfect) for the GUI, and a bit of C to do some crypto stuff, and we
-had a clean, simple system anyone could maintain, extend, or fix. It
-was tiny, and it worked, in production, for years.
+Back in 1998, I left permanent employment and got my first
+contract. My task was to create a system, with a GUI, for
+self-service deployment of infrastructure. A user clicked a button,
+and got a whole bunch of machines, fully configured as databases,
+cluster nodes, web servers, application servers, whatever. It took
+me three months to do this, on my own. I used Solaris and Jumpstart
+and, because I understood those technologies, it was simple to make
+them perform in the way I required. I wrote a thin layer of PHP (I
+never claimed to be perfect) for the GUI, and a bit of C to do some
+crypto stuff, and we had a clean, simple system anyone could
+maintain, extend, or fix. It was tiny, and it worked, in
+production, for years.
 
 Now, in 2015, I see teams of CS-qualified Full-Stack Jedis layering
 gem upon gem, or npm inside npm, building huge sprawling systems
@@ -282,7 +282,7 @@ seemingly-arbitrary JSON.
 In a sense, we're back to piping data between programs, but now the
 pipe goes over some unknown software-defined network, and to make
 the things at each end talk safely to one another, you must have
-digested the subtle concepts buried in 400 pages of documentation,
+digested the subtle concepts buried in 400 pages of IAM documentation,
 and done some language-of-your-choice voodoo with a
 machine-generated API the size of Wales. Or the CLI. Jesus, the CLI.
 
@@ -309,7 +309,7 @@ emissaries who would try to get you to convert more of your products
 to depend on theirs. The main difference between '90s Microsoft and
 '10s Amazon, so far as I can tell, is that Microsoft wanted to put
 all other IT companies out of business, whatever it took, whereas
-Amazon want to put all other companies out of business, regardless
+Amazon want to put *all* other companies out of business, regardless
 of market sector. If you're going to hate a company in 2015, Amazon
 seems like a pretty good one to choose.
 
