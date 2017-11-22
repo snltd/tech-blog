@@ -1,25 +1,13 @@
 #!/usr/bin/env ruby
 
-require 'sinatra'
-require 'slim'
-require 'yaml'
-require 'date'
-require 'pathname'
-require 'kramdown'
-
-root = Pathname(__FILE__).parent.realpath
-
-require root + 'lib' + 'rouge'
-require root + 'lib' + 'common'
-require root + 'lib' + 'blog'
-
-#-----------------------------------------------------------------------------
-# SCRIPT STARTS HERE
-#
-blog = Blog.new
+%w(sinatra slim yaml date pathname kramdown).each { |f| require f }
+ROOT = Pathname.new(__FILE__).dirname.realpath
+%w(rouge common blog).each { |f| require ROOT + 'lib' + f }
 
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
+
+set :bind, '0.0.0.0'
 
 kramdown_options = {
   input:              'GFM',
@@ -27,8 +15,7 @@ kramdown_options = {
   hard_wrap:          false,
 }
 
-#-----------------------------------------------------------------------------
-# ROUTING
+blog = Blog.new
 
 get '/' do
   @posts = blog.cache
@@ -37,7 +24,7 @@ get '/' do
 end
 
 get '/post/:page' do
-  md_file = root + 'posts' + "#{params[:page]}.md"
+  md_file = ROOT + 'posts' + "#{params[:page]}.md"
 
   if md_file.exist?
     @meta = blog.cache["#{params[:page]}.md"]
@@ -60,7 +47,14 @@ end
 
 get '/:year/?:month?/?:day?' do
   @posts = blog.posts_by_date(params[:year], params[:month], params[:day])
-  slim :post_list
+  if @posts.empty?
+    status 404
+    @breadcrumbs = nil
+    @nofooter = true
+    slim :error_page
+  else
+    slim :post_list
+  end
 end
 
 not_found do
