@@ -6,8 +6,6 @@ layout: post
 category: Terraform
 ---
 
-## Pre-Ramble
-
 My friend said:
 
 > I've been building my own tooling with Terraform and Ansible. I
