@@ -350,7 +350,7 @@ Another T2000 was added as a dev/staging box. It began as a direct clone
 of live, giving the developers the chance to easily trial on a
 equivalent-to-live environment.
 
-### Releasing Code and Content
+## Releasing Code and Content
 
 As our NFS server was a single-point-of-failure, I wanted to get away
 from NFS-mounted content as much as possible. To that end I wrote a

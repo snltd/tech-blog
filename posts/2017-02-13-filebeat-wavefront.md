@@ -53,7 +53,7 @@ caps and how much bandwidth I use, and I'm alerted if any SMF
 services fail, or if there's unexpected paging.  It
 would be great to add site usage and latency to that dashboard.
 
-### Telling nginx What to Log
+## Telling nginx What to Log
 
 First off I changed my nginx log format to produce the information I
 needed.
@@ -71,7 +71,7 @@ doesn't really think in terms of "vhosts", though I habitually call
 them that.) I also log the upstream response and total request
 times.
 
-### Telling Wavefront What to Expect and What to Do With It
+## Telling Wavefront What to Expect and What to Do With It
 
 I turned on Wavefront proxy log ingestion by adding two lines
 to `wavefront.conf` and restarting the service.
@@ -163,7 +163,7 @@ second, making it trivial to find the outliers you're probably interested in.
 For high frequency data, this is what you want. The log ingestion also offers
 counters and gauges, but I think they're less useful.
 
-###  Getting Logs to Wavefront
+##  Getting Logs to Wavefront
 
 We need a log shipper which can speak
 [Lumberjack](https://github.com/elastic/logstash-forwarder/blob/master/PROTOCOL.md).
@@ -291,7 +291,7 @@ logging:
 path.data: /var/filebeat
 ```
 
-### Sexy Graph Time
+## Sexy Graph Time
 
 With Filebeat running, I put four of my sites under
 [Siege](https://www.joedog.org/siege-home/), using the `-i` option,

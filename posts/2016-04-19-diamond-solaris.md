@@ -45,7 +45,7 @@ This is a more modern approach to the same problem. It's written in
 Python, and it's very modular, so it ought to be easy to extend. But,
 it's not without problems.
 
-### Problem 1: Installing Diamond
+## Problem 1: Installing Diamond
 
 Installing Diamond on Solaris is easy:
 
@@ -60,7 +60,7 @@ dev box, but even in the age of the 2Gb base install, I am *not*
 putting GCC or Forte (God, I'm old) on machines just to install a
 single Python module
 
-### Problem 2: Nothing Works
+## Problem 2: Nothing Works
 
 Trying out the standard collectors didn't go too well. In short:
 
@@ -92,7 +92,7 @@ Well, I'm up slack alley with that lot aren't I? And there's nothing
 for ZFS, or zones, or SMF, or FMA, or pretty much anything that I
 might conceivably want to alert on.
 
-### Problem 3: Virtualization
+## Problem 3: Virtualization
 
 One of the great things about zones is that a non-global-zone (NGZ), is
 fully visible from the global. This gives you a different way to perform
@@ -125,7 +125,7 @@ stuff is a small part of the whole.
 I know a little bit of Python, and I know a bit about Solaris internals
 and the user interfaces to them. Get writing!
 
-### Solution 1: Installing Diamond -- use `tar(1)`
+## Solution 1: Installing Diamond -- use `tar(1)`
 
 To get round Python dependencies, need for a C compiler etc, I took the
 "Omnibus" approach that I use to deploy Puppet.
@@ -141,7 +141,7 @@ If I were doing this on SmartOS I'd make a proper `pkgin` package: it's
 not a lot more effort than a tarfile. IPS, though, is way too much of a
 PITA.
 
-### Solution 2: Nothing Works -- use `kstat(3kstat)`
+## Solution 2: Nothing Works -- use `kstat(3kstat)`
 
 Solaris does have a `/proc` filesystem, but it is quite a pure
 interface, only exposing `proc`ess information, rather than Linux's
@@ -263,7 +263,7 @@ implemented with things like `vmstat` and `mpstat` in mind: accurate
 into a telemetry system mandates that you fix it to timestamps.
 We're at odds, aren't we?
 
-### New Shiny! Point Tags
+## New Shiny! Point Tags
 
 I particularly like Wavefront's ability to apply any number of
 `key=value` tags to a point. This lets you build up
@@ -297,13 +297,13 @@ of the disk. "Wouldn't it be nice", I thought (knowing full well
 most tech disasters begin with just those words), to tag the points
 so you can more easily idenfity the errant disk? Which brings us to:
 
-### Problem 4: Diamond does not Understand Point Tags
+## Problem 4: Diamond does not Understand Point Tags
 
 Up to this point, I was using the OpenTSDB handler (output plugin)
 for Diamond. OpenTSDB does have a concept of tags, but they're
 different to point tags, so it was time to...
 
-### Solution 4: Write a Wavefront Handler
+## Solution 4: Write a Wavefront Handler
 
 Wavefront's wire format is, of course, clearly documented, and very
 close to OpenTSDB's, so I began with the code for the OpenTSDB
@@ -353,7 +353,7 @@ wish to use it now, you can clone from [my
 branch](https://github.com/snltd/Diamond/tree/feature/wavefront_handler),
 and if you can make it better, piggy-back off my PR.
 
-### Postscript: There is no Solution 3
+## Postscript: There is no Solution 3
 
 The observant reader (yeah, right) may have noticed that I posed
 four problems but only three solutions; the outstanding being

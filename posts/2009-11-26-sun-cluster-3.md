@@ -238,7 +238,7 @@ Veritas's fault - the technology works, if you know how to use it.)
 There's also an issue with device minor numbers and VxVM boot disks with
 Sun Cluster, which I'm not going to go into.
 
-### Post Install
+## Post Install
 
 Obiously it's always a good idea to fully patch your fresh install. Use
 [PCA](http://www.par.univie.ac.at/solaris/pca/), not the junk that Sun
@@ -477,7 +477,7 @@ it.
 Up to now we've only done normal Solaris stuff. Here's where we start to
 move into the cluster's world.
 
-### Node 01
+## Node 01
 
 Run
 
@@ -612,7 +612,7 @@ did subpath sc31-01:/dev/rdsk/c3t40d1 created for instance 7.
 And there are the DID devices I was telling you about. Once the node is
 up, we can have a look at those.
 
-### Node 02
+## Node 02
 
 Again, run `scinstall` and choose option 1. This time, we'll be adding
 this machine as a node in an existing cluster.
@@ -651,7 +651,7 @@ If you still had your `sc31-01` console open, you'd have seen the
 `cl_runtime` daemon inform you that it had seen the cluster transport
 links being created.
 
-### Final Configuration
+## Final Configuration
 
 Earlier I talked about quorum, and there being a device with a casting
 vote. We have to set that up now. Let's examine the quorum status with
@@ -1047,7 +1047,7 @@ features of the agent into a "resource" which can be used by the
 cluster.  Resource types have to be added to the framework, and they're
 all called `SUNW.`something.
 
-### Resource Groups
+## Resource Groups
 
 Resource groups are groups of resources. Got that? So, what are
 resources?  Pretty much anything that makes up a running cluster, but

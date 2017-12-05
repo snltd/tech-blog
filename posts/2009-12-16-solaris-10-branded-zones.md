@@ -110,7 +110,7 @@ Oh, here's a zones top tip. When you're SSHed into a machine and you
 `zlogin -C` doing a `~.` will terminate the SSH session, rather than the
 `zlogin`. Do `~~.` and that won't happen. Very useful that.
 
-### Update
+## Update
 
 I patched my Solaris 10 zone, and found it wouldn't boot. I also tried
 installing another zone from another source, and the `zoneadm` failed

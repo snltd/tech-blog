@@ -307,7 +307,7 @@ which identified the system's network interfaces, time zone, language
 and so-on, and the `profile`, which laid out disks and mirrors, selected
 the install cluster, and added and removed packages.
 
-### Install Manifests
+## Install Manifests
 
 The main difference between Jumpstart files and AI files is that, as
 with many things modern in Solaris, AI manifests are XML. Different
@@ -327,7 +327,7 @@ setup.
 # mkdir -p /export/ai/clients
 ```
 
-### The SC Manifest
+## The SC Manifest
 
 First we'll look at the System Configuration, or SC manifest. This is
 pretty much your `sysidcfg` equivalent, because here you define the
@@ -368,7 +368,7 @@ recommend you completely delete the `install_ipv6_interface` property
 group. If you leave it all unset, you'll get an SMF error once the
 client is installed.
 
-### AI Manifest
+## AI Manifest
 
 Now on to the biggie, the AI manifest. This is the equivalent of the
 Jumpstart `profile`.
@@ -485,7 +485,7 @@ I'm not sure yet if there's a better way to validate manifests,
 something like `svccfg validate` would be great. If you have errors
 though, you'll be shown them when you try to add the manifest.
 
-### Install Criteria
+## Install Criteria
 
 When you Jumpstart clients, the client finds out what profile to use by
 consulting the `rules.ok` table. In AI, *install criteria* map clients

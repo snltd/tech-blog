@@ -6,7 +6,7 @@ layout: post
 category: Wavefront
 ---
 
-### Previously on Twin Peaks
+## Previously on Twin Peaks
 
 After some amount of work, I have very useful Solaris-specific
 Wavefront dashboards. Most of the metrics come from
@@ -31,7 +31,7 @@ Linux `/proc` is a mess. Who knows what's in there. [Solaris
 clean, consistent, and, of course, well documented.  `man -s4 proc`
 will tell you all you need to know.
 
-### What the `/proc`?
+## What the `/proc`?
 
 You likely know that `/proc` contains one directory for each process
 in the system. The name of the directory is the PID of the process.
@@ -212,7 +212,7 @@ Between them, those two structures reveal everything I want. And,
 they're both universally accessible. So how the heck do I read a
 binary `struct` in Python?
 
-### Ruddy Python
+## Ruddy Python
 
 I'm not the biggest Python fan. I certainly don't think there's
 anything *bad* about it, but it's never "clicked" with me in the way
@@ -323,7 +323,7 @@ def proc_info(p_file, pid):
 I put all of this into a library, and went on to write the
 collector.
 
-### Collector
+## Collector
 
 The collector loops over every process in `/proc`, reading both
 `psinfo` and `usage` and turning them into a single `dict`. The
