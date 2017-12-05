@@ -16,7 +16,7 @@ pointless, circular bikeshedding about what tools we should use to
 deploy and configure our platforms.  At one point we were standing
 up boxes with Fabric, raw Cloudformation, CFNDSL, shell scripts, a
 home-grown Boto wrapper (which, to my satisfaction, pre-empted some
-of the big features in Boto 3), and *Footman*, an in-house,
+of the big features in Boto 3), and Footman, an in-house,
 supposedly cloud-agnostic tool whose lasting legacy seems to be the
 fact that a successful operation would be reported as `error:
 undefined error`. Configuration management was a little better, with
@@ -29,7 +29,8 @@ I've tried the back half of Chris' portmanteau, and found
 configuration management with Ansible rather reminded me of the old
 joke about the gynaecologist who painted  his hall through the
 letter-box. I found the logic-in-YAML config files more distasteful
-even than that. I've had a mantra for the last few years:
+even than that. Watching the Footman project flounder and fail,
+I came to the conclusion:
 
 > Infrastructure as code. Yes. Infrastructure as config file. No.
 
@@ -43,7 +44,7 @@ and clumsy way. So I'd prefer someone to be straight up, and give us
 some kind of DSL, that looks and behaves like a real language. After
 all, aren't we all supposed to be devs these days?
 
-Our client eventually standardised on CFNDSL generated
+Our client eventually standardised on CFNDSL-generated
 Cloudformation, which is a mix of code and config-file, or a mix of
 bad and worse, depending on your opinions. Most of the rest of the
 world seems to like Terraform, and even though we work in an
@@ -79,6 +80,11 @@ AWS services from a Mac, but that's been done a million times and
 I'd learn next to nothing. I'm a (reluctant) contrarian, and I'm
 going to launch SmartOS instances, from a SmartOS instance.
 
+Triton only provides compute, network, and storage services, so even
+a tiny exercise like this has some value: it still covers most of
+the things Triton can do. I won't be doing any Manta stuff here, as
+the stack
+
 ## This is SmartOS
 
 Everyone, apparently, thinks all kernels are Linux, all clouds are
@@ -103,20 +109,20 @@ To get it, we have to create the config file that will eventually
 define our infrastructure. I made a `terraform` directory, opened up
 `vi`, and declared my providers and credentials thus:
 
-```
+```json
 provider "triton" {
   account = "snltd"
-  key_id = "e7:07:82:5d:f1:47:99:4d:6c:80:52:2d:f4:0f:ec:d5"
-  url = "https://eu-ams-1.api.joyentcloud.com"
+  key_id  = "e7:07:82:5d:f1:47:99:4d:6c:80:52:2d:f4:0f:ec:d5"
+  url     = "https://eu-ams-1.api.joyentcloud.com"
 }
 ```
 
 I had to specify the `eu-ams-1` datacentre as my API endpoint,
-because the provider defaults to US east, and much like Vincent
-Vega, I've spent the last three years in Amsterdam. Note that the
-key ID is supplied as a fingerprint. This means you need `ssh-agent`
-to be running, and for it to be aware of the key. This caught me
-out, because, for no particular reason, I don't generally use
+because the provider defaults to US east, and, like Vincent Vega,
+I've spent the last three years in Amsterdam. Note that the key ID
+is supplied as a fingerprint. This means you need `ssh-agent` to be
+running, and for it to be aware of the key. This caught me out,
+because, for no particular reason, I don't generally use
 `ssh-agent`.  If you're as backward as I am, you might have to do
 something like:
 
@@ -145,13 +151,15 @@ Solaris](https://github.com/golang/go/issues/20832).  I tried
 provider.
 
 A very nice thing about Terraform is that you can use as many
-providers as you like. An obvious use for this would be to launch
-stacks in, say AWS and Azure, but providers don't have to be cloud
-platforms. The next provider I'm going to use comes from Space Ape,
-and lets you configure Wavefront alerts and dashboards as part of
-your stack. It doesn't support SmartOS out of the box, which is a
-little sad given that I banged on about it constantly when I worked
-there, but it's easy to build.
+providers as you like. An obvious use for this would be to
+simultaneously launch stacks in, say AWS and Azure, but providers
+don't have to be cloud platforms. The next provider I'm going to use
+is made by the very clever people at [Space
+Ape](https://github.com/spaceapegames/terraform-provider-wavefront),
+and it lets you configure [Wavefront](https://www.wavefront.com/)
+alerts and dashboards as part of your stack. They haven't built
+SmartOS support in, which is a little sad given that I banged on
+about it constantly when I worked there, but it's easy to build.
 
 
 ```cmd
@@ -178,7 +186,7 @@ Once it knows that, we're ready to go.
 
 With everything installed and working I was ready to write a
 configuration file describing my tiny little project: a couple of
-native SmartOS zones, a few simple firewall rules, and a two or
+native SmartOS zones, a few simple firewall rules, and two or
 three Wavefront alerts.
 
 Specifying a machine is, presumably to be more consistent with
@@ -194,9 +202,9 @@ API for a specific semantic version, or simply ask for the
 `most_recent`. Great: that's far better than hardcoding instance IDs
 (assuming we trust Joyent not to make breaking changes).  So put
 
-```
+```json
 data "triton_image" "base" {
-  name = "minimal-64"
+  name        = "minimal-64"
   most_recent = true
 }
 ```
@@ -204,7 +212,7 @@ data "triton_image" "base" {
 into the config file, and you can reference the value it fetches
 with the not *too* onerous
 
-```
+```json
 image = "${data.triton_image.base.id}"
 ```
 
@@ -220,15 +228,16 @@ instance specification for a box which runs Sinatra-based websites.
 
 ```json
 resource "triton_machine" "sinatra" {
-  name = "www-terraform"
-  package = "g4-highcpu-512M"
-  image = "${data.triton_image.base.id}"
+  name             = "www-terraform"
+  package          = "g4-highcpu-512M"
+  image            = "${data.triton_image.base.id}"
   firewall_enabled = true
-  user_script = "curl -k https://us-east.manta.joyent.com/snltd/public/bootstrap-puppet.sh | sh"
+  user_script      = "curl -k \
+                      https://us-east.manta.joyent.com/snltd/public/bootstrap-puppet.sh | sh"
 
   metadata {
     environment = "production"
-    role = "sinatra"
+    role        = "sinatra"
   }
 
   tags {
@@ -251,7 +260,7 @@ exported the alerts I needed with [the Wavefront
 CLI](https://github.com/snltd/wavefront-cli), and massaged them into
 HCL.
 
-```
+```cmd
 $ wf alert list | grep JPC
 1490980663852  CHECKING  JPC: no metrics
 1497275466684  CHECKING  JPC Failed Services
@@ -269,12 +278,12 @@ like this:
 
 ```json
 resource "wavefront_alert" "failed_services" {
-  minutes = 2
-  name = "JPC Failed Services"
-  target = "target:T0in8AtVb56Zkzlz"
+  minutes   = 2
+  name      = "JPC Failed Services"
+  target    = "target:T0in8AtVb56Zkzlz"
   condition = "ts(\"smf.svcs.maintenance\", env=production)"
-  severity = "SMOKE"
-  tags = [ "JPC" ]
+  severity  = "SMOKE"
+  tags      = [ "JPC" ]
 }
 ```
 
@@ -334,9 +343,9 @@ It wasn't *quite* a copy-and-paste job to get the rules into
 Terraform, as it's very finnicky about quoting. For instance, that
 first rule has to be phrased *exactly* thus:
 
-```
+```json
 resource "triton_firewall_rule" "http" {
-  rule = "FROM any TO tag \"triton.cns.services\" = \"www\" ALLOW tcp PORT 80"
+  rule    = "FROM any TO tag \"triton.cns.services\" = \"www\" ALLOW tcp PORT 80"
   enabled = true
 }
 ```
@@ -383,15 +392,15 @@ in Github, but obviously I don't want my secrets there. I don't need
 something as heavy-duty as [Vault](https://www.vaultproject.io/), so
 I put the following into my spec.
 
-```
+```json
 variable "wf_token" {}
 ...
 resource "triton_machine" "wavefront-proxy" {
 ...
   metadata {
     environment = "production"
-    role = "wavefront-proxy"
-    wf_token = "${var.wf_token}"
+    role        = "wavefront-proxy"
+    wf_token    = "${var.wf_token}"
   }
 ...
 }
@@ -404,7 +413,7 @@ documentation, and it took me ages to work it out.
 In a file called `sysdef.auto.tfvars` (my main spec file is called
 `sysdef.tf`) I define the variable,
 
-```
+```json
 wf_token = "---REDACTED---"
 ```
 
@@ -416,13 +425,13 @@ the process memory, with the token in. Nothing's perfect, especially
 when it comes to secrets.
 
 So long as `sysdef.auto.tfvars` is kept safe, and not committed to
-Git, our secrets stay secret. Right? Everythin else is
+Git, our secrets stay secret. Right? Everything else is
 version-controlled and we're golden.
 
 Well, no. Because there's one so far unmentioned problem Terraform
 has to deal with.  Developers of a particularly modern sensibility
-might wish to retreat to a safe space,
-because I'm about to drop a trigger word.
+might wish to retreat to a safe space, because I'm about to drop a
+trigger word.
 
 State.
 
@@ -458,6 +467,14 @@ me. But if you were a team of a dozen people, making regular changes
 to a complex infrastructure, you'd need something far more
 sophisticated.
 
+I can't get away from the thought that this model gives too much
+scope for disaster: that is, for losing, corrupting, or getting
+conflicts in the state file so it no longer reflects reality. This
+isn't a worry I've ever had with Cloudformation. (So long as people
+aren't tweaking things in the console after you've done a deploy,
+but that applies equally to Terraform and everything else. You can't
+be protected from that level of recklessness.)
+
 ## Nothing's Ever Simple is It?
 
 The files I'd made by now were fine for standing up the stack in a
@@ -476,7 +493,7 @@ across stacks, and symlinked it into the stack directories. I put
 the stack colour a variable (in `colour.auto.tfvars`) and added a
 stack-specific name to the instance resources:
 
-```
+```json
 name = "www-${var.colour}"
 ```
 
@@ -502,25 +519,141 @@ non-identifiable network rules. This goes up first, and the
 application stacks sit alongside, or on top of it, depending on your
 point of view. This works well enough
 
+## Something's Been Bothering Me
+
+I don't like this local storage thing. It's asking for trouble. And
+what if this website suddenly takes off to the point that I have to
+hire a team of crack SREs to keep it running? I should use a proper
+backend. We should all use a proper backend.
+
+If you looked at  the list of Terraform backends above, you'd have
+seen there's [one for
+Manta](https://www.terraform.io/docs/backends/types/manta.html).  We
+don't need to compile it. We don't even need to `init` it.  it's
+built into the core `terraform` binary.
+
+The `base` stack is easy: I just added this:
+
+```json
+terraform {
+  backend "manta" {
+    path       = "terraform"
+    objectName = "sysdef.base.tfstate"
+  }
+}
+```
+
+and made the remote directory I defined in it.
+
+```cmd
+$ mmkdir ~~/stor/terraform
+```
+
+For obvious reasons, the backend assumes your path is under
+`~~/stor`, which is your private storage area. Therefore, you're
+going to need credentials In addition to the usual creds needed for
+the `mmkdir` command to work, I also had to declare
+`MANTA_KEY_MATERIAL` in my shell. Its value is the path to the SSH
+key I use to access Manta. It seems the backend can't pick the key
+up via `ssh-agent` like the `triton` provider can.
+
+Running `terraform plan` told me there was no remote state, and
+asked if I wanted to take the local copy and upload it. I did.
+Sweet.
+
+I said the base was the simplest stack. If you recall, the blue and
+green stacks use the same configuration, one being a symlink. All
+stack-specifics are put in through the `${var.colour}` variable. So
+the obvious thing to do is pop this into `sysdef.tf`
+
+```json
+terraform {
+  backend "manta" {
+    path       = "terraform"
+    objectName = "sysdef.${var.colour}.tfstate"
+  }
+}
+```
+
+Obivious, right? And like most obvious things, it doesn't work.
+
+```cmd
+$ terraform plan
+Failed to load backend: Error loading backend config: 1 error(s)
+occurred:
+
+* terraform.backend: configuration cannot contain interpolations
+The backend configuration is loaded by Terraform extremely early, before
+the core of Terraform can be initialized. This is necessary because the
+backend dictates the behavior of that core. The core is what handles
+interpolation processing. Because of this, interpolations cannot be
+used in backend configuration.
+
+If you'd like to parameterize backend configuration, we recommend
+using partial configuration with the "-backend-config" flag to
+"terraform init".
+...
+```
+
+Wow. Whoever writes error messages needs to have a word with whoever
+writes them for Terraform, because that is great. I looked up
+`-backend-config` ([single-dash long
+options are wrong
+btw](https://twitter.com/no_identifier/status/902508998003482624)),
+and it was plain all I had to do was
+delete the `objectName` property from the `backend` definition,
+then re-initialize the stack directories.
+
+```cmd
+$ pwd
+/home/rob/work/terraform/green
+$ terraform init -plugin-dir=$GOPATH/bin \
+  -backend-config="objectName=sysdef.green.tfstate"
+Initializing the backend...
+Do you want to copy state from "local" to "manta"?
+...
+$ cd ../blue
+$ terraform init -plugin-dir=$GOPATH/bin \
+  -backend-config="objectName=sysdef.blue.tfstate"
+Initializing the backend...
+...
+```
+
+That creates, in both directories, a `.terraform/terraform.tfstate`
+file, which contains the full backend configuration. There's no need
+to reference it explicitly. Check the remote:
+
+```cmd
+$ mls -l ~~/stor/terraform/
+-rwxr-xr-x 1 snltd          2867 Feb 25 13:28 sysdef.base.tfstate
+-rwxr-xr-x 1 snltd         13630 Feb 25 13:42 sysdef.blue.tfstate
+-rwxr-xr-x 1 snltd           317 Feb 25 13:42 sysdef.green.tfstate
+```
+
+remove the local state files, and rest easy.
+
 ## So?
 
-My considered professional opinion on Terraform puts it in the top
-corner of the "err, yeah, it's okay, but it feels a bit hacky and
-I'm not that sure how much I trust it" quadrant.
+My considered professional opinion on Terraform puts somewhere near
+the top corner of Gartner's "err, yeah, it's okay, and some things
+are really nice but it also feels a bit hacky and I'm not that sure
+how much I trust it" quadrant.
 
 Truth is, much as I frequently find myself hating it, Cloudformation
-is miles ahead in the infrastructure-as-config-file world.
+is miles ahead of anything else in the infrastructure-as-config-file
+world. For the massive sprawl of AWS -- and assuming all my stuff
+was in AWS -- I wouldn't use anything else.
 
 Triton is not like AWS. It has very few services, and very few
 resource types, to the point that a single, small, Terraform
-provider covers them all. I'd like to see a dedicated
-Clouformation-style infrastrucutre builder offered as a service.
-Perhaps it could be Terraform, with the state stored in Triton, with
-a tighter coupling to what's really there, rather than what
-Terraform's state file says is there.
+provider covers them all. This makes infrastructure definition far
+simpler, and I'd like to see a dedicated Clouformation-style
+infrastructure building service in Triton.  Perhaps it could be
+Terraform, the state stored by Joyent, with a tighter coupling to
+what's really there, rather than what Terraform's state file says is
+there.
 
-I've been dusing the "triple-stack" approach for a few months now,
+I've been running my "triple-stack" approach for a few months now,
 and it works just fine. Because my stacks are so tiny, it doesn't
-save me any work, and, honestly, it's a grossly over-engineered
-solution. But it's given me some learning, and that's never a bad
-thing.
+save me any work, and clearly it's grossly over-engineered.
+But, it's given me some learning, and that's never a bad thing.

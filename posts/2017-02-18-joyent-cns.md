@@ -23,7 +23,8 @@ interactions in this little walk-through will use [the `triton`
 CLI](https://github.com/joyent/node-triton). This is a nice,
 intuitive tool with a clearly thought-out interface. It's simpler to
 use than `aws`, but that might just be because Joyent's cloud is
-nowhere near so featureful as Amazon's.
+nowhere near so featureful as Amazon's. And because it does't have
+`--filters`.
 
 
 ```cmd
@@ -79,11 +80,11 @@ $ triton instance get wavefront-proxy | json 'dns_names'
 either the name you give them, or the unique start of their UUID.)
 
 You can see the instance has six DNS names, all of which contain
-`4c19787d-405b-477a`. This is my account ID, truncated it for
-formatting reasons.
+`4c19787d-405b-477a`. This is an account ID. (Real account IDs are
+longer: this one doesn't mess up my formatting.)
 
 The `.joyent.com` names resolve to the box's internal address, and
-the `.triton.zone` ones to its external address, and let me easily
+the `.triton.zone` ones to its external address, and they
 refer to, in increasing order of scope,  that specific instance; any
 instance with that name (which will be the same if I kill that one
 and build another); or any instance with that tag, of which I may
@@ -98,16 +99,39 @@ $ dig +short wavefront.svc.4c19787d-405b-477a.eu-ams-1.triton.zone
 37.153.111.77
 ```
 
-There is a potential problem in that the name may resolve before the
-service running on the host is fully up. But you've written your
-services defensively, right? So that won't be a problem?
+There is a potential problem in that the DNS name may resolve, and
+be in the maps, before the service running on the host is fully up.
+But you've written your applications defensively, right? So that
+won't be a problem?
 
-I can also use these tags in my firewall rules, so it's simple to
-allow all my instances to talk to anything with the `wavefront` tag
-on port 2878, or give all `app` instances access to `redis`
-instances on 6379.
+## Real DNS
 
-It's not a replacement for Consul, but it's good enough for my
-needs, and would still be good enough if my requirements were
-significantly more complicated. And it's all built on top of proven
-technology that we all understand.
+My webserver hosts have the `www` tag, and in my public DNS I have
+`www.sysdef.xyz` as a `CNAME` to the `www.svc.4c19787d-405b...`
+name. So, I never need to touch DNS: no need for jiggery-pokery in
+my Terraform config, or API calls as part of my launch script, or
+code registering instances from the Chef index, or any of that
+nonsense. I stand something up, with the right tag, and it goes
+live.
+
+The final DNS piece is an [NS1](https://ns1.com/)'s `ALIAS` to link
+the naked domain name to the `www.` `CNAME`.
+
+## Firewall Rules
+
+The proxies, obviously, are not accessible on their public addresses.
+
+Tags can also be referenced by cloud firewall rules, so it's simple
+to allow all my instances to talk to anything with the `wavefront`
+tag on port 2878, or give all `app` instances access to `redis`
+instances on 6379. Again, tag the instance, and it all happens.
+
+I originally ended the last paragraph with "magic happens", but it's
+not magic: what's happening is obvious, and simple, and that's what
+I like CNS so much.
+
+CNS is not a replacement for Consul, but it's an answer to the
+problem of service discovery, which all some people use Consul for.
+It's good enough for my needs, and would still be good enough if
+those needs were significantly more complicated. And it's all built
+on top of proven technology that we all understand.
