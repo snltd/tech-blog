@@ -166,8 +166,8 @@ ul.post_list {
 
 
 blockquote {
-  font-style: italic;
-  padding-bottom: 1em;
+  border: 1px solid #ddd;
+  padding: 1em;
 }
 
 

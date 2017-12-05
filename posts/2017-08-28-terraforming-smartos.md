@@ -11,13 +11,13 @@ category: Terraform
 My friend said:
 
 > I've been building my own tooling with Terraform and Ansible. I
-> call it "Terrible"*.
+> call it "Terrible".
 
 I loved that. For context, the team we worked in had been mired in
 pointless, circular bikeshedding about what tools we should use to
 deploy and configure our platforms.  At one point we were standing
 up boxes with Fabric, raw Cloudformation, CFNDSL, shell scripts, a
-home-grown Boto wrapper (which, to my satisfaction, pre-empted many
+home-grown Boto wrapper (which, to my satisfaction, pre-empted some
 of the big features in Boto 3), and *Footman*, an in-house,
 supposedly cloud-agnostic tool whose lasting legacy seems to be the
 fact that a successful operation would be reported as `error:
@@ -37,11 +37,13 @@ even than that. I've had a mantra for the last few years:
 
 This comes from using all the technologies listed above. If you want
 to put six web servers behind a load-balancer, a config file might
-just about describe it. Go much beyond that though, and you need to start
-putting variables into your config file, and references, and
-possibly ordering, and conditions, and templating. By that point, what you've got is
-effectively code, but expressed in a very forced and clumsy way. So I'd prefer someone to be straight up, and give us some kind of DSL,
-that looks and behaves like a real language. After all, aren't we all supposed to be devs these days?
+just about describe it. Go much beyond that though, and you need to
+start putting variables into your config file, and references, and
+possibly ordering, and conditions, and templating. By that point,
+what you've got is effectively code, but expressed in a very forced
+and clumsy way. So I'd prefer someone to be straight up, and give us
+some kind of DSL, that looks and behaves like a real language. After
+all, aren't we all supposed to be devs these days?
 
 Our client eventually standardised on CFNDSL generated
 Cloudformation, which is a mix of code and config-file, or a mix of
@@ -54,9 +56,9 @@ mean use in some real sense, rather than following through one
 elementary blog post. (Like this.)
 
 My little pet projects, for the time being, use Puppet for their
-config-management. The infrastructure, which runs on SmartOS VMs in Joyent's
-"Triton" cloud, was originally deployed by a couple of extremely
-simple shell scripts which wrap commands rather like this:
+config-management. The infrastructure, which runs on SmartOS VMs in
+Joyent's "Triton" cloud, was originally deployed by a couple of
+extremely simple shell scripts which wrap commands rather like this:
 
 ```cmd
 $ triton create \
@@ -116,7 +118,7 @@ because the provider defaults to US east, and much like Vincent
 Vega, I've spent the last three years in Amsterdam. Note that the
 key ID is supplied as a fingerprint. This means you need `ssh-agent`
 to be running, and for it to be aware of the key. This caught me
-out, because, for no particularly good reason, I don't generally use
+out, because, for no particular reason, I don't generally use
 `ssh-agent`.  If you're as backward as I am, you might have to do
 something like:
 
@@ -171,17 +173,19 @@ $ terraform init -plugin-dir=$GOPATH/bin
 ...
 ```
 
-The final command tells Terraform where to look for its providers. Once it knows that, we're ready to go.
+The final command tells Terraform where to look for its providers.
+Once it knows that, we're ready to go.
 
-## This is So Easy
+## This is Brilliant -- So Easy!
 
 With everything installed and working I was ready to write a
 configuration file describing my tiny little project: a couple of
-native SmartOS zones, a few simple firewall rules, and a two or three Wavefront alerts.
+native SmartOS zones, a few simple firewall rules, and a two or
+three Wavefront alerts.
 
 Specifying a machine is, presumably to be more consistent with
-Terraform standard practice, slightly different to the way to you do it
-with the `triton` CLI.
+Terraform standard practice, slightly different to the way to you do
+it with the `triton` CLI.
 
 The last two arguments to the `triton` command near the top of the
 page are the short UUID for the image and the package. "image" is
@@ -240,11 +244,14 @@ resource "triton_machine" "sinatra" {
 ```
 
 You can put comments in Terraform configuration files, but surely
-there's no need in any of that? Terraform config is written in Hashicorp Configuration Language. In my opinion "language" flatters it. It's
-tarted up JSON with variables and references.
+there's no need in any of that? Terraform config is written in
+Hashicorp Configuration Language. In my opinion "language" flatters
+it. It's tarted up JSON with variables and references.
 
-Creating Wavefront alerts was even simpler than making instances. I exported the alerts I needed
-with [the Wavefront CLI](https://github.com/snltd/wavefront-cli), and massaged them into HCL.
+Creating Wavefront alerts was even simpler than making instances. I
+exported the alerts I needed with [the Wavefront
+CLI](https://github.com/snltd/wavefront-cli), and massaged them into
+HCL.
 
 ```
 $ wf alert list | grep JPC
@@ -254,10 +261,13 @@ $ wf alert list | grep JPC
 $ wf alert describe -f yaml 1497275466684
 ```
 
-YAML is close enough to HCL that a bit of quick seddage converts it. HCL accepts raw JSON (which the CLI can produce), but I wasn't certain whether the provider would.
-In any event, I also had to delete most of the exported fields. Some can't be used in a Wavefront API create operation
-(`id`) others aren't yet supported by the provider (`description`).
-The "failed services" alert ended up like this:
+YAML is close enough to HCL that a bit of quick seddage converts it.
+HCL accepts raw JSON (which the CLI can produce), but I wasn't
+certain whether the provider would.  In any event, I also had to
+delete most of the exported fields. Some can't be used in a
+Wavefront API create operation (`id`) others aren't yet supported by
+the provider (`description`).  The "failed services" alert ended up
+like this:
 
 ```json
 resource "wavefront_alert" "failed_services" {
@@ -270,24 +280,26 @@ resource "wavefront_alert" "failed_services" {
 }
 ```
 
-You have to supply at least one tag. Omitting the field or using an empty array produced an error. I'm not sure if this is the
-fault of the provider or the API, but you should be tagging anyway,
-so just do it.
+You have to supply at least one tag. Omitting the field or using an
+empty array produced an error. I'm not sure if this is the fault of
+the provider or the API, but you should be tagging anyway, so just
+do it.
 
 The `target` in that block is a pre-existing alert target which uses
 a webhook to write to a Slack channel. You can (and obviously
-should!) create alert targets with the provider. Just make a resource and define it with HCL.
+should!) create alert targets with the provider. Just make a
+resource and define it with HCL.
 
 We're cooking now: stack, alerts, dashboards, everything. This is
 brillant, right? Zero effort!
 
-## This is Harder than I Thought
+## Hang On, this is Harder than I Thought
 
-When we defined the instance we set `firewall_enabled = true`. Triton doesn't
-have IAM and security groups, which is good because it means you
-don't have to deal with IAM and security groups. But it's bad
-because there's less power. (For a start, you don't have instance
-roles, which are great.)
+When we defined the instance we set `firewall_enabled = true`.
+Triton doesn't have IAM and security groups, which is good because
+it means you don't have to deal with IAM and security groups. But
+it's bad because there's less power. (For a start, you don't have
+instance roles, which are great.)
 
 Instead, Triton has its cloud firewall. Cloud firewall rules are
 quite nice. They're flexible, and they're obvious to anyone with any
@@ -298,13 +310,14 @@ groups so long as I don't think about them too much. When I start
 thinking, I overthink, and convince myself they don't work how I
 think they work. But I digress.
 
-The Terraform SmartOS provider takes the lazy, but sensible shortcut of
-having you define your cloud firewall rules  with native
+The Terraform SmartOS provider takes the lazy, but sensible shortcut
+of having you define your cloud firewall rules  with native
 [CloudAPI](https://docs.joyent.com/public-cloud/network/firewall/cloud-firewall-rules-reference)
-data, rather than providing, say, native `from` and `to` attributes in the way the Wavefront provider does. I
-originally made my firewall rules through the UI, but getting the
-raw CloudAPI data was easy. I've folded the last line to stop it
-overflowing the right margin.
+data, rather than providing, say, native `from` and `to` attributes
+in the way the Wavefront provider does. I originally made my
+firewall rules through the UI, but getting the raw CloudAPI data was
+easy. I've folded the last line to stop it overflowing the right
+margin.
 
 ```cmd
 $ triton fwrule list
@@ -359,15 +372,18 @@ what matters now.
 Notice the final firewall rule above, which allows metrics and logs
 through to a [Wavefront
 proxy](http://sysdef.xyz/post/2016-03-30-wavefront-solaris). The
-proxy host also gets a `triton_machine` definition much like the one we saw
-before. But, it needs a secret: the token which the proxy uses to
-connect to the Wavefront server. Yep. We're distributing secrets. I'm using Puppet, so I could use something like hiera-eyaml-gpg, but I
-would prefer the token to be made available to the host as metadata. On SmartOS, Puppet automatically exposes all metadata pairs as facts.
+proxy host also gets a `triton_machine` definition much like the one
+we saw before. But, it needs a secret: the token which the proxy
+uses to connect to the Wavefront server. Yep. We're distributing
+secrets. I'm using Puppet, so I could use something like
+hiera-eyaml-gpg, but I would prefer the token to be made available
+to the host as metadata. On SmartOS, Puppet automatically exposes
+all metadata pairs as facts.
 
-Being a by-the-book SRE, I want to keep my Terraform configuration in Github, but obviously I
-don't want my secrets there. I don't need something as heavy-duty as
-[Vault](https://www.vaultproject.io/), so I put the following into
-my spec.
+Being a by-the-book SRE, I want to keep my Terraform configuration
+in Github, but obviously I don't want my secrets there. I don't need
+something as heavy-duty as [Vault](https://www.vaultproject.io/), so
+I put the following into my spec.
 
 ```
 variable "wf_token" {}
@@ -402,7 +418,8 @@ the process memory, with the token in. Nothing's perfect, especially
 when it comes to secrets.
 
 So long as `sysdef.auto.tfvars` is kept safe, and not committed to
-Git, our secrets stay secret. Right? Everythin else is version-controlled and we're golden.
+Git, our secrets stay secret. Right? Everythin else is
+version-controlled and we're golden.
 
 Well, no. Because there's one so far unmentioned problem Terraform
 has to deal with.  Developers of a particularly modern sensibility
@@ -434,16 +451,16 @@ plaintext.
 
 Terraform has a bunch of
 [backends](https://www.terraform.io/docs/backends/types/index.html)
-which will take away the misery of storing state. Different backends
-will suit different needs, and my needs couldn't be simpler. I'm the
-only person working on a tiny stack. ZFS gives me a versioned
-filesystems, and my workspace is automatically backed up to Manta.
-Losing the state file, frankly, doesn't much matter to me. But if
-you were a team of a dozen people, making regular changes to a
-sprawling, complex infrastructure, you'd need something far more
+which at least promise to take away the misery of storing state.
+Different backends will suit different needs, and my needs couldn't
+be simpler. I'm the only person working on a tiny stack. ZFS gives
+me a versioned filesystems, and my workspace is automatically backed
+up to Manta.  Losing the state file, frankly, doesn't much matter to
+me. But if you were a team of a dozen people, making regular changes
+to a complex infrastructure, you'd need something far more
 sophisticated.
 
-## Nothing's Ever Simple
+## Nothing's Ever Simple is It?
 
 The files I'd made by now were fine for standing up the stack in a
 single-shot. But I regularly destroy and recreate instances, and I
