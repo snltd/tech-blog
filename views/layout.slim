@@ -3,18 +3,17 @@ html lang='en'
   head
     meta charset='utf-8'
     title sysdef
-    link href='http://fonts.googleapis.com/css?family=Roboto+Slab:300,700' rel='stylesheet'
-    link href='http://fonts.googleapis.com/css?family=Roboto+Mono:300,700' rel='stylesheet'
+    link href='http://fonts.googleapis.com/css?family=Lato:400,700|Lora:400,400i' rel='stylesheet'
+    link href='https://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet'
     link href='/css/main.css' rel='stylesheet'
     link href='/css/error_page.css' rel='stylesheet'
     link href='/css/solarized.css' rel='stylesheet'
   body
     #container
 
-      #brand_logo
-        | sysdef
-      #brand_strapline
-        | &mdash; modern ops stuff &mdash;
+      #header
+        #brand_logo
+          | $ sysdef_
 
       #body_copy
         == yield
