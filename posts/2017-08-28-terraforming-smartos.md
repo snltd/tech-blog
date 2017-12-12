@@ -82,8 +82,9 @@ going to launch SmartOS instances, from a SmartOS instance.
 
 Triton only provides compute, network, and storage services, so even
 a tiny exercise like this has some value: it still covers most of
-the things Triton can do. I won't be doing any Manta stuff here, as
-the stack
+the things Triton can do. I won't be doing any Manta (object
+storage) stuff here as the stack doesn't do anything with it.
+(Though it fetches a pre-existing bootstrap script from there.)
 
 ## This is SmartOS
 
