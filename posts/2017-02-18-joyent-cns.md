@@ -159,9 +159,9 @@ world, Triton uses what it calls a "Cloud Firewall". Like a normal
 firewall, it lets you define rules base around `FROM`, and `TO`. My
 Wavefront proxies, obviously should not be accessible to the outside
 world. (I probably should put everything on a private subnet, but
-that's for another article.) For now I shall a rule that says "let
+that's for another article.) For now I shall make a rule that says "let
 all my instances talk to the Wavefront proxies on 2878 and 5044".
-And it looks as simple as this:
+And it looks like this:
 
 ```
 FROM all vms TO tag "triton.cns.services" = "wavefront" ALLOW tcp (PORT 2878 AND PORT 5044)
