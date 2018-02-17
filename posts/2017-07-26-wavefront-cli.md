@@ -6,9 +6,6 @@ layout: post
 category: Wavefront
 ---
 
-> **Note**: This page gets updated from time to time, as the CLI
-> acquires new features.
-
 The [Wavefront](https://wavefront.com) console is excellent, and its
 API coverage is complete and simple to use. At my client's
 site, we put *everything* in Wavefront, and actively use the data
@@ -16,12 +13,11 @@ for alerts, webhooks, and other automated behaviour. The easier it
 is to do this, the more it will be done, and the more benefit we all
 get.
 
-There is already [a Wavefront
-CLI and Ruby SDK](https://github.com/wavefrontHQ/ruby-client), to
-which I was a core contributor. But that tool uses API version 1,
-which is somewhat limited. It's also, because it evolved in a "we
-have a problem right now - fix it!" kind of way, it's a bit messy
-and WET.
+There is already [a Wavefront CLI and Ruby
+SDK](https://github.com/wavefrontHQ/ruby-client), to which I was a
+core contributor. But that tool uses API version 1, which is
+somewhat limited. It's also, because it evolved in a "we have a
+problem right now - fix it!" kind of way, it's a bit messy and WET.
 
 As Wavefront's API uses [Swagger](https://swagger.io/) it is pretty
 easy to generate an SDK for whatever language you like. But I find
@@ -36,6 +32,9 @@ which Swagger would not have done.
 Built on top of the SDK is a new [Wavefront
 CLI](https://github.com/snltd/wavefront-cli), which I'm going to run
 through in this article.
+
+> **Note**: This page gets updated from time to time, as the CLI
+> acquires new features.
 
 ## Installation and Basics
 
@@ -98,6 +97,10 @@ $ wf alert --help
 Usage:
   wf alert list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-l] [-f format] [-o offset] [-L limit]
+  wf alert firing [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-o offset] [-L limit]
+  wf alert snoozed [-DnV] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-o offset] [-L limit]
   wf alert describe [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-v version] <id>
   wf alert delete [-DnV] [-c file] [-P profile] [-E endpoint]
