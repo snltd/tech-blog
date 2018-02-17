@@ -6,6 +6,9 @@ layout: post
 category: Wavefront
 ---
 
+> **Note**: This page gets updated from time to time, as the CLI
+> acquires new features.
+
 The [Wavefront](https://wavefront.com) console is excellent, and its
 API coverage is complete and simple to use. At my client's
 site, we put *everything* in Wavefront, and actively use the data
@@ -460,6 +463,28 @@ an indefinitely snoozed alert.
 ```cmd
 $ wf alert unsnooze 1497276280057
 ```
+
+I get a bit paranoid about having missed a firing alert, so I
+sometimes run the CLI just to double-check I haven't missed a
+notification. To make my life marginally simpler I added a `firing`
+command.
+
+```cmd
+$ wf alert firing
+1459508340708  Point Rate  2018-02-17 01:47:39.929
+```
+
+Good job I did. I'm over my allocated point rate! I also like to be
+able to check that no one has been snoozing alerts instead of fixing
+them.
+
+```cmd
+$ wf alert snoozed
+1489162558204  Zpool usage  2017-11-17 11:03:12.922
+```
+
+Ooh, some cheeky so-and-so has used up all the disk space and
+silenced the alert so I didn't find out!
 
 ## Dashboards, Proxies, and Sources
 
