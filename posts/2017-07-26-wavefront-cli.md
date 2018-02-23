@@ -838,11 +838,15 @@ brevity.)
 ```cmd
 $ wf query --help
 Usage:
+  wf query aliases [-DV] [-c file] [-P profile]
   wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-g granularity] [-s time] [-e time] [-f format] [-ivO] [-S mode]
           [-N name] [-p points] <query>
   wf query raw [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-H host] [-s time] [-e time] [-f format] <metric>
+  wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-g granularity] [-s time] [-e time] [-f format] [-ivO] [-S mode]
+          [-N name] [-p points] <query>
 
 Options:
   -g, --granularity=STRING     query granularity (d, h, m, or s)
@@ -911,7 +915,6 @@ $ wf query raw 'lab.dev.host.nfs.server.v4.read' -H shark -s 13:00 -e 13:01
              12:00:36.000    127493.0
              12:00:46.000    127493.0
              12:00:56.000    127493.0
-
 ```
 
 Start and end times don't have to be absolute. As of version 2.1.0
@@ -925,6 +928,37 @@ calendar changes.
 You can specify future times as `+2.5h` or similar. This is useful
 for maintenance windows, but if you try to see into the future on a
 query, the Wavefront API will, not unreasonably, throw an exception.
+
+Imagine if you got a bit obsessive over running that NFS query.
+You'd soon get tired of typing it in, and remembering to balance the
+brackets and the quotes. Handily, `wf` lets you "alias" commonly
+used queries. To set up an alias called `nfs` for the above query,
+you would add this to the relevant stanza of your `~/.wavefront`
+file.
+
+```
+q_nfs = deriv(ts("lab.dev.host.nfs.server.v4.read"))
+```
+
+Then to run the query (with default granularity and time windowing)
+you'd just do
+
+```cmd
+$ wf query run nfs
+...
+```
+
+You can, of course, specify all the normal query options with an
+alias. The syntax, as I'm sure you noticed, is that the alias name
+you'd use must be prefixed with `q_`. This is a workaround for the
+limitations of INI files, which don't let you nest sections.
+
+To see what aliases you have configured, you can just run
+
+```cmd
+$ wf query aliases
+nfs
+```
 
 ## Write
 
