@@ -224,6 +224,11 @@ $ wf alert search status=SNOOZED
 1481553823153  SNOOZED
 $ wf alert search status=SNOOZED name~' '
 1481553823153  SNOOZED  JVM Memory
+$ wf alert search status=SNOOZED name~' '
+1481553823153  SNOOZED  JVM Memory
+$ wf alert search tags=CLS name~
+1463135909875  [["customerTags", ["CLS"]]]  Fluentd Overflow
+1460546172048  [["customerTags", ["CLS"]]]  Logging Snapshot Failure
 ```
 
 Getting more detail is best done in a more targeted way. Let's have
