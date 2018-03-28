@@ -990,6 +990,9 @@ $ wf write point cli.example 10
         unsent 0
 ```
 
+You can turn off the summary by supplying `-q` (for "quiet"), but it
+will still be printed if there are any rejected or unsent points.
+
 If you don't specify a timestamp, it's stamped "now". But you can
 specify one if you want, again, in any parseable format. You can
 specify any number of point tags, too.
