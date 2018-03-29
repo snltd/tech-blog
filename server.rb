@@ -39,6 +39,28 @@ get '/post/:page' do
   end
 end
 
+# quick and nasty hack to get a drafts page up XXX FIXME
+#
+get '/drafts/:page' do
+  md_file = ROOT + 'drafts' + "#{params[:page]}.md"
+
+  if md_file.exist?
+    @meta = blog.parse_file(md_file).first
+    @meta = Hash[@meta.map{ |k, v| [k.to_sym, v] }]
+
+    @meta[:date] = Date.strptime(@meta[:date])
+
+    raw = blog.parse_file(md_file).last
+    @content = Kramdown::Document.new(raw, kramdown_options).to_html
+    @posts = blog.cache
+    @tags = blog.tags[0..9]
+    slim :post
+  else
+    status 404
+    slim :error_page
+  end
+end
+
 get '/tag/:tag' do
   @posts = blog.posts_by_tag(params[:tag])
   @tag = params[:tag]
