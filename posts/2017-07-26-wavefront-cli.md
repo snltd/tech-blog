@@ -1039,10 +1039,11 @@ $ while true; do echo $RANDOM; sleep 0.1; done | \
 id="wavefront-embedded-hGympnPMv9" width="700"
 height="300"></script>
 
-There's a more in-depth look at the `write` command
-[here](http://sysdef.xyz/post/2016-07-21-wavefront_writer). Though
-that was written for a previous version of the CLI, the interface
-remains the same.
+You can substitute `write` for `report`, and send metrics directly
+to Wavefront, bypassing your proxies. I've written [a separate
+article which looks more closely at sending
+metrics](/post/2018-08-08-wavefront-writer), and that's one of the
+topics it covers.
 
 ## End
 
