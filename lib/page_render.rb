@@ -22,7 +22,7 @@ def display_page(md_file, metadata_cache)
   @tags    = POSTS.top_tags
   @content = BlogPostReader.new(md_file).as_html
   slim :post
-rescue
+rescue StandardError
   status 500
   slim :'500'
 end

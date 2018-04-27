@@ -19,10 +19,9 @@ class BlogPostReader
   #
   def parse(file)
     return nil unless file.is_a?(Pathname) && file.exist?
-
     parts = IO.read(file).split(/^---$/, 3)
-
-    return [YAML.safe_load(parts[1], [Date]).to_hash, parts.last] if parts.size == 3
+    raise StandardError unless parts.size == 3
+    [YAML.safe_load(parts[1], [Date]).to_hash, parts.last]
   rescue StandardError
     LOG.error "could not parse #{file}."
     raise

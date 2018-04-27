@@ -14,6 +14,8 @@ KRAMDOWN_OPTS = { input:              'GFM',
                   syntax_highlighter: 'rouge',
                   hard_wrap:          false }.freeze
 
+# Modularized application
+#
 class WebApp < Sinatra::Base
   set :root, ROOT
 

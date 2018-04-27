@@ -17,15 +17,14 @@ RuboCop::RakeTask.new(:rubocop) do |t|
 end
 
 desc 'build gem'
-#task :build => :test do
+# task :build => :test do
 task :build do
-  version = gem_version
   puts "building gem version #{gem_version}"
   `gem build #{ROOT + 'meetup-generator.gemspec'}`
 end
 
 desc 'push to Gemfury'
-task :push => :build do
+task push: :build do
   if ENV['TRAVIS'] == 'true' && ENV['TRAVIS_BRANCH'] == 'master'
     puts 'Pushing to Gemfury'
     `curl --fail -vF package=@#{GEM} \
@@ -36,4 +35,3 @@ task :push => :build do
     abort 'Only Travis can push. You will have to upload manually.'
   end
 end
-

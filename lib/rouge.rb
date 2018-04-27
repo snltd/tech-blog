@@ -1,11 +1,15 @@
+# rubocop:disable Lint/AmbiguousRegexpLiteral
 require 'rouge'
-
+#
 # Mostly Solaris-specific extensions to the Rouge syntax-colouring
 # library. These are crude first attempts, hacked into working as I
 # find more edge cases.
 #
 module Rouge
   module Lexers
+    #
+    # Highlight DTrace scripts
+    #
     class DTrace < RegexLexer
       title 'DTrace'
       desc 'The DTrace dynamic tracing language'
@@ -33,7 +37,7 @@ module Rouge
       state :root do
         rule /\s+/, Text::Whitespace
         rule /%(s|d)/, Str::Interpol
-        rule /[~^*!%&\[\](){}<>\|+=:;,.\/?-]/, Operator
+        rule %r{[~^*!%&\[\](){}<>\|+=:;,.\/?-]}, Operator
         rule /^(\S*)(:)(\S*)(:)(\S*)(:)(\S*)$/ do |_m|
           groups Name::Class, Punctuation, Name::Class, Punctuation,
                  Name::Class, Punctuation, Name::Class, Punctuation
@@ -52,24 +56,28 @@ module Rouge
       end
     end
 
+    # Highlighting for Solaris Jumpstart profiles
+    #
     class JumpstartProfile < RegexLexer
       title 'Jumpstart Profile'
       desc 'profiles for Solaris Jumpstarts'
       tag 'jsprof'
 
       state :root do
-        rule /\/\w*$|swap$/, Name::Constant
+        rule %r{\/\w*$|swap$}, Name::Constant
         rule /^\w+/, Keyword
         rule /SUNW\w+/, Str
         rule /c\d+t\d+d\d+s\d+/, Str
         rule /\d+/, Num
         rule /delete|add|free/, Keyword::Reserved
-        rule /[\d\w#"'\/]+/, Text
+        rule %r{[\d\w#"'\/]+}, Text
         rule /:/, Punctuation
         rule /\s/, Text
       end
     end
 
+    # Highlighting for Solaris sysidcfg files
+    #
     class SysIdCfg < RegexLexer
       title 'Solaris sysidcfg'
       tag 'sysidcfg'
@@ -87,7 +95,8 @@ module Rouge
       state :root do
         mixin :basic
         rule /{/ do
-          token Punctuation; push :block
+          token Punctuation
+          push :block
         end
         rule id, Keyword::Namespace
       end
@@ -133,3 +142,5 @@ module Rouge
     end
   end
 end
+#
+# rubocop:enable Lint/AmbiguousRegexpLiteral
