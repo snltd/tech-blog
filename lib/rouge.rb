@@ -1,49 +1,49 @@
 require 'rouge'
 
-#
 # Mostly Solaris-specific extensions to the Rouge syntax-colouring
 # library. These are crude first attempts, hacked into working as I
 # find more edge cases.
 #
 module Rouge
   module Lexers
-
     class DTrace < RegexLexer
       title 'DTrace'
       desc 'The DTrace dynamic tracing language'
       tag 'dtrace'
       attr_accessor :keywords, :keywords_type
 
-      keywords = %w(
-          auto goto sizeof break if static case import string char inline
-          stringof const int struct continue long switch counter offsetof this
-          default probe translator do provider typedef double register union
-          else restrict unsigned enum return void extern self volatile float
-          short system while for signed xlate printf printa trace)
+      keywords = %w[
+        auto goto sizeof break if static case import string char inline
+        stringof const int struct continue long switch counter offsetof this
+        default probe translator do provider typedef double register union
+        else restrict unsigned enum return void extern self volatile float
+        short system while for signed xlate printf printa trace
+      ]
 
-      keywords_type = %w(
-          char short int long int8_t int16_t int32_t int64_t intptr_t
-          uint8_t uint16_t uint32_t uinit64_t uiniptr_t float double)
+      keywords_type = %w[
+        char short int long int8_t int16_t int32_t int64_t intptr_t
+        uint8_t uint16_t uint32_t uinit64_t uiniptr_t float double
+      ]
 
-      helpers = %w(alloca bcopy copin copyinto copyinstr count)
+      helpers = %w[alloca bcopy copin copyinto copyinstr count]
 
-      builtin_vars = %w(curthread tid pid ppid uid gid execname zonename
-                       timestamp cpu self)
+      builtin_vars = %w[curthread tid pid ppid uid gid execname zonename
+                        timestamp cpu self]
 
       state :root do
         rule /\s+/, Text::Whitespace
         rule /%(s|d)/, Str::Interpol
         rule /[~^*!%&\[\](){}<>\|+=:;,.\/?-]/, Operator
-        rule /^(\S*)(:)(\S*)(:)(\S*)(:)(\S*)$/ do |m|
+        rule /^(\S*)(:)(\S*)(:)(\S*)(:)(\S*)$/ do |_m|
           groups Name::Class, Punctuation, Name::Class, Punctuation,
                  Name::Class, Punctuation, Name::Class, Punctuation
         end
         rule /[0-9]+/, Num::Integer
         rule /#.*?$/, Comment::Single
-        rule %r(#{keywords.join('|')}), Keyword
-        rule %r(#{helpers.join('|')}), Keyword::Reserved
-        rule %r(#{keywords_type.join('|')}), Keyword::Type
-        rule %r(#{builtin_vars.join('|')}), Name::Builtin
+        rule /#{keywords.join('|')}/, Keyword
+        rule /#{helpers.join('|')}/, Keyword::Reserved
+        rule /#{keywords_type.join('|')}/, Keyword::Type
+        rule /#{builtin_vars.join('|')}/, Name::Builtin
         rule /@[\w_]+/, Name::Variable::Instance # Aggregate
         rule /arg\d+/, Name::Variable
         rule /\$[\w_]+/, Name::Variable
@@ -99,7 +99,6 @@ module Rouge
       end
     end
 
-    #
     # I want to bold commands. I don't want any other colouring,
     # just bold for things you type in and normal for things the
     # machine outputs
@@ -110,7 +109,7 @@ module Rouge
       desc 'put commands in bold. Assumes you begin a command line
             with a hash or dollar, but handles \ escaped continuations,
             PS2 sub-prompts. Also works for Sun OBP "ok" prompts,
-            interactive use of Solaris zonecfg,  and SCCLI prompts'
+            interactive use of Solaris zonecfg, and SCCLI prompts'
 
       state :root do
         rule /\n/, Text
