@@ -596,9 +596,9 @@ using partial configuration with the "-backend-config" flag to
 ...
 ```
 
-Wow. Whoever writes error messages needs to have a word with whoever
-writes them for Terraform, because that is great. I looked up
-`-backend-config` ([single-dash long
+Wow. Whoever writes the error messages for Puppet needs to have a
+word with whoever writes them for Terraform, because that is great.
+I looked up `-backend-config` ([single-dash long
 options are wrong
 btw](https://twitter.com/no_identifier/status/902508998003482624)),
 and it was plain all I had to do was
