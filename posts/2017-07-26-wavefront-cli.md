@@ -50,8 +50,8 @@ $ gem install wavefront-cli
 This installs the CLI and all its dependencies.  A lot of care has
 been taken to ensure there are no "native extension" gems anywhere
 in the chain, so installation should be quick and painless on any
-host. I *hate* people thinking it's fine to expect me to install C
-compiler to run a hundred line tool written in a scripting language.
+host. I *hate* people thinking it's fine to expect me to install a C
+compiler to run a hundred-line tool written in a scripting language.
 
 Following the model of [the best designed CLI I
 know](https://illumos.org/man/1M/zfs), there's a single command, with
@@ -614,7 +614,7 @@ Notice that first line of output. The CLI has created, on the local
 host, (not on `shark`) a "state file". This is a little memo of the
 event ID, and every open event (i.e. one which is not instantaneous
 and does not specify and end time) forces the creation of one. Those
-state files work like a stack, and simply issuing and `event close`
+state files work like a stack, and simply issuing an `event close`
 command will pop the first one (that is, the last one that was
 created) off the top of the stack, and close it. You can also supply
 the name of an event to the `close` command (just the name: no
