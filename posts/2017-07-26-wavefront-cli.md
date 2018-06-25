@@ -68,21 +68,25 @@ Usage:
   wf --help
 
 Commands:
-  alert           view and manage alerts
-  dashboard       view and manage dashboards
-  event           open, close, view, and manage events
-  integration     view and manage cloud integrations
-  link            view and manage external links
-  message         read and mark user messages
-  metric          view metrics
-  proxy           view and manage Wavefront proxies
-  query           query the Wavefront API
-  savedsearch     view and manage saved searches
-  source          view and manage source tags and descriptions
-  user            view and manage Wavefront users
-  webhook         view and manage webhooks
-  window          view and manage maintenance windows
-  write           send data to a Wavefront proxy
+  alert              view and manage alerts
+  cloudintegration   view and manage cloud integrations
+  dashboard          view and manage dashboards
+  derivedmetric      view and manage derived metrics
+  event              open, close, view, and manage events
+  integration        view and manage Wavefront integrations
+  link               view and manage external links
+  message            read and mark user messages
+  metric             view metrics
+  notificant         view and manage Wavefront notification targets
+  proxy              view and manage Wavefront proxies
+  query              query the Wavefront API
+  report             send data directly to Wavefront
+  savedsearch        view and manage saved searches
+  source             view and manage source tags and descriptions
+  user               view and manage Wavefront users
+  webhook            view and manage webhooks
+  window             view and manage maintenance windows
+  write              send data to a Wavefront proxy
 
 Use 'wf <command> --help' for further information.
 ```
@@ -793,6 +797,30 @@ runningState          ENDED
 You can import also import and export windows, just like everything
 else.
 
+## Derived Metrics
+
+You can manage [derived
+metrics](https://docs.wavefront.com/derived_metrics.html) with the
+`derivedmetrics` command. As well as all the usual deleting,
+exporting, importing, tagging and whatnot, you can create derived
+metrics on the command line. You have to supply a name for the
+derived metric, along with the actual metric. So something like:
+
+```cmd
+$ wf derivedmetric create my_metric 'aliasMetric(ts(real.series), "alias")'
+$ wf derivedmetric list
+1529944840652  my_metric
+```
+
+Like everything in Wavefront, you can tag derived metrics, and the
+`derivedmetric create` subcommand lets you do this on the fly, as
+well as specifying a description; adjusting the interval at
+which the metric runs on the cluster; specifying the amount of
+time over which the metric is created; and whether or not to include
+obsolete metrics in the calculations.
+
+Derived metrics support history and soft-deleting.
+
 ## Cloud Integrations, Webhooks, External Links
 
 The `integration`, `webhook`, `window`, and `link` commands are
@@ -845,22 +873,24 @@ $ wf query --help
 Usage:
   wf query aliases [-DV] [-c file] [-P profile]
   wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-g granularity] [-s time] [-e time] [-f format] [-ivO] [-S mode]
+          [-g granularity] [-s time] [-e time] [-f format] [-ikvO] [-S mode]
           [-N name] [-p points] <query>
   wf query raw [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-H host] [-s time] [-e time] [-f format] <metric>
-  wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf query run [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-g granularity] [-s time] [-e time] [-f format] [-ivO] [-S mode]
-          [-N name] [-p points] <query>
+          [-N name] [-p points] <alias>
+  wf query --help
 
 Options:
+  -t, --token=TOKEN            Wavefront authentication token
   -g, --granularity=STRING     query granularity (d, h, m, or s)
   -s, --start=TIME             start of query window
   -e, --end=TIME               end of query window
   -N, --name=STRING            name identifying query
   -p, --points=INTEGER         maximum number of points to return
-  -i, --inclusive              include matching series with no points
-                               inside the query window
+  -i, --inclusive              include matching series with no points inside
+                               the query window
   -v, --events                 include events for matching series
   -S, --summarize=STRING       summarization strategy for bucketing points
                                (mean, median, min, max, sum, count, last,
@@ -868,24 +898,37 @@ Options:
   -O, --obsolete               include metrics unreported for > 4 weeks
   -H, --host=STRING            host or source to query on
   -f, --format=STRING          output format
+  -k, --nospark                do not show sparkline
 ```
 
 ```cmd
-$ wf query 'deriv(ts("lab.dev.host.nfs.server.v4.read"))'
-name        deriv(ts("lab.dev.host.nfs.server.v4.read"))
-query       deriv(ts("lab.dev.host.nfs.server.v4.read"))
+$ wf query 'deriv(ts("nfs.server.v4.read"))'
+name         deriv(ts("nfs.server.v4.read"))
+query        deriv(ts("nfs.server.v4.read"))
 timeseries
-  label     lab.dev.host.nfs.server.v4.read
-  host      shark
-  data      2017-06-13 22:22:00    0.0
-                       22:24:00    0.06666666666666667
-                       22:25:00    0.016666666666666666
-                       22:26:00    0.016666666666666666
-                       22:27:00    0.05000000000000001
-                       22:28:00    0.0
-                       22:29:00    0.0
-                       22:30:00    0.016666666666666666
-                       22:31:00    0.016666666666666666
+  label      nfs.server.v4.read
+  sparkline  >   ▁  ▂▁ ▃        ▂▁ ▃   ▁ ▂   <
+  host       shark
+  tags
+    env      lab
+  data       2018-06-25   17:10:29    0.0
+                          17:10:39    0.0
+                          17:10:49    0.0
+                          17:10:59    0.0
+                          17:11:09    0.0
+                          17:11:19    0.0
+                          17:11:29    0.0
+                          17:11:39    0.5
+                          17:11:49    0.0
+                          17:15:59    0.0
+                          17:16:09    0.0
+                          17:16:19    0.0
+                          17:16:29    0.6
+                          17:16:39    0.4
+                          17:16:49    0.0
+                          17:16:59    0.8
+                          17:17:09    0.0
+...
 ```
 
 The `granularity` is an important option. It lets you select the
@@ -895,12 +938,15 @@ based on the size of the time window you give. And if you don't give
 a time window, it will use the last ten minutes.
 
 The Wavefront API expects the query window to be defined by start
-and end times in epoch milliseconds, but the CLI will try to
-convert any time format you give it, using [Ruby's
+and end times in epoch milliseconds, but the CLI will try to convert
+any time format you give it, using [Ruby's
 `strptime()`](https://ruby-doc.org/stdlib-1.9.3/libdoc/date/rdoc/DateTime.html#method-c-_strptime).
 Times as loosely defined as `12:00` or `Saturday` may well work, but
 sometimes Ruby will assume `Saturday` means the next one, not the
 last one, so choose wisely!
+
+The `sparkline` is a bit of a novelty. It uses Unicode blocks, which
+severely limits its range. If it annoys you, `-k` turns it off.
 
 As well as specifying the granularity of the point buckets (just
 like the UI does, dependent on its canvas size), you can select the
@@ -956,7 +1002,8 @@ $ wf query run nfs
 You can, of course, specify all the normal query options with an
 alias. The syntax, as I'm sure you noticed, is that the alias name
 you'd use must be prefixed with `q_`. This is a workaround for the
-limitations of INI files, which don't let you nest sections.
+limitations of INI files, which don't let you nest sections. (At
+least, not in Ruby's understanding of them.)
 
 To see what aliases you have configured, you can just run
 
