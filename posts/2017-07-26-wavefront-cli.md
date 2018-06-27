@@ -380,16 +380,58 @@ deleted                   false
 There's the old alert, fully restored. It has a new `id`, but that's
 okay. Everything significant is just the same.
 
-Once that alert is exported you can, of course, do things to it. At
-my client's site we
-have a user who has a number of environments: dev, staging, prod
-and so on. He created alerts for one environment in the Wavefront
-console, then exported them and made them into ERB templates. He now
-has a simple build job which takes those templates and few
-parameters and generates a whole batch of alerts, tailored for
-one or many environements, and and pushes them back up to Wavefront.
-If he wants to change the severity of an alert, he does it in one
-place, and it's enacted everywhere.
+Once an alert is exported you can, of course, do things to it before
+re-importing.
+
+At my client's site we have a user who has a number of environments:
+dev, staging, prod and so on. He created alerts for the first
+environment in the Wavefront console, then exported them and made
+them into ERB templates. Now, when he stands up a new environment, a
+script combines those templates with a few parameters to generate a
+whole new set of alerts, which it pushes to Wavefront.  When he
+tears down an environment, a script deletes all alerts tagged with
+the environment being destroyed. Infrastucture as code, and alerts
+as part of your infrastructure.
+
+If you don't want to make templates (and I, personally, don't), it's
+probably simpler and cleaner to manipulate the original structured
+data. All you have to do is, in the language of your choice, load
+and parse some JSON, change what needs to be changed, dump it and
+re-import it.
+
+To illustrate, here is a Ruby script which will read a JSON format
+alert from STDIN, change the condition, and dump the modified JSON
+to STDOUT.
+
+```ruby
+#!/usr/bin/env ruby
+
+require 'json'
+
+alert = JSON.parse(STDIN.read)
+alert['condition'] = '0 > 1'
+puts alert.to_json
+```
+
+If I save that to an executable file called `modifier`, I can run
+
+```cmd
+$ wf alert export -f json 1497275466684 | modifier | wf alert import -
+```
+
+and get a new alert with a new condition, leaving the old one in
+place. Obviously, it would be no more difficult to change any other
+aspect of the alert, or to source it from a version-controlled file
+rather than pulling it out of Wavefront.
+
+If you use Terraform, the [Wavefront Terraform
+provider](https://github.com/spaceapegames/terraform-provider-wavefront)
+can create your alerts, alert-targets and dashboards as part of a
+stack. To make this easier, supplying `-f hcl` to a `describe`
+subcommand will export any of those objects in
+[HCL](https://github.com/hashicorp/hcl) format, ready of pasting
+straight into your Terraform configuration. (I discuss this further
+[elsewhere](/post/2017-08-28-terraforming-smartos).
 
 What else can we do with the alerts CLI? Well, we can easily snooze
 and unsnooze an alert. Let's make an alert that's always going to
@@ -503,7 +545,10 @@ silenced the alert so I didn't find out!
 `dashboard` commands are pretty much a subset of the `alert` ones.
 Obviously you can't `snooze` a dashboard, but most of the others
 work just the same. Dashboard descriptions can be h-u-g-e, so quite
-a lot of information is dropped when you `describe` one.
+a lot of information is dropped when you `describe` one in
+human-readable format. Everything I said about exporting and
+templating or manipulating alerts applies just as well to
+dashboards.
 
 `proxy` is similar to dashboard, but you can't have versions of
 proxies. All the tagging and undeleting goodness is there though.
