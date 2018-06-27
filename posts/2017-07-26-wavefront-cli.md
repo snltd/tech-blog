@@ -204,15 +204,18 @@ like `wf proxy list | wc -l` to give the answer you expect.
 You can also `list -l`, which more-or-less dumps all of every
 resource into your terminal. I don't often use that.
 
-We can also `search` for alerts. You can define multiple conditions,
-which the Wavefront engine will `AND` together to refine a query.
-Conditions are specified as `key=value`. Or, if you wish to search
-for objects where the `key` field merely *contains* `value`, use
-`key~value`.  If you want objects where the field *starts with* the
-value, use `key^value`. The default display mode for `search`
-subcommands is one object per line, and the fields will be the
-object's `id`, plus whichever other keys you used in your
-conditions.
+We can also `search` for alerts, or, indeed, for any other object
+type. (All commands support the `search` sub-command, so long as
+their ultimate API endpoint supports it.)
+
+When searching you can define multiple conditions, which the
+Wavefront engine will `AND` together to refine a query.  Conditions
+are specified as `key=value`. Or, if you wish to search for objects
+where the `key` field merely *contains* `value`, use `key~value`.
+If you want objects where the field *starts with* the value, use
+`key^value`. The default display mode for `search` subcommands is
+one object per line, and the fields will be the object's `id`, plus
+whichever other keys you used in your conditions.
 
 ```cmd
 $ wf alert search name~JPC
@@ -540,6 +543,33 @@ $ wf alert snoozed
 Ooh, some cheeky so-and-so has used up all the disk space and
 silenced the alert so I didn't find out!
 
+## Alert Targets
+
+The API calls alert targets "notificants". The SDK echoes that, and
+the CLI follows the SDK. So, one manages one's alert targets with
+the "notificant" command.
+
+Alert targets are typically big things with lots of templating, so
+the CLI doesn't provide a short-hand way of creating them in the way
+it does for, say, events, or derived metrics. You can still import
+them though. You just have to create a JSON or YAML description,
+likely starting from an existing one in the way we did with an alert
+earlier.
+
+As well as `describe`-ing alert targets, you can do all the usual
+listing, deleting, updating, searching, and even testing.
+
+```cmd
+$ wf notificant list
+CHTo475vsPzSaGhh  WEBHOOK  Slack alert webhook
+EKdKFv1rJ6ibahqI  EMAIL    alerts from lab machines
+T0i98AtVbs6Zkzlz  EMAIL    alerts from JPC production instances
+$ wf notificant test CHTo475vsPzSaGhh
+```
+
+You'll have to trust me, but I promise that just popped up a Slack
+notification on my desktop.
+
 ## Dashboards, Proxies, and Sources
 
 `dashboard` commands are pretty much a subset of the `alert` ones.
@@ -866,15 +896,116 @@ obsolete metrics in the calculations.
 
 Derived metrics support history and soft-deleting.
 
-## Cloud Integrations, Webhooks, External Links
+## Cloud Integrations, Webhooks, External Links and Saved Searches
 
-The `integration`, `webhook`, `window`, and `link` commands are
+The `integration`, `webhook`, `link` and `savedsearch` commands are
 simpler than those we've seen so far, becaue the API doesn't allow
-tagging or soft-deleting of those types of resource. The CLI still
+tagging or soft-deleting of those resource types. The CLI still
 lets you list, describe, delete and import them though, and each has
-properties you can `update`.
+properties you can `update`. The `search` subcommand works for all
+of them too.
 
-Now let's look at the three "oddball" commands.
+Now let's look at the "oddball" commands.
+
+## Source
+
+The `source` command lets you manage tags and descriptive strings
+for any of your sources. In Wavefront "sources" usually equate to
+hosts or containers, but they don't have to. I have some
+applications which identify as a source, because I don't care where
+they run, only what they say.
+
+You will have lots of sources, so the output of `sources list` will
+likely be paginated. (If it is, it says so.) You can use `-o` and
+`-L` to set the offset (starting point) and limit of the page you
+view.  These options work for all `list` sub-commands, but when
+listing sources `-o` should refer to a source name. For everything
+else it is a numerical offset. This reflects the way the API works.
+
+By default `source list` does not show sources which are "hidden"
+(which usually means they are very old) or Wavefront's own sources
+(the things that look like `prod-2b-app101-i-018e5f6aa6d8b3967`).
+If you want to see these, supply the `-a` flag.
+
+The hidden and internal sources are filtered out by the CLI
+*after* the API call is made, but the `-o` and `-L` flags are set
+*before* the call. This can mean it can get a confusing working
+through the pages. You're probably better off using `source
+search`, or using `-a` and dealing with it.
+
+```cmd
+$ wf source describe shark-ws
+id            shark-ws
+sourceName    shark-ws
+hidden        false
+description   workstation zone
+tags
+  ~status.errortrue
+  zone        true
+  solaris     true
+$ wf source clear shark-ws
+status
+  result OK
+  code   200
+$ wf source describe shark-ws
+id           shark-ws
+sourceName   shark-ws
+hidden       false
+$ wf source description set shark-ws "workstation zone"
+status
+  result OK
+  code   200
+$ wf source tag add shark-ws solaris
+Tagged source 'shark-ws'.
+$ wf source tag add shark-ws zone
+Tagged source 'shark-ws'.
+$ wf source describe shark-ws
+id            shark-ws
+sourceName    shark-ws
+hidden        false
+description   workstation zone
+tags
+  solaris     true
+  zone        true
+
+```
+
+## Message
+
+You won't use this one very much, but it's in the API, so the CLI
+covers it. `list` shows any messages you may have (you get them if
+your cluster is going to be upgraded). Once you've read a message
+you can `mark` it as read, and it will go away. I can't show you an
+example, because I don't have any messages.
+
+## User
+
+As you'd expect, you can `list`, `describe` and `delete` users, but
+more interestingly, you can also `revoke` and `grant` privileges.
+
+```cmd
+$ wf user describe ian@company.net
+identifier   ian@company.net
+customer     sysdef
+groups       embedded_charts
+             browse
+
+$  wf user grant alerts_management to ian@company.net
+identifier   ian@company.net
+customer     sysdef
+groups       embedded_charts
+             browse
+             alerts_management
+
+$ wf user revoke alerts_management from ian@company.net
+identifier   ian@company.net
+customer     sysdef
+groups       embedded_charts
+             browse
+```
+
+You can't create users from the CLI for the very good reason that
+you can't create users over the API.
 
 ## Metric
 
