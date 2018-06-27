@@ -416,7 +416,7 @@ puts alert.to_json
 If I save that to an executable file called `modifier`, I can run
 
 ```cmd
-$ wf alert export -f json 1497275466684 | modifier | wf alert import -
+$ wf alert describe -f json 1497275466684 | modifier | wf alert import -
 ```
 
 and get a new alert with a new condition, leaving the old one in
