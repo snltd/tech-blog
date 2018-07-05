@@ -184,6 +184,10 @@ you use. Most people will just have one, but I have a couple. You
 only need the `default`. Oh, and in case you were wondering, those
 aren't my real tokens!
 
+You can override values in the configuration files with command-line
+options, and also with environment variables. `WAVEFONT_TOKEN`,
+`WAVEFRONT_ENDPOINT` and `WAVEFRONT_PROXY` are all supported.
+
 Now we're fully credentialled, let's have a look at the alerts in my
 account.
 
@@ -973,10 +977,40 @@ tags
 ## Message
 
 You won't use this one very much, but it's in the API, so the CLI
-covers it. `list` shows any messages you may have (you get them if
-your cluster is going to be upgraded). Once you've read a message
-you can `mark` it as read, and it will go away. I can't show you an
-example, because I don't have any messages.
+covers it. `list` shows any messages you may have (you get them, for
+instance, if your cluster is going to be upgraded).  There isn't a
+`read` command in the API, so to read a message with the CLI, you
+have to do a long listing.
+
+Once you've read a message you can `mark` it as read, and it will go
+away. Read messages can still be retrieved with `list -a`. They
+appear to age out after `endEpochMillis` has passed.
+
+
+```cmd
+$ wf message list
+CLUSTER::743cvsHu  Wavefront Upgrade Notification
+$ wf message list -l
+scope              CLUSTER
+id                 CLUSTER::743cvsHu
+content            Wavefront is upgrading to the latest version within the
+                   next two (2) weeks. -Wavefront Customer Success
+source             system@wavefront.com
+title              Wavefront Upgrade Notification
+severity           INFO
+startEpochMillis   1530553832000
+endEpochMillis     1531763432000
+display            BANNER
+read               false
+$ wf message mark CLUSTER::743cvsHu
+status
+  result OK
+  code   200
+$ wf message list
+$ wf message list -a
+CLUSTER::LmPJTdQ8  Wavefront Upgrade Notification
+```
+
 
 ## User
 
