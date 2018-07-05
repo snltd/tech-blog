@@ -1288,7 +1288,7 @@ conventions, you can give the filename as `-`, and the CLI will read
 from standard in.
 
 ```cmd
-$ while true; do echo $RANDOM; sleep 0.1; done | \
+$ while true; do echo $RANDOM; sleep 1; done | \
   wf write file -m cli.example -T tag=randomness -Fv -
 ```
 
