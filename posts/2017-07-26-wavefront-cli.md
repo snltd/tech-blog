@@ -1222,6 +1222,37 @@ $ wf query aliases
 nfs
 ```
 
+`wf query` supports an additional output format: `wavefront`. This
+writes out the points in native Wavefront wire format. It works for
+timeseries and raw queries.
+
+```cmd
+$ wf query 'ts("solaris.network.obytes64", environment=production)' -f wavefront
+solaris.network.obytes64 121037323749.0 1533754102 source=wf-blue env="prod" nic="net0"
+solaris.network.obytes64 121037670562.0 1533754122 source=wf-blue env="prod" nic="net0"
+solaris.network.obytes64 121038023454.0 1533754142 source=wf-blue env="prod" nic="net0"
+...
+$ wf query raw -H www-blue 'solaris.network.obytes64' -f wavefront
+solaris.network.obytes64 1219563430.0 1533751241000 source=www-blue nic="net0" role="sinatra"
+solaris.network.obytes64 1219563982.0 1533751261000 source=www-blue nic="net0" role="sinatra"
+...
+```
+
+You might have noticed that the timeseries query reports the
+point timestamp as epoch seconds, whereas a `raw` query phrases them
+as epoch milliseconds. Don't worry about it: the proxy accepts both.
+
+If you have a lot of data you wish to modify, perhaps to rename a
+metric path, or retrospectively change tags, you
+could pipe the output of these commands through `sed`, `awk`, or
+some other stream editing program, and back into a proxy.
+
+```cmd
+$ wf query 'ts("solaris.network.obytes64")' -f wavefront \
+  | sed 's/solaris/smartos/' \
+  | nc wf-proxy 2878
+```
+
 ## Write
 
 Finally we get to the `write` command. This is different from all
