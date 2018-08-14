@@ -21,7 +21,7 @@ problem right now - fix it!" kind of way, it's a bit messy and WET.
 
 As Wavefront's API uses [Swagger](https://swagger.io/) it is pretty
 easy to generate an SDK for whatever language you like. But I find
-these machine-genrated SDKs hard work to use, and I wanted a nice
+these machine-generated SDKs hard work to use, and I wanted a nice
 little project to work on in my spare time, so I wrote [yet another
 Wavefront SDK](https://github.com/snltd/wavefront-sdk), in Ruby.
 This has more features, and around 40,000 less lines of code than
