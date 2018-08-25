@@ -21,7 +21,6 @@ class WebApp < Sinatra::Base
 
   get '/' do
     @posts = POSTS.all
-    @tags = blog.tags[0..9]
     slim :front_page
   end
 
