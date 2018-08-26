@@ -1,2 +1,2 @@
-require_relative 'bin/webapp.rb'
+require_relative 'bin/sysdef.rb'
 run WebApp

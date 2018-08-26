@@ -4,7 +4,7 @@
 # level.
 #
 def render_page(dir, page, metadata)
-  md_file = ROOT + dir.to_s + format('%s.md', page)
+  md_file = ROOT + dir.to_s + format('%<page>s.md', page: page)
   md_file.exist? ? display_page(md_file, metadata) : display_404
 end
 

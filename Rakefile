@@ -17,10 +17,8 @@ RuboCop::RakeTask.new(:rubocop) do |t|
 end
 
 desc 'build gem'
-# task :build => :test do
-task :build do
-  puts "building gem version #{gem_version}"
-  `gem build #{ROOT + 'meetup-generator.gemspec'}`
+task build: :test do
+  `gem build #{ROOT + 'sysdef.gemspec'}`
 end
 
 desc 'push to Gemfury'
