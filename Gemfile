@@ -1,7 +1,2 @@
 source 'https://rubygems.org'
-gem 'kramdown', '1.14.0'
-gem 'puma', '>= 3.9'
-gem 'rouge', '1.10.1'
-gem 'sinatra', '>= 2.0'
-gem 'slim', '>= 3.0'
-gem 'tilt', '>= 2.0'
+gemspec
