@@ -3,6 +3,7 @@ require 'English'
 
 require_relative 'lib/build_helpers'
 
+# rubocop:disable Metrics/BlockLength
 Gem::Specification.new do |gem|
   gem.name          = 'sysdef'
   gem.version       = gem_version
@@ -20,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.executables   = ['sysdef.rb', 'locate_sysdef']
   gem.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   gem.test_files    = gem.files.grep(%r{^spec/})
-  gem.require_paths = %w(lib)
+  gem.require_paths = %w[lib]
 
   gem.add_runtime_dependency 'kramdown', '= 1.14.0'
   gem.add_runtime_dependency 'puma', '~> 3.11', '>= 3.11.0'
@@ -38,3 +39,4 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version = Gem::Requirement.new('>= 2.4.0')
 end
+# rubocop:enable Metrics/BlockLength
