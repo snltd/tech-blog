@@ -24,9 +24,9 @@ end
 
 desc 'push to Gemfury'
 task push: :build do
-  abort 'No Gemfury credentials.' unless ENV['GEMFURY_TOKEN']
+  abort 'No Gemfury credentials.' unless ENV['gemfury']
 
   puts 'Pushing to Gemfury'
   `curl --fail -vF package=@#{GEM} \
-   https://push.fury.io/#{ENV['GEMFURY_TOKEN']}/sysdef`
+   https://push.fury.io/#{ENV['gemfury']}/sysdef`
 end
