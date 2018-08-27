@@ -268,7 +268,7 @@ So, take one happy chef, cooking from scratch, creating "just right"
 dishes, and stick her in the AWS kitchen. She's now got a never
 ending stream of ready-meals coming in, and a wall full of
 microwaves. That's it. She might initially like the convenience, and
-she probably won't miss sharpening knifes or cleaning the grease
+she probably won't miss sharpening knives or cleaning the grease
 traps, but hell, it soon gets boring. Oh, and the microwaves can
 only be operated with huge swathes of JSON.
 

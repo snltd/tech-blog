@@ -17,21 +17,16 @@ RuboCop::RakeTask.new(:rubocop) do |t|
 end
 
 desc 'build gem'
-# task :build => :test do
-task :build do
-  puts "building gem version #{gem_version}"
-  `gem build #{ROOT + 'meetup-generator.gemspec'}`
+task build: :test do
+  p ENV
+  `gem build #{ROOT + 'sysdef.gemspec'}`
 end
 
 desc 'push to Gemfury'
 task push: :build do
-  if ENV['TRAVIS'] == 'true' && ENV['TRAVIS_BRANCH'] == 'master'
-    puts 'Pushing to Gemfury'
-    `curl --fail -vF package=@#{GEM} \
-     https://push.fury.io/#{ENV['GEMFURY_TOKEN']}/#{ENV['GEMFURY_USER']}`
-  elsif ENV['TRAVIS'] == 'true'
-    puts 'Not on master so not pushing.'
-  else
-    abort 'Only Travis can push. You will have to upload manually.'
-  end
+  abort 'No Gemfury credentials.' unless ENV['gemfury']
+
+  puts 'Pushing to Gemfury'
+  `curl --fail -vF package=@#{GEM} \
+   https://push.fury.io/#{ENV['gemfury']}/sysdef`
 end

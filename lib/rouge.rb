@@ -123,6 +123,8 @@ module Rouge
       state :root do
         rule /\n/, Text
         rule /^[#$] .*\\/, Generic::Strong, :long
+        rule /^\w+@manta # .*\\/, Generic::Strong, :long
+        rule /^\w+@manta # .*/, Generic::Strong
         rule /^[>#$] .*/, Generic::Strong
         rule /^zonecfg.*>.*/, Generic::Strong
         rule /^root@.*# .*/, Generic::Strong

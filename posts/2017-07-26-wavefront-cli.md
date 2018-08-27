@@ -21,7 +21,7 @@ problem right now - fix it!" kind of way, it's a bit messy and WET.
 
 As Wavefront's API uses [Swagger](https://swagger.io/) it is pretty
 easy to generate an SDK for whatever language you like. But I find
-these machine-genrated SDKs hard work to use, and I wanted a nice
+these machine-generated SDKs hard work to use, and I wanted a nice
 little project to work on in my spare time, so I wrote [yet another
 Wavefront SDK](https://github.com/snltd/wavefront-sdk), in Ruby.
 This has more features, and around 40,000 less lines of code than
@@ -50,8 +50,8 @@ $ gem install wavefront-cli
 This installs the CLI and all its dependencies.  A lot of care has
 been taken to ensure there are no "native extension" gems anywhere
 in the chain, so installation should be quick and painless on any
-host. I *hate* people thinking it's fine to expect me to install C
-compiler to run a hundred line tool written in a scripting language.
+host. I *hate* people thinking it's fine to expect me to install a C
+compiler to run a hundred-line tool written in a scripting language.
 
 Following the model of [the best designed CLI I
 know](https://illumos.org/man/1M/zfs), there's a single command, with
@@ -68,21 +68,25 @@ Usage:
   wf --help
 
 Commands:
-  alert           view and manage alerts
-  dashboard       view and manage dashboards
-  event           open, close, view, and manage events
-  integration     view and manage cloud integrations
-  link            view and manage external links
-  message         read and mark user messages
-  metric          view metrics
-  proxy           view and manage Wavefront proxies
-  query           query the Wavefront API
-  savedsearch     view and manage saved searches
-  source          view and manage source tags and descriptions
-  user            view and manage Wavefront users
-  webhook         view and manage webhooks
-  window          view and manage maintenance windows
-  write           send data to a Wavefront proxy
+  alert              view and manage alerts
+  cloudintegration   view and manage cloud integrations
+  dashboard          view and manage dashboards
+  derivedmetric      view and manage derived metrics
+  event              open, close, view, and manage events
+  integration        view and manage Wavefront integrations
+  link               view and manage external links
+  message            read and mark user messages
+  metric             view metrics
+  notificant         view and manage Wavefront notification targets
+  proxy              view and manage Wavefront proxies
+  query              query the Wavefront API
+  report             send data directly to Wavefront
+  savedsearch        view and manage saved searches
+  source             view and manage source tags and descriptions
+  user               view and manage Wavefront users
+  webhook            view and manage webhooks
+  window             view and manage maintenance windows
+  write              send data to a Wavefront proxy
 
 Use 'wf <command> --help' for further information.
 ```
@@ -180,6 +184,10 @@ you use. Most people will just have one, but I have a couple. You
 only need the `default`. Oh, and in case you were wondering, those
 aren't my real tokens!
 
+You can override values in the configuration files with command-line
+options, and also with environment variables. `WAVEFONT_TOKEN`,
+`WAVEFRONT_ENDPOINT` and `WAVEFRONT_PROXY` are all supported.
+
 Now we're fully credentialled, let's have a look at the alerts in my
 account.
 
@@ -200,15 +208,18 @@ like `wf proxy list | wc -l` to give the answer you expect.
 You can also `list -l`, which more-or-less dumps all of every
 resource into your terminal. I don't often use that.
 
-We can also `search` for alerts. You can define multiple conditions,
-which the Wavefront engine will `AND` together to refine a query.
-Conditions are specified as `key=value`. Or, if you wish to search
-for objects where the `key` field merely *contains* `value`, use
-`key~value`.  If you want objects where the field *starts with* the
-value, use `key^value`. The default display mode for `search`
-subcommands is one object per line, and the fields will be the
-object's `id`, plus whichever other keys you used in your
-conditions.
+We can also `search` for alerts, or, indeed, for any other object
+type. (All commands support the `search` sub-command, so long as
+their ultimate API endpoint supports it.)
+
+When searching you can define multiple conditions, which the
+Wavefront engine will `AND` together to refine a query.  Conditions
+are specified as `key=value`. Or, if you wish to search for objects
+where the `key` field merely *contains* `value`, use `key~value`.
+If you want objects where the field *starts with* the value, use
+`key^value`. The default display mode for `search` subcommands is
+one object per line, and the fields will be the object's `id`, plus
+whichever other keys you used in your conditions.
 
 ```cmd
 $ wf alert search name~JPC
@@ -376,16 +387,58 @@ deleted                   false
 There's the old alert, fully restored. It has a new `id`, but that's
 okay. Everything significant is just the same.
 
-Once that alert is exported you can, of course, do things to it. At
-my client's site we
-have a user who has a number of environments: dev, staging, prod
-and so on. He created alerts for one environment in the Wavefront
-console, then exported them and made them into ERB templates. He now
-has a simple build job which takes those templates and few
-parameters and generates a whole batch of alerts, tailored for
-one or many environements, and and pushes them back up to Wavefront.
-If he wants to change the severity of an alert, he does it in one
-place, and it's enacted everywhere.
+Once an alert is exported you can, of course, do things to it before
+re-importing.
+
+At my client's site we have a user who has a number of environments:
+dev, staging, prod and so on. He created alerts for the first
+environment in the Wavefront console, then exported them and made
+them into ERB templates. Now, when he stands up a new environment, a
+script combines those templates with a few parameters to generate a
+whole new set of alerts, which it pushes to Wavefront.  When he
+tears down an environment, a script deletes all alerts tagged with
+the environment being destroyed. Infrastucture as code, and alerts
+as part of your infrastructure.
+
+If you don't want to make templates (and I, personally, don't), it's
+probably simpler and cleaner to manipulate the original structured
+data. All you have to do is, in the language of your choice, load
+and parse some JSON, change what needs to be changed, dump it and
+re-import it.
+
+To illustrate, here is a Ruby script which will read a JSON format
+alert from STDIN, change the condition, and dump the modified JSON
+to STDOUT.
+
+```ruby
+#!/usr/bin/env ruby
+
+require 'json'
+
+alert = JSON.parse(STDIN.read)
+alert['condition'] = '0 > 1'
+puts alert.to_json
+```
+
+If I save that to an executable file called `modifier`, I can run
+
+```cmd
+$ wf alert describe -f json 1497275466684 | modifier | wf alert import -
+```
+
+and get a new alert with a new condition, leaving the old one in
+place. Obviously, it would be no more difficult to change any other
+aspect of the alert, or to source it from a version-controlled file
+rather than pulling it out of Wavefront.
+
+If you use Terraform, the [Wavefront Terraform
+provider](https://github.com/spaceapegames/terraform-provider-wavefront)
+can create your alerts, alert-targets and dashboards as part of a
+stack. To make this easier, supplying `-f hcl` to a `describe`
+subcommand will export any of those objects in
+[HCL](https://github.com/hashicorp/hcl) format, ready of pasting
+straight into your Terraform configuration. (I discuss this further
+[elsewhere](/post/2017-08-28-terraforming-smartos).
 
 What else can we do with the alerts CLI? Well, we can easily snooze
 and unsnooze an alert. Let's make an alert that's always going to
@@ -494,12 +547,42 @@ $ wf alert snoozed
 Ooh, some cheeky so-and-so has used up all the disk space and
 silenced the alert so I didn't find out!
 
+## Alert Targets
+
+The API calls alert targets "notificants". The SDK echoes that, and
+the CLI follows the SDK. So, one manages one's alert targets with
+the "notificant" command.
+
+Alert targets are typically big things with lots of templating, so
+the CLI doesn't provide a short-hand way of creating them in the way
+it does for, say, events, or derived metrics. You can still import
+them though. You just have to create a JSON or YAML description,
+likely starting from an existing one in the way we did with an alert
+earlier.
+
+As well as `describe`-ing alert targets, you can do all the usual
+listing, deleting, updating, searching, and even testing.
+
+```cmd
+$ wf notificant list
+CHTo475vsPzSaGhh  WEBHOOK  Slack alert webhook
+EKdKFv1rJ6ibahqI  EMAIL    alerts from lab machines
+T0i98AtVbs6Zkzlz  EMAIL    alerts from JPC production instances
+$ wf notificant test CHTo475vsPzSaGhh
+```
+
+You'll have to trust me, but I promise that just popped up a Slack
+notification on my desktop.
+
 ## Dashboards, Proxies, and Sources
 
 `dashboard` commands are pretty much a subset of the `alert` ones.
 Obviously you can't `snooze` a dashboard, but most of the others
 work just the same. Dashboard descriptions can be h-u-g-e, so quite
-a lot of information is dropped when you `describe` one.
+a lot of information is dropped when you `describe` one in
+human-readable format. Everything I said about exporting and
+templating or manipulating alerts applies just as well to
+dashboards.
 
 `proxy` is similar to dashboard, but you can't have versions of
 proxies. All the tagging and undeleting goodness is there though.
@@ -614,7 +697,7 @@ Notice that first line of output. The CLI has created, on the local
 host, (not on `shark`) a "state file". This is a little memo of the
 event ID, and every open event (i.e. one which is not instantaneous
 and does not specify and end time) forces the creation of one. Those
-state files work like a stack, and simply issuing and `event close`
+state files work like a stack, and simply issuing an `event close`
 command will pop the first one (that is, the last one that was
 created) off the top of the stack, and close it. You can also supply
 the name of an event to the `close` command (just the name: no
@@ -793,15 +876,170 @@ runningState          ENDED
 You can import also import and export windows, just like everything
 else.
 
-## Cloud Integrations, Webhooks, External Links
+## Derived Metrics
 
-The `integration`, `webhook`, `window`, and `link` commands are
+You can manage [derived
+metrics](https://docs.wavefront.com/derived_metrics.html) with the
+`derivedmetrics` command. As well as all the usual deleting,
+exporting, importing, tagging and whatnot, you can create derived
+metrics on the command line. You have to supply a name for the
+derived metric, along with the actual metric. So something like:
+
+```cmd
+$ wf derivedmetric create my_metric 'aliasMetric(ts(real.series), "alias")'
+$ wf derivedmetric list
+1529944840652  my_metric
+```
+
+Like everything in Wavefront, you can tag derived metrics, and the
+`derivedmetric create` subcommand lets you do this on the fly, as
+well as specifying a description; adjusting the interval at
+which the metric runs on the cluster; specifying the amount of
+time over which the metric is created; and whether or not to include
+obsolete metrics in the calculations.
+
+Derived metrics support history and soft-deleting.
+
+## Cloud Integrations, Webhooks, External Links and Saved Searches
+
+The `integration`, `webhook`, `link` and `savedsearch` commands are
 simpler than those we've seen so far, becaue the API doesn't allow
-tagging or soft-deleting of those types of resource. The CLI still
+tagging or soft-deleting of those resource types. The CLI still
 lets you list, describe, delete and import them though, and each has
-properties you can `update`.
+properties you can `update`. The `search` subcommand works for all
+of them too.
 
-Now let's look at the three "oddball" commands.
+Now let's look at the "oddball" commands.
+
+## Source
+
+The `source` command lets you manage tags and descriptive strings
+for any of your sources. In Wavefront "sources" usually equate to
+hosts or containers, but they don't have to. I have some
+applications which identify as a source, because I don't care where
+they run, only what they say.
+
+You will have lots of sources, so the output of `sources list` will
+likely be paginated. (If it is, it says so.) You can use `-o` and
+`-L` to set the offset (starting point) and limit of the page you
+view.  These options work for all `list` sub-commands, but when
+listing sources `-o` should refer to a source name. For everything
+else it is a numerical offset. This reflects the way the API works.
+
+By default `source list` does not show sources which are "hidden"
+(which usually means they are very old) or Wavefront's own sources
+(the things that look like `prod-2b-app101-i-018e5f6aa6d8b3967`).
+If you want to see these, supply the `-a` flag.
+
+The hidden and internal sources are filtered out by the CLI
+*after* the API call is made, but the `-o` and `-L` flags are set
+*before* the call. This can mean it can get a confusing working
+through the pages. You're probably better off using `source
+search`, or using `-a` and dealing with it.
+
+```cmd
+$ wf source describe shark-ws
+id            shark-ws
+sourceName    shark-ws
+hidden        false
+description   workstation zone
+tags
+  ~status.errortrue
+  zone        true
+  solaris     true
+$ wf source clear shark-ws
+status
+  result OK
+  code   200
+$ wf source describe shark-ws
+id           shark-ws
+sourceName   shark-ws
+hidden       false
+$ wf source description set shark-ws "workstation zone"
+status
+  result OK
+  code   200
+$ wf source tag add shark-ws solaris
+Tagged source 'shark-ws'.
+$ wf source tag add shark-ws zone
+Tagged source 'shark-ws'.
+$ wf source describe shark-ws
+id            shark-ws
+sourceName    shark-ws
+hidden        false
+description   workstation zone
+tags
+  solaris     true
+  zone        true
+
+```
+
+## Message
+
+You won't use this one very much, but it's in the API, so the CLI
+covers it. `list` shows any messages you may have (you get them, for
+instance, if your cluster is going to be upgraded).  There isn't a
+`read` command in the API, so to read a message with the CLI, you
+have to do a long listing.
+
+Once you've read a message you can `mark` it as read, and it will go
+away. Read messages can still be retrieved with `list -a`. They
+appear to age out after `endEpochMillis` has passed.
+
+
+```cmd
+$ wf message list
+CLUSTER::743cvsHu  Wavefront Upgrade Notification
+$ wf message list -l
+scope              CLUSTER
+id                 CLUSTER::743cvsHu
+content            Wavefront is upgrading to the latest version within the
+                   next two (2) weeks. -Wavefront Customer Success
+source             system@wavefront.com
+title              Wavefront Upgrade Notification
+severity           INFO
+startEpochMillis   1530553832000
+endEpochMillis     1531763432000
+display            BANNER
+read               false
+$ wf message mark CLUSTER::743cvsHu
+status
+  result OK
+  code   200
+$ wf message list
+$ wf message list -a
+CLUSTER::LmPJTdQ8  Wavefront Upgrade Notification
+```
+
+
+## User
+
+As you'd expect, you can `list`, `describe` and `delete` users, but
+more interestingly, you can also `revoke` and `grant` privileges.
+
+```cmd
+$ wf user describe ian@company.net
+identifier   ian@company.net
+customer     sysdef
+groups       embedded_charts
+             browse
+
+$  wf user grant alerts_management to ian@company.net
+identifier   ian@company.net
+customer     sysdef
+groups       embedded_charts
+             browse
+             alerts_management
+
+$ wf user revoke alerts_management from ian@company.net
+identifier   ian@company.net
+customer     sysdef
+groups       embedded_charts
+             browse
+```
+
+You can't create users from the CLI for the very good reason that
+you can't create users over the API.
 
 ## Metric
 
@@ -845,22 +1083,24 @@ $ wf query --help
 Usage:
   wf query aliases [-DV] [-c file] [-P profile]
   wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-g granularity] [-s time] [-e time] [-f format] [-ivO] [-S mode]
+          [-g granularity] [-s time] [-e time] [-f format] [-ikvO] [-S mode]
           [-N name] [-p points] <query>
   wf query raw [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-H host] [-s time] [-e time] [-f format] <metric>
-  wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf query run [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-g granularity] [-s time] [-e time] [-f format] [-ivO] [-S mode]
-          [-N name] [-p points] <query>
+          [-N name] [-p points] <alias>
+  wf query --help
 
 Options:
+  -t, --token=TOKEN            Wavefront authentication token
   -g, --granularity=STRING     query granularity (d, h, m, or s)
   -s, --start=TIME             start of query window
   -e, --end=TIME               end of query window
   -N, --name=STRING            name identifying query
   -p, --points=INTEGER         maximum number of points to return
-  -i, --inclusive              include matching series with no points
-                               inside the query window
+  -i, --inclusive              include matching series with no points inside
+                               the query window
   -v, --events                 include events for matching series
   -S, --summarize=STRING       summarization strategy for bucketing points
                                (mean, median, min, max, sum, count, last,
@@ -868,24 +1108,37 @@ Options:
   -O, --obsolete               include metrics unreported for > 4 weeks
   -H, --host=STRING            host or source to query on
   -f, --format=STRING          output format
+  -k, --nospark                do not show sparkline
 ```
 
 ```cmd
-$ wf query 'deriv(ts("lab.dev.host.nfs.server.v4.read"))'
-name        deriv(ts("lab.dev.host.nfs.server.v4.read"))
-query       deriv(ts("lab.dev.host.nfs.server.v4.read"))
+$ wf query 'deriv(ts("nfs.server.v4.read"))'
+name         deriv(ts("nfs.server.v4.read"))
+query        deriv(ts("nfs.server.v4.read"))
 timeseries
-  label     lab.dev.host.nfs.server.v4.read
-  host      shark
-  data      2017-06-13 22:22:00    0.0
-                       22:24:00    0.06666666666666667
-                       22:25:00    0.016666666666666666
-                       22:26:00    0.016666666666666666
-                       22:27:00    0.05000000000000001
-                       22:28:00    0.0
-                       22:29:00    0.0
-                       22:30:00    0.016666666666666666
-                       22:31:00    0.016666666666666666
+  label      nfs.server.v4.read
+  sparkline  >   ▁  ▂▁ ▃        ▂▁ ▃   ▁ ▂   <
+  host       shark
+  tags
+    env      lab
+  data       2018-06-25   17:10:29    0.0
+                          17:10:39    0.0
+                          17:10:49    0.0
+                          17:10:59    0.0
+                          17:11:09    0.0
+                          17:11:19    0.0
+                          17:11:29    0.0
+                          17:11:39    0.5
+                          17:11:49    0.0
+                          17:15:59    0.0
+                          17:16:09    0.0
+                          17:16:19    0.0
+                          17:16:29    0.6
+                          17:16:39    0.4
+                          17:16:49    0.0
+                          17:16:59    0.8
+                          17:17:09    0.0
+...
 ```
 
 The `granularity` is an important option. It lets you select the
@@ -895,12 +1148,15 @@ based on the size of the time window you give. And if you don't give
 a time window, it will use the last ten minutes.
 
 The Wavefront API expects the query window to be defined by start
-and end times in epoch milliseconds, but the CLI will try to
-convert any time format you give it, using [Ruby's
+and end times in epoch milliseconds, but the CLI will try to convert
+any time format you give it, using [Ruby's
 `strptime()`](https://ruby-doc.org/stdlib-1.9.3/libdoc/date/rdoc/DateTime.html#method-c-_strptime).
 Times as loosely defined as `12:00` or `Saturday` may well work, but
 sometimes Ruby will assume `Saturday` means the next one, not the
 last one, so choose wisely!
+
+The `sparkline` is a bit of a novelty. It uses Unicode blocks, which
+severely limits its range. If it annoys you, `-k` turns it off.
 
 As well as specifying the granularity of the point buckets (just
 like the UI does, dependent on its canvas size), you can select the
@@ -956,13 +1212,45 @@ $ wf query run nfs
 You can, of course, specify all the normal query options with an
 alias. The syntax, as I'm sure you noticed, is that the alias name
 you'd use must be prefixed with `q_`. This is a workaround for the
-limitations of INI files, which don't let you nest sections.
+limitations of INI files, which don't let you nest sections. (At
+least, not in Ruby's understanding of them.)
 
 To see what aliases you have configured, you can just run
 
 ```cmd
 $ wf query aliases
 nfs
+```
+
+`wf query` supports an additional output format: `wavefront`. This
+writes out the points in native Wavefront wire format. It works for
+timeseries and raw queries.
+
+```cmd
+$ wf query 'ts("solaris.network.obytes64", environment=production)' -f wavefront
+solaris.network.obytes64 121037323749.0 1533754102 source=wf-blue env="prod" nic="net0"
+solaris.network.obytes64 121037670562.0 1533754122 source=wf-blue env="prod" nic="net0"
+solaris.network.obytes64 121038023454.0 1533754142 source=wf-blue env="prod" nic="net0"
+...
+$ wf query raw -H www-blue 'solaris.network.obytes64' -f wavefront
+solaris.network.obytes64 1219563430.0 1533751241000 source=www-blue nic="net0" role="sinatra"
+solaris.network.obytes64 1219563982.0 1533751261000 source=www-blue nic="net0" role="sinatra"
+...
+```
+
+You might have noticed that the timeseries query reports the
+point timestamp as epoch seconds, whereas a `raw` query phrases them
+as epoch milliseconds. Don't worry about it: the proxy accepts both.
+
+If you have a lot of data you wish to modify, perhaps to rename a
+metric path, or retrospectively change tags, you
+could pipe the output of these commands through `sed`, `awk`, or
+some other stream editing program, and back into a proxy.
+
+```cmd
+$ wf query 'ts("solaris.network.obytes64")' -f wavefront \
+  | sed 's/solaris/smartos/' \
+  | nc wf-proxy 2878
 ```
 
 ## Write
@@ -1031,7 +1319,7 @@ conventions, you can give the filename as `-`, and the CLI will read
 from standard in.
 
 ```cmd
-$ while true; do echo $RANDOM; sleep 0.1; done | \
+$ while true; do echo $RANDOM; sleep 1; done | \
   wf write file -m cli.example -T tag=randomness -Fv -
 ```
 
