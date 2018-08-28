@@ -7,3 +7,8 @@ end
 def build_number
   ENV['TRAVIS_BUILD_NUMBER'] || 0
 end
+
+def env?(var)
+  ENV.key?(var.to_s) && !ENV[var.to_s].empty?
+end
+

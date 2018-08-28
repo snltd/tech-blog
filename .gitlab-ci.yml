@@ -6,10 +6,9 @@ before_script:
   - gem install bundler --no-ri --no-rdoc
   - bundle install --jobs $(nproc) "${FLAGS[@]}"
 
-rubocop:
-  script:
-    - bundle exec rubocop
-
-spec:
-  script:
-    - bundle exec rake test
+deploy:
+  variables:
+    GEMFURY_TOKEN: "$(gemfury)"
+  script: "bundle exec push"
+  only:
+    - tags
