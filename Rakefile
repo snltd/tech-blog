@@ -18,8 +18,8 @@ end
 
 desc 'build gem'
 task build: :test do
-  p ENV
-  `gem build #{ROOT + 'sysdef.gemspec'}`
+  success = system("gem build #{ROOT + 'sysdef.gemspec'}")
+  abort 'could not build gem' unless success
 end
 
 desc 'push to Gemfury'
@@ -29,8 +29,9 @@ task push: :build do
   elsif !env?(:CI_COMMIT_TAG)
     puts 'Not tagged. Not pushing.'
   else
-    puts 'Pushing to Gemfury'
-    `curl --fail -vF package=@#{GEM} \
-    https://push.fury.io/#{ENV['gemfury']}/sysdef`
+    puts 'Pushing to Gemfury.'
+    resp = push_to_gemfury(most_recent_gem)
+    abort "Failed to push. Code #{resp.status}." unless resp.status == 200
+    puts 'Successfully pushed to Gemfury.'
   end
 end
