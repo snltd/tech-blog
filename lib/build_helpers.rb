@@ -1,5 +1,14 @@
 require 'faraday'
-require_relative 'version'
+
+def gem_version
+  if env?(:CI_BUILD_TAG)
+    ENV['CI_BUILD_TAG']
+  elsif env?(:CI_BUILD_ID)
+    "0.0.0-#{ENV['CI_BUILD_ID']}"
+  else
+    '0.0.0'
+  end
+end
 
 def most_recent_gem
   Pathname.glob("#{ROOT}/*.gem").sort.last
