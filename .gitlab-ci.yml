@@ -4,11 +4,14 @@ image: ruby:2.5
 
 before_script:
   - gem install bundler --no-ri --no-rdoc
-  - bundle install --jobs $(nproc) "${FLAGS[@]}"
+  - bundle install --jobs $(nproc)
+
+build:
+  script: "bundle exec rake build"
+  unless:
+    - tags
 
 deploy:
-  variables:
-    GEMFURY_TOKEN: $GEMFURY
   script: "bundle exec rake push"
-  #only:
-  #- tags
+  only:
+    - tags
