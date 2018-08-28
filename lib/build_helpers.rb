@@ -22,7 +22,7 @@ end
 #
 def push_to_gemfury(file)
   gemfury_connection.post(
-    '/connectedhomes/',
+    '/sysdef/',
     payload: Faraday::UploadIO.new(file.to_s,
                                    'application/x-www-form-urlencoded')
   )
