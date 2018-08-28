@@ -8,7 +8,7 @@ before_script:
 
 deploy:
   variables:
-    GEMFURY_TOKEN: "$(gemfury)"
+    GEMFURY_TOKEN: $gemfury
   script: "bundle exec rake push"
   #only:
   #- tags
