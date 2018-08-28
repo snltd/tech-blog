@@ -10,5 +10,5 @@ deploy:
   variables:
     GEMFURY_TOKEN: "$(gemfury)"
   script: "bundle exec rake push"
-  only:
-    - tags
+  #only:
+  #- tags
