@@ -31,6 +31,7 @@ task push: :build do
   else
     puts 'Pushing to Gemfury.'
     resp = push_to_gemfury(most_recent_gem)
+    p resp
     abort "Failed to push. Code #{resp.status}." unless resp.status == 200
     puts 'Successfully pushed to Gemfury.'
   end
