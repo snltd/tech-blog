@@ -1,5 +1,3 @@
-require 'faraday'
-
 def gem_version
   if env?(:CI_BUILD_TAG)
     ENV['CI_BUILD_TAG']
@@ -33,6 +31,8 @@ end
 # @return [Faraday] a connection to Gemfury.
 #
 def gemfury_connection
+  require 'faraday' # include at the top, and the build will fail
+
   Faraday.new(url: 'https://push.fury.io') do |f|
     f.basic_auth(ENV['GEMFURY_TOKEN'], nil)
     f.request(:multipart)
