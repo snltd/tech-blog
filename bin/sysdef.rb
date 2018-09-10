@@ -24,6 +24,11 @@ class WebApp < Sinatra::Base
     slim :front_page
   end
 
+  get '/_health' do
+    @posts = POSTS.all
+    render_page(:posts, POSTS.uris.sample, POSTS)
+  end
+
   get '/post/:page' do
     render_page(:posts, params[:page], POSTS)
   end
