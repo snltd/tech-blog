@@ -7,11 +7,12 @@ require_relative 'blog_post_reader'
 # fine, as we deploy as a package.
 #
 class BlogPosts
-  attr_reader :all, :dir
+  attr_reader :all, :dir, :uris
 
   def initialize(dir = 'posts')
-    @dir = dir
-    @all = generate_cache
+    @dir  = dir
+    @all  = generate_cache
+    @uris = uri_list
   end
 
   def generate_cache
@@ -53,5 +54,12 @@ class BlogPosts
 
   def top_tags(limit = 10)
     all_tags.take(limit)
+  end
+
+  # For the health check, we render a randomly chosen page. This
+  # method returns a list of all available page URIs
+  #
+  def uri_list
+    all.keys.map { |p| p.chomp('.md') }
   end
 end

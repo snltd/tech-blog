@@ -9,7 +9,7 @@ def gem_version
 end
 
 def most_recent_gem
-  Pathname.glob("#{ROOT}/*.gem").sort.last
+  Pathname.glob("#{ROOT}/*.gem").max
 end
 
 def env?(var)
