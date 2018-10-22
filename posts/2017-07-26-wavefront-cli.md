@@ -100,27 +100,29 @@ great at alerts.
 $ wf alert --help
 Usage:
   wf alert list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-l] [-f format] [-o offset] [-L limit]
+          [-al] [-f format] [-o offset] [-L limit]
   wf alert firing [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-o offset] [-L limit]
   wf alert snoozed [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-o offset] [-L limit]
   wf alert describe [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-v version] <id>
-  wf alert delete [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id>
+  wf alert delete [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          <id>
   wf alert undelete [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] <id>
   wf alert history [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-f format] [-S start] [-L limit] <id>
-  wf alert import [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <file>
-  wf alert snooze [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-T time] <id>
+          [-t token] [-f format] [-o offset] [-L limit] <id>
+  wf alert import [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          <file>
+  wf alert snooze [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-T time] <id>
+  wf alert update [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          <key=value> <id>
   wf alert unsnooze [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] <id>
   wf alert search [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-l] <condition>...
+          [-al] [-f format] [-o offset] [-L limit] <condition>...
   wf alert tags [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
   wf alert tag set [-DnV] [-c file] [-P profile] [-E endpoint]
@@ -131,9 +133,10 @@ Usage:
           [-t token] <id> <tag>
   wf alert tag delete [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] <id> <tag>
+  wf alert currently [-DnV] [-c file] [-P profile] [-E endpoint]
+          [-t token] <state>
   wf alert summary [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-a]
-  wf alert --help
 
 Global options:
   -c, --config=FILE         path to configuration file
@@ -207,6 +210,19 @@ like `wf proxy list | wc -l` to give the answer you expect.
 
 You can also `list -l`, which more-or-less dumps all of every
 resource into your terminal. I don't often use that.
+
+By default `list` and `search` will return the first hundred objects
+they find. You will be informed if there are more objects, and can
+use the `--offset` and `--limit` flags (`-o` and `-L`) to get the
+next pages.
+
+But now, all `search` and almost all `list` commands take a `--all`
+(or `-a`) option which fetches all objects of the given type. (This
+can be a heavy operation, if you have a lot of large objects,
+particularly dashboards.) The commands which do not paginate are
+`user`, because the API doesn't paginate its response, and `source`,
+because there are typically many thousands of sources, and an "all"
+operation takes for ever.
 
 We can also `search` for alerts, or, indeed, for any other object
 type. (All commands support the `search` sub-command, so long as
@@ -488,6 +504,14 @@ Snooze it again, this time, indefinitely.
 ```cmd
 $ wf alert snooze 1497276280057
 ```
+
+`alert firing` and `alert snoozed` are deprecated now. [Changes in
+the
+SDK](https://github.com/snltd/wavefront-sdk/blob/master/lib/wavefront-sdk/alert.rb#L203-L298)
+made it simple to add a more generic `currently` sub-command. So `wf
+alert currently firing` shows you all firing alerts, and `wf alert
+currently no_data` will show you all the ones whose series have no
+points over their last "would fire" interval.
 
 The final batch of `alert` sub-commands are to do with tagging. It's
 probably easiest just to show you those:
@@ -873,8 +897,21 @@ relevantHostNames     shark
 runningState          ENDED
 ```
 
-You can import also import and export windows, just like everything
-else.
+To see which windows are ongoing, use `wf window ongoing`, and to
+see which are coming up soon, use `wf window pending`. By default,
+`pending` shows windows which will open in the next 24 hours, but it
+takes an optional "hours" argument. So, what windows are coming up
+in the next two days?
+
+```cmd
+$ wf window pending 48
+No maintenance windows in the next 48.0 hours.
+```
+
+Like I said, I don't use them,
+
+You can import and export maintenance window objects, just like
+everything else.
 
 ## Derived Metrics
 
