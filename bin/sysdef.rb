@@ -4,8 +4,10 @@ require 'logger'
 require 'English'
 require 'sinatra/base'
 require 'pathname'
+require 'wavefront-sdk/write'
 require_relative '../lib/page_render'
 require_relative '../lib/blog_posts'
+require_relative '../lib/middleware'
 
 ROOT          = Pathname.new(__FILE__).dirname.realpath.parent.freeze
 LOG           = Logger.new(STDOUT)
@@ -13,11 +15,15 @@ POSTS         = BlogPosts.new.freeze
 KRAMDOWN_OPTS = { input:              'GFM',
                   syntax_highlighter: 'rouge',
                   hard_wrap:          false }.freeze
+SITE          = ROOT.basename.to_s.freeze
+WF            = Wavefront::Write.new(proxy: 'wavefront')
 
 # Modularized application
 #
-class WebApp < Sinatra::Base
+class Sysdef < Sinatra::Base
   set :root, ROOT
+
+  use RackWavefront
 
   get '/' do
     @posts = POSTS.all
