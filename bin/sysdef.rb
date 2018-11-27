@@ -16,7 +16,9 @@ KRAMDOWN_OPTS = { input:              'GFM',
                   syntax_highlighter: 'rouge',
                   hard_wrap:          false }.freeze
 SITE          = ROOT.basename.to_s.freeze
-WF            = Wavefront::Write.new(proxy: 'wavefront')
+WF            = Wavefront::Write.new({ socket: '/tmp/telegraf.sock'},
+                                     writer: :unix,
+                                     verbose: true)
 
 # Modularized application
 #
