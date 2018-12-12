@@ -102,9 +102,9 @@ Usage:
   wf alert list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-al] [-f format] [-o offset] [-L limit]
   wf alert firing [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-o offset] [-L limit]
+          [-f format] [-o offset] [-L limit]
   wf alert snoozed [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-o offset] [-L limit]
+          [-t token] [-f format] [-o offset] [-L limit]
   wf alert describe [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-v version] <id>
   wf alert delete [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
@@ -134,9 +134,12 @@ Usage:
   wf alert tag delete [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] <id> <tag>
   wf alert currently [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <state>
+          [-t token] [-f format] <state>
+  wf alert queries [-DnV] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] [-b]
   wf alert summary [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-a]
+          [-t token] [-f format] [-a]
+  wf alert --help
 
 Global options:
   -c, --config=FILE         path to configuration file
@@ -150,11 +153,12 @@ Options:
   -E, --endpoint=URI        cluster endpoint
   -t, --token=TOKEN         Wavefront authentication token
   -l, --long                list alerts in detail
+  -a, --all                 list all alerts
   -v, --version=INTEGER     describe only this version of alert
   -o, --offset=n            start from nth alert
   -L, --limit=COUNT         number of alerts to list
   -T, --time=SECONDS        how long to snooze (default 3600)
-  -a, --all                 list all alerts
+  -b, --brief               do not show alert names
   -f, --format=STRING       output format
 ```
 
@@ -484,15 +488,17 @@ snoozed                  1
 trash                    15
 ```
 
-Ooh, look, a firing alert! Quick, back to the listing.
+Ooh, look, a firing alert! Mor info please!
 
 ```cmd
-$ wf alert list | grep -i firing
+$ wf alert firing
 1497276280057  FIRING    test alert
 ```
 
 What do you know, it turns out that 2 _is_ greater than 1. Good job
-we had an alert set up for that! Snooze it for now.
+we had an alert set up for that!
+
+Snooze that alert for now.
 
 ```cmd
 $ wf alert snooze -T 10 1497276280057
@@ -511,7 +517,13 @@ SDK](https://github.com/snltd/wavefront-sdk/blob/master/lib/wavefront-sdk/alert.
 made it simple to add a more generic `currently` sub-command. So `wf
 alert currently firing` shows you all firing alerts, and `wf alert
 currently no_data` will show you all the ones whose series have no
-points over their last "would fire" interval.
+points over their last "would fire" interval.  Valid alert states are
+`firing`, `snoozed`, `in_maintenance`, `invalid`, `none`,
+`checking`, `trash`, and `no_data`.
+
+The `alert queries` subcommand will show you the conditions used
+across all your alerts. This can be useful if you're thinking of
+thinning out the metrics you collect.
 
 The final batch of `alert` sub-commands are to do with tagging. It's
 probably easiest just to show you those:
@@ -1116,20 +1128,29 @@ The `query` command has quite a lot of options (common options removed for
 brevity.)
 
 ```cmd
-$ wf query --help
+[box:/home/rob/work/sites/sysdef.xyz/posts]$ wf query --help
 Usage:
   wf query aliases [-DV] [-c file] [-P profile]
   wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-g granularity] [-s time] [-e time] [-f format] [-ikvO] [-S mode]
-          [-N name] [-p points] <query>
+          [-g granularity] [-s time] [-e time] [-f format] [-WikvO] [-S mode]
+          [-N name] [-p points] [-F options] <query>
   wf query raw [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-H host] [-s time] [-e time] [-f format] <metric>
+          [-H host] [-s time] [-e time] [-f format] [-F options] <metric>
   wf query run [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-g granularity] [-s time] [-e time] [-f format] [-ivO] [-S mode]
-          [-N name] [-p points] <alias>
+          [-g granularity] [-s time] [-e time] [-f format] [-F options] [-WkivO]
+          [-S mode] [-N name] [-p points] <alias>
   wf query --help
 
+Global options:
+  -c, --config=FILE            path to configuration file
+  -P, --profile=NAME           profile in configuration file
+  -D, --debug                  enable debug mode
+  -n, --noop                   do not perform API calls
+  -V, --verbose                be verbose
+  -h, --help                   show this message
+
 Options:
+  -E, --endpoint=URI           cluster endpoint
   -t, --token=TOKEN            Wavefront authentication token
   -g, --granularity=STRING     query granularity (d, h, m, or s)
   -s, --start=TIME             start of query window
@@ -1145,7 +1166,17 @@ Options:
   -O, --obsolete               include metrics unreported for > 4 weeks
   -H, --host=STRING            host or source to query on
   -f, --format=STRING          output format
+  -F, --format-opts=STRING     comma-separated options to pass to output
+                               formatter
   -k, --nospark                do not show sparkline
+  -W, --nowarn                 do not show API warning messages
+
+The query command has an additional output format. Using
+'-f wavefront' produces output suitable for feeding back into a proxy.
+Other output formats are 'yaml', 'json', 'ruby', and 'csv'. CSV format
+options are 'header' (print column headers); 'tagkeys' (print tags as
+key=value rather than value); and 'quote' (force quoting of every CSV
+element).
 ```
 
 ```cmd
@@ -1259,7 +1290,7 @@ $ wf query aliases
 nfs
 ```
 
-`wf query` supports an additional output format: `wavefront`. This
+`wf query` supports additional output formats. `wavefront`
 writes out the points in native Wavefront wire format. It works for
 timeseries and raw queries.
 
@@ -1275,6 +1306,15 @@ solaris.network.obytes64 1219563982.0 1533751261000 source=www-blue nic="net0" r
 ...
 ```
 
+`csv` format outputs points as a CSV table. By default no column
+headers are printed; values are not quoted unless they contain
+whitespace, a comma or a soft quote; and point tags have their
+values printed but not their keys. By using the `-F` option you can
+change all these things. `-F` takes a comma-separated list of
+keywords: `header` will print the CSV header line; `quote` will
+soft-quote every value; and `tagkeys` will print point tags as
+`key=value`.
+
 You might have noticed that the timeseries query reports the
 point timestamp as epoch seconds, whereas a `raw` query phrases them
 as epoch milliseconds. Don't worry about it: the proxy accepts both.
@@ -1289,6 +1329,7 @@ $ wf query 'ts("solaris.network.obytes64")' -f wavefront \
   | sed 's/solaris/smartos/' \
   | nc wf-proxy 2878
 ```
+
 
 ## Write
 
