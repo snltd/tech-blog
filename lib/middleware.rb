@@ -7,8 +7,13 @@ class RackWavefront
     @status, @headers, @body = @app.call(env)
 
     if env['REQUEST_PATH'].start_with?('/post/')
-      WF.write_delta(path: 'rack.request', value: 1,
-                     tags: { site: SITE, page: env['REQUEST_PATH'] })
+      point = { path:  'dev.rack.request2',
+                value: 1,
+                ts:    (Time.now.to_f * 1000).round,
+                tags:  { site: SITE,
+                         page: env['REQUEST_PATH']
+                       } }
+      wf.write_delta(point)
     end
 
     [@status, @headers, @body]
