@@ -7,7 +7,7 @@ category: Wavefront
 ---
 
 Wavefront has [over a hundred and fifty
-integration](https://www.wavefront.com/integrations/) and counting.
+integrations](https://www.wavefront.com/integrations/) and counting.
 But it doesn't, at the time I write this, have one for
 [Travis-CI](http://travis-ci.org/) or
 [Gitlab](https://gitlab.com/), both of which I use every day.
@@ -23,7 +23,7 @@ Most of my projects are written in Ruby, so they test, build, and
 deploy through jobs in a `Rakefile`. (In fact, I like `Rakefiles` so
 much I use them for some things that *aren't* written in Ruby.)
 
-You can probably trace the `Rakefile`s on Most of my my existing
+You can probably trace the `Rakefile`s on most of my my existing
 projects back to the first "decent" one I made. Why write a new one
 when you can modify an old one? And they tend to call the Ruby
 `abort` function with a (hopefully) helpful error message when
@@ -59,8 +59,6 @@ class.
 require 'wavefront-sdk/report'
 wf = Wavefront::Report.new(creds)
 ```
-
-
 
 I decided to time the various steps of the pipeline. This meant
 wrapping all my Rake tasks in a little timer. There are a million

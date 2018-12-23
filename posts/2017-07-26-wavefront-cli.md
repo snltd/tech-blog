@@ -70,6 +70,7 @@ Usage:
 Commands:
   alert              view and manage alerts
   cloudintegration   view and manage cloud integrations
+  config             create and manage local configuration
   dashboard          view and manage dashboards
   derivedmetric      view and manage derived metrics
   event              open, close, view, and manage events
@@ -91,8 +92,48 @@ Commands:
 Use 'wf <command> --help' for further information.
 ```
 
-Looks pretty simple. Let's start with some alerts. Wavefront is
-great at alerts.
+The majority of those commands talk to Wavefront's API. To do that,
+`wf` obviously needs to know where the API is, and to pass on some
+credentials.
+
+You can do this with command-line options (we'll see those in a
+moment), but for everyday interactive use, it's much better to
+create a configuration. file.
+
+You can, of course, create configuration by hand, but the `wf
+config` command will guide you through it. The first time you run
+the program without credentials, it tells you how to create
+configuration, and even suggests helpful default values for most
+things.
+
+```cmd
+$ wf alert list
+No credentials supplied on the command line or via environment variables,
+and no configuration file found. Please run 'wf config setup' to create
+configuration.
+$ wf config setup
+Creating new configuration file at /home/rob/.wavefront.
+Creating profile 'default'.
+  Wavefront API token:> 820ac1de-4e1f-41a4-f9c3-231c95ae4da1
+  Wavefront API endpoint [metrics.wavefront.com]:>
+  Wavefront proxy endpoint [wavefront]:>
+  default output format [human]:>
+$ wf config show
+[default]
+token = 820ac1de-4e1f-41a4-f9c3-231c95ae4da1
+endpoint = metrics.wavefront.com
+proxy = wavefront
+format = human
+```
+
+You can override values in the configuration files with command-line
+options, and also with environment variables. `WAVEFONT_TOKEN`,
+`WAVEFRONT_ENDPOINT` and `WAVEFRONT_PROXY` are all supported. If
+you have multiple Wavefront accounts, you can add a new stanza for
+each account.
+
+Now we're fully credentialled, we can start exploring the CLI.
+Let's start with some alerts. Wavefront is great at alerts.
 
 ## Alert
 
@@ -162,41 +203,11 @@ Options:
   -f, --format=STRING       output format
 ```
 
-(Notice the line-wrapping on the help: it automatically adjusts to
+Notice the line-wrapping on the help: it automatically adjusts to
 fit the width of your terminal, and I'm an unapologetic, hardcore,
-80-column guy. Deal with it.)
+80-column guy. Deal with it.
 
-You can see the `alert` command has quite a lot of subcommands, and
-that most of those subcommands have credential-related options. We
-don't want to have to manually feed it an endpoint and token every
-time we run a command, so let's make a config file. Though you can
-override the location with `-c`, the CLI expects to find this file
-at `~/.wavefront`, and it expects it to look something like this:
-
-```ini
-[default]
-token = c9a10d4f-09a1-45ac-1401-9acfa15b433c
-endpoint = metrics.wavefront.com
-format = human
-proxy = wavefront.localnet
-
-[myclient]
-token = 820ac1de-4e1f-41a4-f9c3-231c95ae4da1
-endpoint = myclient.wavefront.com
-format = human
-```
-
-It's an INI format file, with a stanza for each Wavefront account
-you use. Most people will just have one, but I have a couple. You
-only need the `default`. Oh, and in case you were wondering, those
-aren't my real tokens!
-
-You can override values in the configuration files with command-line
-options, and also with environment variables. `WAVEFONT_TOKEN`,
-`WAVEFRONT_ENDPOINT` and `WAVEFRONT_PROXY` are all supported.
-
-Now we're fully credentialled, let's have a look at the alerts in my
-account.
+Let's start by having a look at the alerts in my account.
 
 ```cmd
 $ wf alert list

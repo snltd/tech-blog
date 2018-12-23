@@ -57,52 +57,60 @@ I digest what I've read and go back over it with the book open, at
 the computer. That works for me. Naturally I bought *The Go
 Programming Language*. It's obvious, right? It's co-written by Brian
 Kernighan, it's solid 5-star ratings everywhere you look, it's
-official, and it's AS BORING AS HELL. I also found it elitist. The
-example code could have done anything, and the choice to, from
-chapter one, have it render mathematical forms I've never heard of,
-put me on the back foot. I immediately thought "this isn't supposed
-to be for me. They don't want me in their club".
+official, and -- it's AS BORING AS HELL.
 
-On page 43 they're showing me how to convert Celcius to Fahrenheit.
-(Again.) Then on page 62 I'm asked to use Newton's method to find
-complex solutions to a function and shade an SVG wireframe based on
-numbers of iterations or something. I've done a physics degree and
-an Engineering masters, I don't know what Newton's method is. I
-don't feel encouraged or enthused by these exercises. I feel stupid.
-And not because I can't *do* the exercises, but because I can't even
-*understand* them.
+A programming language book will, I suppose, reflect the language it
+describes, so this was my first warning that Go would also be BORING
+AS HELL. But worse than boring, I found *The Go Programming
+Language* elitist. The example code could have done anything, and
+the choice to, from chapter one, have it render mathematical forms
+I've never heard of, put me on the back foot. After a couple of
+chapters I had a half-formed idea that Go wasn't supposed to be for
+me. That they don't want me in their club.
 
-Or how about Exercise 8.2.
+For example, On page 43 they're showing me how to convert Celcius to
+Fahrenheit.  (Again.) Then on page 62 I'm asked to use Newton's
+method to find complex solutions to a function and shade an SVG
+wireframe based on numbers of iterations. (Or something.) I've done
+a physics degree and an Engineering masters, but I don't know what
+Newton's method is. I could learn it, but unfortunately I'm using
+all my spare time learning Go. Consequently I don't feel encouraged
+or enthused by these exercises. I feel stupid.  And not because I
+can't *do* the exercises, but because I can't even *understand*
+them.
+
+How about Exercise 8.2?
 
 > Implement a concurrent FTP server... You can use the standard
 > `ftp` command as the client, or write your own.
 
-Yeah, I could do that, couldn't I? I've nothing better to do. Why
-stop at reinventing the client? Maybe I could write an entire
-operating system for it to run on? One day it might take over the
-world, just like Plan 9.
+Yeah, I could do that, couldn't I? It's not like I have a job to do,
+and a life to live, and people to see. Why stop at reinventing the
+client? Maybe I could write an entire operating system for it to run
+on! One day it might go on to be as wildly successful as Plan 9.
 
-They're worded so flippantly too. Like they're taking the piss,
-setting students busy-work exercises so they can knock off early and
-go down the pub. Anyone can do that.
+The exercises are worded so flippantly too. Like they're taking the
+piss, setting students busy-work exercises so they can knock off
+early and go down the pub. Anyone can do that.
 
 > **Exercise x.y:** Microsoft Office is a productivity suite aimed
 > at large enterprises. Implement it.
 
 The book -- particularly the exercises -- indelibly coloured my view
 of the language.  Perhaps it unleashed a hitherto unnoticed angry
-inadequacy at my lack of useful schooling, (I admit I have an axe to
-grind with formal education) but I saw it as elitist, long-winded,
+inadequacy at my lack of useful schooling, (I know I have grudges
+against formal education) but I saw it as elitist, long-winded,
 full of boilerplate, and the more I read (from various sources) the
-more I felt myself setting against it. The book, I have come to
-think, perfectly reflects the language.
+more I felt myself setting against it. As I said: the book reflects
+the language.
 
 The Go community felt, and feels, like a club whose entry
 requirements are a recent CS degree and a fondness for being told
 what to think. The extremely thorough but extremely dry
 documentation is riddled with academic smugness, like the preamble
 to the `regexp` module suggesting I look at "any book on automata
-theory".
+theory". I've got a suggestion for you, regex module people, but
+it's coarse.
 
 I tried to find people like me, who had had eventual success with Go
 despite it being antithetical to their mindset, but found little. It
@@ -111,18 +119,18 @@ and if you don't like it, then that's YOUR PROBLEM. Go is FUN, and
 one of the most fun things about it is HOW PRODUCTIVE IT MAKES YOU.
 
 The penny dropped when I read that Go was made so Google could
-quickly get reliable, usable code out of recent graduates. Golang
-is the programming equivalent of an open plan office. An academic
+quickly get reliable, usable code out of recent graduates. Golang is
+programming's answer to the open plan office. An academic
 implementation of a time-and-motion study designed to maximise a
 huge corporation's staffing ROI.
 
 Google is built on automation, repetition, stamping out the same
 image over the world. It's natural they'd see their people in the
-same way. Start with the same people, with the same education, in
+same way. Start with the same people, with the same education in
 the same patterns and the same algorithms. Give them the same
 language which enforces the same syntax and the same techniques, and
-when one burns out at 26 from the 80 hour weeks, drop in another and
-you won't see the join.
+any time someone burns out at 26 from the 80 hour weeks, drop in
+another and you won't see the join.
 
 Give me the child and I will mould the man. And Go probably does
 seem like fun when your programming experience up to that point has
@@ -149,8 +157,12 @@ judgement.
 But a few years ago Ruby was all the rage, and when I saw Ruby I
 loved it. I was happy to run with the crowd then, so why not now?
 
-Maybe it's Google. I'd say now I actively hate Google, and I hate
-the fawning follow-the-leader my industry has for anything they do.
+Maybe it's Google. I borderline hate Google. I hate their business
+model, their arrogance, their disregard for privacy, their
+ever-creeping Ts&Cs, the lot really. And I hate the fawning
+follow-the-leader attitude my industry has for anything they do.
+We're seeing it again with Kubernetes: everyone knows they have to
+have it, but hardly anyone seems to know why.
 
 Go isn't the first language I've tried to love and failed. I feel
 very similarly about Python, which I first ran into twenty-odd years
