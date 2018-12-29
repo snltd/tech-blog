@@ -1185,7 +1185,7 @@ Options:
 The query command has an additional output format. Using
 '-f wavefront' produces output suitable for feeding back into a proxy.
 Other output formats are 'yaml', 'json', 'ruby', and 'csv'. CSV format
-options are 'header' (print column headers); 'tagkeys' (print tags as
+options are 'headers' (print column headers); 'tagkeys' (print tags as
 key=value rather than value); and 'quote' (force quoting of every CSV
 element).
 ```
@@ -1322,7 +1322,7 @@ headers are printed; values are not quoted unless they contain
 whitespace, a comma or a soft quote; and point tags have their
 values printed but not their keys. By using the `-F` option you can
 change all these things. `-F` takes a comma-separated list of
-keywords: `header` will print the CSV header line; `quote` will
+keywords: `headers` will print the CSV header line; `quote` will
 soft-quote every value; and `tagkeys` will print point tags as
 `key=value`.
 
