@@ -3,7 +3,7 @@
 image: ruby:2.5
 
 before_script:
-  - gem install bundler --no-ri --no-rdoc
+  - gem install bundler --no-document
   - bundle install --jobs $(nproc)
 
 build:
