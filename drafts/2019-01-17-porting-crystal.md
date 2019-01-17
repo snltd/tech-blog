@@ -45,7 +45,7 @@ show-stopping bug in 6.0.0.  (Which, frustratingly, is the version
 shipped by default with every OS I looked at.) So I decided to play
 it safe and use 5.0, even though this ended up making me more work.
 
-I set up an Ubuntu 16.04 (6b47e1d9-36b8-4b6f-8764-5ff5fe6d120b) KVM
+I set up an Ubuntu 16.04 (`6b47e1d9-36b8-4b6f-8764-5ff5fe6d120b`) KVM
 on a SmartOS box, and gave it 4Gb of RAM. I found that with 2Gb (my
 default build), cross-compilation could fail.
 
@@ -59,6 +59,16 @@ $ echo "deb https://dist.crystal-lang.org/apt crystal main" | \
   sudo tee /etc/apt/sources.list.d/crystal.list
 $ sudo apt update
 $ sudo apt install build-essential libgc-dev llvm-5.0 crystal
+$ gcc -dumpversion
+$ gcc -dumpversion
+5.4.0
+$ crystal version
+Crystal 0.27.0 [c9d1eef8f] (2018-11-01)
+
+LLVM: 4.0.0
+Default target: x86_64-unknown-linux-gnu
+$ llvm-config-5.0 --version
+5.0.0
 ```
 
 I did all the following as the default `ubuntu` user. You don't need
@@ -78,6 +88,8 @@ Solaris, so we'll need GCC.
 
 ```cmd
 # pkg install developer/gcc-7 developer/build/gnu-make
+$ gcc -dumpversion
+7.3.0
 ```
 
 Crystal requires [the Boehm GC](http://www.hboehm.info/gc/). Solaris
@@ -136,8 +148,9 @@ if (UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM_NAME} MATCHES
 endif()
 ```
 
-Then I was able to configure and build cleanly. I had to specify GCC because
-my build box has Studio CC on it, and `cmake` defaulted to that.
+Then I was able to configure and build cleanly. I had to specify GCC
+because my build box has Studio CC on it, and `cmake` defaulted to
+that.
 
 ```cmd
 $ CC=gcc cmake -DCMAKE_INSTALL_PREFIX=/usr/local/llvm ../llvm-5.0.2.src
@@ -145,10 +158,39 @@ $ gmake
 ...
 # gmake install
 ...
+$ /usr/local/llvm/bin/llvm-config --version
+5.0.2
 ```
 
 The build takes ages, and doing it parallel exhausted all the memory
 in the zone at the linking phase!
+
+## Set Up SmartOs
+
+Though I'm primarily targeting Solaris, my final aim is to have
+Crystal running on SmartOS. So, I built a SmartOS environment too.
+
+I spun up a native zone using the `base-64` image.
+(`c6a275e4-c730-11e8-8c5f-9b24fe560a8f`). Inside it I added the
+necessary packages, including the Boehm-GC, and `libevent` (which we
+did not have to specify on Solaris.)
+
+```cmd
+# pkgin in cmake binutils gmake gcc7 boehm-gc libevent
+$ gcc -dumpversion
+7.3.0
+```
+
+Unfortunately, the LLVM in the pkgsrc repo at the moment is 6.0.0.
+So, I built LLVM-5.0.2, largely as before, but omitting the `ld`
+flags from the configuration.  SmartOS's `ld` hasn't grown
+GNU-compatible extensions in the way Solaris' has, and I couldn't
+work out how to force the build to use `gld`. Should anyone ever
+wish to repeat my experiments, you can [download a tarball of my
+LLVM
+build](https://us-east.manta.joyent.com/sysdef/public/usr-local-llvm-5.0.2.tar.xz).
+Unpack it into `/usr/local`, and add `/usr/local/llvm/bin` to your
+`PATH`.
 
 ## Porting Crystal -- Bindings and if-ladders
 
@@ -324,11 +366,16 @@ $ ./test
 
 First success! A Crystal program running on Solaris.
 
-The linking did not work for me when I tried it on SmartOS. The error was:
+The linking did not work for me when I tried it on SmartOS.
 
 ```cmd
+$ gcc -m64 -L/opt/local/lib -o test test.o -lpcre -levent libcrystal.a \
+  -lpthread -lssp -lgc
 ld: fatal: relocation error: file libcrystal.a(sigfault.o): section [2].rela.text: invalid relocation type: 0x2a
 ```
+
+I'm not sure how to progress from this, so from now on I only
+worried about Solaris.
 
 ## Cross Compiling Crystal Itself
 
