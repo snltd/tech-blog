@@ -29,9 +29,9 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'sinatra', '~>2.0', '>= 2.0.1'
   gem.add_runtime_dependency 'slim', '~> 3.0', '>= 3.0.0'
   gem.add_runtime_dependency 'tilt', '~> 2.0', '>= 2.0.0'
-  gem.add_runtime_dependency 'wavefront-sdk', '~> 2.1', '>= 2.1.0'
+  gem.add_runtime_dependency 'wavefront-sdk', '~> 2.3', '>= 2.3.0'
 
-  gem.add_development_dependency 'bundler', '~> 1.3'
+  gem.add_development_dependency 'bundler', '~> 1.17'
   gem.add_development_dependency 'faraday', '~> 0.14.0'
   gem.add_development_dependency 'minitest', '~> 5.11', '>= 5.11.0'
   gem.add_development_dependency 'nokogiri', '~> 1.8', '>= 1.8.0'
