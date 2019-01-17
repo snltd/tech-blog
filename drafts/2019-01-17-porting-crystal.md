@@ -473,11 +473,16 @@ fiber assembler.
 So here, sadly, ends my adventure trying to port Crystal to Solaris.
 Possibly some of what I've done could help someone smarter than me,
 but I've had to stretch myself on every aspect of this, and I am not
-altogether confident in the quality of any of the work. That said,
-the fact that a very basic one-liner links and runs suggests I've
-got *something* right.
+altogether confident in the quality of the work. That said, the fact
+that a basic one-liner links and runs suggests I've got *something*
+right.
 
-## Useful Links
+I have a feeling that the intersect of "people who want to write
+Crystal" and "people who want to use SmartOS" might be just me, so
+this port will likely never work. But at least I tried, eh? And
+learnt a couple of things on the way.
+
+## Bibliography and Useful Links
 
 * ["Add Illumos/Solaris support"
   issue](https://github.com/crystal-lang/crystal/issues/3173)
