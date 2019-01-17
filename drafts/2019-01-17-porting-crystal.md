@@ -1,7 +1,7 @@
 ---
 title: "Porting Crystal to Solaris and SmartOS"
 date: "2019-01-16"
-tags: [Crystal, Solaris, SmartOs, failure]
+tags: [Crystal, Solaris, SmartOS, failure]
 layout: post
 category: programming
 ---
@@ -165,7 +165,7 @@ $ /usr/local/llvm/bin/llvm-config --version
 The build takes ages, and doing it parallel exhausted all the memory
 in the zone at the linking phase!
 
-## Set Up SmartOs
+## Set Up SmartOS
 
 Though I'm primarily targeting Solaris, my final aim is to have
 Crystal running on SmartOS. So, I built a SmartOS environment too.
