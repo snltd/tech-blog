@@ -165,6 +165,55 @@ x86_64-pc-solaris2.11
 I figured that Linux is probably the most similar platform, so I
 copied its directory and started hacking.
 
+Crystal has its own types which align with the basic C types.
+They're denoted by a capital letter, so an `Int` maps to the
+underlying `int`. For the `_t` types we expect to see in our libC
+headers, the convention is to CamelCase. So `sock_addr_t` is
+`SockAddrT`. Structs and unions look a little like Ruby blocks. For
+example:
+
+```c
+struct timezone {
+  int tz_minuteswest;
+  int tz_dsttime;
+};
+```
+
+becomes
+
+```ruby
+struct Timezone
+  tz_minuteswest : Int
+  tz_dsttime     : Int
+end
+```
+
+Functions are defined in a similar way. `man connect` gives us the
+function signature
+
+```c
+int connect(int socket, const struct sockaddr *address, socklen_t address_len);
+```
+
+and we can create a Crystal binding to that with
+
+```ruby
+fun connect(fd : Int, addr : Sockaddr*, len : SocklenT) : Int
+```
+
+All of this happens in the `LibC` namespace: that is to say that all
+the definitions are inside a
+
+```ruby
+
+lib LibC
+...
+end
+```
+
+block. In this way we build a bridge between Crystal and the
+underlying operating system.
+
 After much `ggrep -r`-ing of `/usr/include`, and much consultation
 of [Solaris Systems
 Programming](https://wordery.com/solaris-systems-programming-paperback-rich-teer-9780768682236),
@@ -172,7 +221,7 @@ I had something that looked fairly okay. It's [in a Git
 branch](https://github.com/snltd/crystal/tree/feature/solaris-smartos_support).
 
 I also had to make a few changes to the Crystal source. It's
-scattered with `if` ladders to handle various OS-specifics, and I
+sprinkled with `if` ladders to handle various OS specifics, and I
 had to add another clause [here and
 there](https://github.com/crystal-lang/crystal/compare/master...snltd:feature/solaris-smartos_support).
 
@@ -182,16 +231,13 @@ There are a number of things I'm unsure of.
   handling](https://github.com/snltd/crystal/blob/feature/solaris-smartos_support/src/errno.cr).
   I chased this through `/usr/include` until my brain melted. I may
   well have done this wrong.
-
 * [the pthread bindings](https://github.com/snltd/crystal/blob/feature/solaris-smartos_support/src/lib_c/x86_64-pc-solaris2.11/c/pthread.cr)
   and  [the
   types](https://github.com/snltd/crystal/blob/feature/solaris-smartos_support/src/lib_c/x86_64-pc-solaris2.11/c/pthread.cr)
-  they use. This, so far, is my undoing.
-
-*  In `c/signal.cr` I need to define `SigsetT`. (The Crystal
-   convention for C bindings is to turn `snake_case_t` to
-   `CamelCaseT`.)
-   `/usr/include/sys/signal.h` defines this type as
+  they use. Though I'm as certain as I can be, some of them got a
+  bit complicated.
+* In `c/signal.cr` I need to define `SigsetT`. `/usr/include/sys/signal.h`
+  defines this type as
   ```c
   typedef struct {    /* signal set type */
         unsigned int  __sigbits[4];
@@ -199,7 +245,6 @@ There are a number of things I'm unsure of.
   ```
   I am unsure how to correctly represent the implementation-specific
   `__sigbits[]`.
-
 * Illumos, as I mentioned, lacks `dprintf()`. In an earlier
   iteration of this work I put if-ladders in the code to use
   `sprintf()` instead, but I haven't done that this time around. It
@@ -370,7 +415,7 @@ Memory fault(coredump)
 ```
 
 [Here's a gist of `truss` following that
-command`](https://gist.github.com/snltd/55160961798481d28703055a7e006f98).
+command](https://gist.github.com/snltd/55160961798481d28703055a7e006f98).
 
 And here's what `pstack` knows.
 
