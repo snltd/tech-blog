@@ -6,18 +6,24 @@ layout: post
 category: Solaris
 ---
 
-If you use Ruby you ought, in my opinion, to be using
-[rbenv](https://github.com/rbenv/rbenv). And if you use computers
-you ought, in my opinion, to be using something SunOS based.
+I love a bit of Ruby. I also love
+[rbenv](https://github.com/rbenv/rbenv), and Solaris.
 
-Out of the box I couldn't get Ruby 2.6.0 (or anything else for that
-matter) to install on a clean Solaris 11.4 build. It's simple enough
-though.
+Getting things running on Solaris seems to get more difficult every
+week. Today I has problems getting Ruby 2.6.0 to install on a clean
+Solaris 11.4 build.
 
-The problems are: `rbenv`, like the rest of the world, pretty much
-assumes a GNU tool chain; and Solaris has (rightly) deprecated a
-whole bunch of OpenSSL stuff. So, assuming you have a machine with a
-decent build environment (GCC and friends) your workaround is:
+A little bit of log-reading showed two problems. First, `rbenv` (or,
+more likely, the build plugin), appears to assume a GNU tool chain.
+This is not new. 90% of the world thinks only Linux exists, 99%
+thinks there's only Linux and Mac.
+
+Once you've fixed that, you'll find that Solaris has (not
+unreasonably) deprecated a whole bunch of OpenSSL stuff. This breaks
+the build.
+
+Assuming you have a machine with a decent build environment (GCC and
+friends) your workaround is:
 
 ```cmd
 $ PATH=/usr/gnu/bin:$PATH RUBY_CFLAGS="-DOPENSSL_NO_MD5" rbenv install 2.6.0
@@ -30,5 +36,5 @@ the right place.
 $ gem install mysql2 -- --with-mysql-config=/usr/mysql/5.7/bin/mysql_config
 ```
 
-I haven't problems with any native extension gems so far, even
-`ffi`.
+I haven't had installation difficulties with any other native
+extension gems so far, even `ffi`.
