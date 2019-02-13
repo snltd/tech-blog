@@ -1375,13 +1375,18 @@ specify one if you want, again, in any parseable format. You can
 specify any number of point tags, too.
 
 ```cmd
-$ wf write point -T tag1=val1 -T tag2=val2 -t 16:30 cli.example 9
-$ wf write point -T tag1=val1 -T tag2=val2 cli.example 12.3
+$ wf write point -T timestamp=given -t 17:03 cli.example 9
+          sent 1
+      rejected 0
+        unsent 0
+$ wf write point -T timestamp=inferred cli.example 12.3
+          sent 1
+      rejected 0
+        unsent 0
 ```
 
-<script src="https://metrics.wavefront.com/embedded/RSgQw0kMk1/js"
-id="wavefront-embedded-RSgQw0kMk1" width="700"
-height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/cGgfb89wpB/js"
+id="wavefront-embedded-cGgfb89wpB" width="700" height="300"></script>
 
 You can also write content from a file. Each line in the file
 describes a point, so it must contain at least a value, which we
@@ -1391,10 +1396,10 @@ tell the CLI what order those fields are in with the `-f` option.
 So, say you have a file which looks like this:
 
 ```
-cli.example 1497455241 31640 tag1=val1 tag2=val2
-cli.example 1497455242 8887 tag1=val1 tag2=val2
-cli.example 1497455248 22038 tag1=val1 tag2=val2
-cli.example 1497455249 5406 tag1=val1 tag2=val2
+cli.example 1550077536 31640 tag1=val1 tag2=val2
+cli.example 1550077536 8887 tag1=val1 tag2=val2
+cli.example 1550077536 22038 tag1=val1 tag2=val2
+cli.example 1550077536 5406 tag1=val1 tag2=val2
 ```
 
 you'd use `-f mtvT`. There are a couple of rules. Because it can
@@ -1412,15 +1417,12 @@ $ while true; do echo $RANDOM; sleep 1; done | \
   wf write file -m cli.example -T tag=randomness -Fv -
 ```
 
-<script src="https://metrics.wavefront.com/embedded/hGympnPMv9/js"
-id="wavefront-embedded-hGympnPMv9" width="700"
-height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/CqVs903Gl2/js"
+id="wavefront-embedded-CqVs903Gl2" width="700" height="300"></script>
 
-You can substitute `write` for `report`, and send metrics directly
-to Wavefront, bypassing your proxies. I've written [a separate
-article which looks more closely at sending
-metrics](/post/2018-08-08-wavefront-writer), and that's one of the
-topics it covers.
+The `write` command has a lot of options and capabilities, so I
+wrote [a separate article which looks more closely at sending
+metrics](/post/2018-08-08-wavefront-writer) from the CLI.
 
 ## End
 
