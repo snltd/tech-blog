@@ -239,9 +239,8 @@ JVM statistics, which let you see memory usage inside the JVM. This
 is one of a number of charts on my Wavefront "internal metrics"
 dashboard.
 
-<script src="https://metrics.wavefront.com/embedded/t7fLqJS7Bg/js"
-id="wavefront-embedded-t7fLqJS7Bg" width="700"
-height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/gGLp7mTvMj/js" id="wavefront-embedded-gGLp7mTvMj"
+width="700" height="300"></script>
 
 The proxy, obviously. needs a config file. It needs to know where to
 talk to, how to authenticate, how to identify itself, and what ports
@@ -349,13 +348,13 @@ monitor things which don't get to Wavefront!
 
 I don't need to do that now, because the proxy reports back counts
 of points received, sent, and blocked, so I can tell Wavefront
-`deriv(ts(~agent.points.*.blocked))` and see a chart of blocked
-points.  form when I was [developing the Ruby
-CLI](http://sysdef.xyz/post/2016-07-21-wavefront_writer) and kept
-sending duff points.
+`rate(ts(~agent.points.2878.blocked))` and see a chart of blocked
+points.  form when I was [working on the Ruby
+CLI](/post/2018-04-08-wavefront-writer) and kept sending duff
+points.
 
-<script src="https://metrics.wavefront.com/embedded/mFZYn8LDxh/js"
-id="wavefront-embedded-mFZYn8LDxh" width="700" height="200"></script>
+<script src="https://metrics.wavefront.com/embedded/M05cFCCLj0/js"
+id="wavefront-embedded-M05cFCCLj0" width="700" height="300"></script>
 
 Wiring your logging into Wavefront is still a great idea though. At
 my client site every FluentD log stream generates metrics, so we can

@@ -340,11 +340,11 @@ has to do some sums. Diamond gives you a class variable,
 `last_value` to memo things between runs, and using that and our
 simple-to-work-with nanosecond times, it's easy to work out the time
 each process spends on-CPU, literally, and as a percentage of
-available time. Here's the CPU usage for the Java processes on one
-of my hosts
+available time. Here's the system + kernel CPU usage for the Java
+processes on one of my hosts
 
-<script src="https://metrics.wavefront.com/embedded/SsbW6tf7yf/js"
-id="wavefront-embedded-SsbW6tf7yf" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/zTvbmlfjFs/js"
+id="wavefront-embedded-zTvbmlfjFs" width="700" height="300"></script>
 
 If you hover over that chart, you'll see the zone tags. These are
 attached to every metric produced by the `proc` collector, using the

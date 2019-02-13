@@ -93,9 +93,8 @@ pretty much the same rate as the `file_time`. Extracting those two
 metrics and removing the `normalize()` gave me something very much
 like this:
 
-<script src="https://metrics.wavefront.com/embedded/QgnDzKMKMs/js"
-id="wavefront-embedded-QgnDzKMKMs" width="700"
-height="300"></script>
+<script src="https://virunga.wavefront.com/embedded/3pc3PH675v/js"
+id="wavefront-embedded-3pc3PH675v" width="700" height="300"></script>
 
 > The chart above is an after-the-fact reconstruction, made by
 > duplicating in the lab the issue I described. I can't show you the
