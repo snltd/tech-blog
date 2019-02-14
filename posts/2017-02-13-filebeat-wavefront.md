@@ -12,12 +12,16 @@ In short, you have a log shipper talk to your Wavefront proxy, which
 applies
 [grok](https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html)
 rules to match lines and extract data, generating metrics from what
-it finds. After processing, the logs are discarded, so Wavefront
-doesn't replace something like Splunk, ELK or Graylog, but I think
-there is a great deal of value in its approach to statisically
-analyzing flows of logs.
+it finds.
 
-On my current client's site, we have hooked our logging to our
+After processing, the logs are discarded, so Wavefront doesn't
+replace something like Splunk, ELK or Graylog, but I think there is
+a great deal of value in its approach to statisically analyzing
+flows of logs. (I actually feel retention of logs is as good as
+worthless, from a technical standpoint. There's an article in there
+somewhere...)
+
+On my current client's site, we have had our logging generating
 telemetry for some time. Logs are collected with
 [fluentd](http://www.fluentd.org/), and we use a
 `record_transformer` to increment a StatsD counter every time we see
@@ -27,7 +31,7 @@ the whole state of our systems and services, and bringing log volume
 in as a metric lets us say, for instance, we don't care about a
 small number of errors if the service as a whole is healthy. On the
 other hand, should the number of errors or warnings suddenly rise,
-we'd want to know about it even if the service were not affected.
+we'd want to know about it even if the service were not (yet) affected.
 
 Our `record_transformer` method is particularly useful when we, the
 SRE team, want to keep an eye on some aspect of an application which
@@ -172,92 +176,31 @@ with Fluentd anyway, because of the messy path from 0.12 (which
 doesn't support much-needed sub-second timestamps) to 0.14 (which
 does). So, I'm going to go with
 [Filebeat](https://www.elastic.co/products/beats/filebeat). As I
-said, I use SmartOS, so I'll have to build Filebeat myself. If you
-aren't using SmartOS, you can skip this part. (And whilst you do
-that, ask yourself why you *don't* use SmartOS.)
-
-Filebeat needs Go 1.7. Ignore the fact that Go can't tell the
-difference between SmartOS and Solaris: they look very similar from
-inside a non-global zone, and everything's fine underneath.
-
-```cmd
-$ go version
-go version go1.7.5 solaris/amd64
-$ mkdir -p $GOPATH/src/github.com/elastic
-$ cd $_
-$ git clone https://github.com/elastic/beats.git
-$ cd beats/filebeat
-$ make
-$ stat $GOPATH/src/github.com/elastic/beats/filebeat/filebeat
-  File: `/home/rob/work/go/src/github.com/elastic/beats/filebeat/filebeat'
-  Size: 15883676        Blocks: 15373      IO Block: 8192   regular file
-Device: 8f80005h/150470661d     Inode: 153540      Links: 1
-Access: (0755/-rwxr-xr-x)  Uid: (  264/     rob)   Gid: (   14/sysadmin)
-Access: 2017-02-15 13:26:35.429568318 +0000
-Modify: 2017-02-13 10:53:21.353451551 +0000
-Change: 2017-02-13 10:53:21.353451551 +0000
- Birth: -
-```
-
-If you want to save yourself the bother, [here's the
-binary](https://us-east.manta.joyent.com/snltd/public/filebeat). It
-appears to also work fine on Solaris 11.
+said, I use SmartOS, so I had to have to build Filebeat myself.
+This was straightforward, and not worth recounting here. I also had
+to write [an SMF
+manifest](https://github.com/snltd/joyent-puppet/blob/d1ac433276d804a11a34623dfe6d68ce02dd1b2a/modules/filebeat/files/filebeat.xml)
+to start and stop the service.
 
 From now on I'm going to explain how everything is done "by
 hand". In real life I [did all my configuration through
-Puppet](https://github.com/snltd/joyent-puppet/blob/master/modules/basenode/manifests/filebeat.pp). It's
-easier to follow this way, I think.
+Puppet](https://github.com/snltd/joyent-puppet/tree/d1ac433276d804a11a34623dfe6d68ce02dd1b2a/modules/filebeat),
+but it will be
+easier to follow this way.
 
-I copied the `filebeat` binary to `/opt/local/bin/` on the JPC host,
-and also uploaded the following SMF manifest to
-`/opt/local/lib/svc/manifest/filebeat.xml`.
-
-```xml
-<?xml version='1.0'?>
-<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
-<service_bundle type='manifest' name='export'>
-  <service name='elastic/filebeat' type='service' version='0'>
-    <create_default_instance enabled='true'/>
-    <single_instance/>
-    <dependency name='multi-user-server' grouping='require_all' restart_on='none' type='service'>
-      <service_fmri value='svc:/milestone/multi-user-server'/>
-    </dependency>
-    <method_context>
-      <method_credential group='daemon'
-      privileges='basic,!proc_session,!proc_info,!file_link_any,'
-      user='logs'/>
-    </method_context>
-    <exec_method name='start' type='method'
-    exec='/opt/local/bin/filebeat -c /config/filebeat/filebeat.yml'
-    timeout_seconds='0'/>
-    <exec_method name='stop' type='method' exec=':kill -TERM' timeout_seconds='30'/>
-    <property_group name='startd' type='framework'>
-      <propval name='duration' type='astring' value='child'/>
-    </property_group>
-    <stability value='Unstable'/>
-    <template>
-      <common_name>
-        <loctext xml:lang='C'>Filebeat log shipper</loctext>
-      </common_name>
-      <documentation>
-        <doc_link name='elastic.co'
-          uri='https://www.elastic.co/products/beats/filebeat' />
-      </documentation>
-    </template>
-  </service>
-</service_bundle>
-```
-
-I SSHed onto the box with the files, made a user for Filebeat to
-run as, and imported the manifest. Because `create_default_instance`
-is `true`, the service starts automatically once the manifest is
-imported.
-
+I SSHed onto the box with the files, and made a user for Filebeat to
+run as
 
 ```cmd
 # useradd -s /bin/false -c log-shipper -u 989 -d /var/log/filebeat logs
 # mkdir /var/log/filebeat /var/filebeat
 # chown logs /var/log/filebeat /var/filebeat
+```
+
+Then I imported the SMF manifest. Because `create_default_instance`
+is `true`, the service starts automatically.
+
+```cmd
 # svccfg import /opt/local/lib/svc/manifest/filebeat.xml
 ```
 
@@ -276,7 +219,6 @@ filebeat.prospectors:
 
 output.logstash:
  hosts: ["wavefront.localnet:5044"]
-        # I added my Graylog box to this array in dev
 
 logging:
   level: info
@@ -291,6 +233,10 @@ logging:
 path.data: /var/filebeat
 ```
 
+I was briefly caught out by Filebeat's (in my opinion, plain
+*wrong*) insistence that the config file be owned by the Filebeat
+`logs` user.
+
 ## Sexy Graph Time
 
 With Filebeat running, I put four of my sites under
@@ -298,34 +244,14 @@ With Filebeat running, I put four of my sites under
 to simulate real traffic, and asked Wavefront to show me
 `rate(ts("nginx.code.200"))`.
 
-<script src="https://metrics.wavefront.com/embedded/F5MZSlRCGq/js"
-id="wavefront-embedded-F5MZSlRCGq" width="700"
-height="300"></script>
+<script src="https://virunga.wavefront.com/embedded/txbxQqNyrv/js"
+id="wavefront-embedded-txbxQqNyrv" width="700" height="200"></script>
 
 And here are the reponse times corresponding to the load generated
-above.
+above. Max, min, and mean, averaged across all four sites.
 
-<script src="https://metrics.wavefront.com/embedded/qJMgMN29f9/js"
-id="wavefront-embedded-qJMgMN29f9" width="700"
-height="300"></script>
-
-This is a tiny box, which runs very close to its limits. As you can
-see, under load, the response times for `sysdef.xyz` get
-unacceptably long, whilst `cassingle.rdfisher.co.uk` don't suffer at
-all. Taking the difference between total and upstream times:
-
-<script src="https://metrics.wavefront.com/embedded/KpY0zB9VX0/js"
-id="wavefront-embedded-KpY0zB9VX0" width="700"
-height="300"></script>
-
-We see that, barring that one spike, all the time is being spent
-upstream: that is, in the Ruby application. This explains the
-previous result: `sysdef.xyz` is a dynamic site, doing some amount
-of processing, and requiring disk access. `cassingle.co.uk`, on the
-other hand, only renders some basic markdown, and keeps pretty much
-all its content cached in memory. Nginx is fine, and the client
-isn't slow. The bad perfomance is definitely *my problem*. There's
-always something, isn't there?
+<script src="https://virunga.wavefront.com/embedded/t7scQDgVpF/js"
+id="wavefront-embedded-t7scQDgVpF" width="700" height="300"></script>
 
 The beauty of using Wavefront here, as opposed to Graylog, is that
 my metrics and alerting all stay in the same place. I only need one
@@ -403,7 +329,5 @@ $ tail -F /var/log/syslog | nc wavefront 5055
 
 and we see:
 
-<script src="https://metrics.wavefront.com/embedded/x4hK3lqHQ6/js"
-id="wavefront-embedded-x4hK3lqHQ6" width="700"
-height="300"></script>
-
+<script src="https://virunga.wavefront.com/embedded/kstBlk1d0T/js"
+id="wavefront-embedded-kstBlk1d0T" width="700" height="300"></script>
