@@ -10,7 +10,7 @@ I love a bit of Ruby. I also love
 [rbenv](https://github.com/rbenv/rbenv), and Solaris.
 
 Getting things running on Solaris seems to get more difficult every
-week. Today I has problems getting Ruby 2.6.0 to install on a clean
+week. Today I had problems getting Ruby 2.6.0 to install on a clean
 Solaris 11.4 build.
 
 A little bit of log-reading showed two problems. First, `rbenv` (or,
