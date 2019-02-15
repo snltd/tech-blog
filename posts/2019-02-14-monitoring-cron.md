@@ -327,16 +327,16 @@ but granting DTrace privileges.
 </method_context>
 ```
 
-Finally, I Wrote a quick Puppet module for deployment, pushed it
-out, and it's been running happily ever since, on Solaris and
+Finally, I wrote a quick Puppet module for deployment, pushed it
+out, and it's been running happily ever since on Solaris and
 SmartOS.
 
-I fixed all the broken cron jobs, improved a couple that seemed very
+I fixed all the broken cron jobs, improved a couple that seemed
 slow, and now Wavefront tells me if anything fails or takes
 inordinately long. It's good.
 
 Imperfections? Most obviously, the user is only displayed by UID. It
-would be nicer if it could be done by username, but I'm not aware of
+would be nicer if it could show the username, but I'm not aware of
 any way I could get that out of DTrace, at least not trivially. The
 command names aren't perfect, but they're good enough.
 
