@@ -48,7 +48,10 @@ that `cron` had started a job.
 To shorten my iterative cycle I set up three test cron jobs,
 covering three cases of execution. One works (exits `0`); one fails
 (exits `1`); one doesn't run because the command does not exist.
-I set all of them to fire every minute, ("5-star cron job. Will run again.")
+I set all of them to fire every minute, ("5-star cron job. Will run
+again.") Doing this reminded me of one of the worst design decisions
+in Unix: `crontab -r`. Maybe whoever decided that one used a
+keyboard where the `r`, *wasn't* right next to the `e`.
 
 [The
 source](https://github.com/illumos/illumos-gate/blob/master/usr/src/cmd/cron/cron.c#L2557)
@@ -312,20 +315,50 @@ Which gives me this.
 id="wavefront-embedded-qlg31jQcpT" width="700"
 height="300"></script>
 
-Imperfections? The user is only displayed by UID. It would probably
-be nicer if it could be done by username, but I'm not aware of any
-way I could get that out of DTrace. The command names aren't
-perfect, but they're good enough.
+I wrapped everything up in an SMF manifest, running as a normal user
+but granting DTrace privileges.
+
+```xml
+<method_context>
+  <method_credential
+    group='daemon'
+    privileges='basic,dtrace_kernel,dtrace_proc,dtrace_user,!file_link_any'
+    user='cronmon'/>
+</method_context>
+```
+
+Finally, I Wrote a quick Puppet module for deployment, pushed it
+out, and it's been running happily ever since, on Solaris and
+SmartOS.
+
+I fixed all the broken cron jobs, improved a couple that seemed very
+slow, and now Wavefront tells me if anything fails or takes
+inordinately long. It's good.
+
+Imperfections? Most obviously, the user is only displayed by UID. It
+would be nicer if it could be done by username, but I'm not aware of
+any way I could get that out of DTrace, at least not trivially. The
+command names aren't perfect, but they're good enough.
 
 The connection between `nc` and Wavefront is brittle, so  it would
 be better to have `nc` write to a local Telegraf socket, and have
 Telegraf pass everything on to Wavefront. Telegraf is smart enough
-to properly handle the endpoint temporarily disappearing. I've got a
+to buffer points if the endpoint temporarily disappears. I've got a
 global zone Telegraf input about half written, and once that's done,
 this will talk to it.
 
-I've been meaning to write this script for *years*, and I'm happy
-with the way it works. It took me a little longer to put together
-than it should have, because I'm so out-of-touch with DTrace and the
-SunOS world in general. I wish I wasn't. I'd love to get paid to
-work on this stuff, instead of the the glorified plumbing I do on AWS.
+Back when I got paid to work on Solaris, I did all kinds of cute
+sysadmin type things like this with DTrace. I'm not a Real
+Programmer, so I don't often trace my own code, but I've always
+loved the in-depth introspection dynamic tracing gives to the ops
+engineer, particularly combined with the zones model.
+
+I spend my days now in the world of IAM and containers and Lambdas,
+and everything-as-a-service. `cron` seems a quaint relic as, I
+suppose, does Solaris. But I do feel there is still a place for "the
+old way" of doing things.  Simple tools, well understood, their
+edges worn smooth from years of careful use.
+
+I'd love to get paid to work on this kind of "real Unix" stuff
+again, instead of the the glorified plumbing of AWS. But at least I
+have a fun hobby.
