@@ -18,9 +18,9 @@ module Rouge
 
       keywords = %w[
         auto goto sizeof break if static case import string char inline
-        stringof const int struct continue long switch counter offsetof this
+        stringof const int struct continue long switch counter offsetof
         default probe translator do provider typedef double register union
-        else restrict unsigned enum return void extern self volatile float
+        else restrict unsigned enum return void extern volatile float
         short system while for signed xlate printf printa trace
       ]
 
@@ -29,10 +29,10 @@ module Rouge
         uint8_t uint16_t uint32_t uinit64_t uiniptr_t float double
       ]
 
-      helpers = %w[alloca bcopy copin copyinto copyinstr count]
+      helpers = %w[alloca bcopy copin copyinto copyinstr count self this]
 
       builtin_vars = %w[curthread tid pid ppid uid gid execname zonename
-                        timestamp cpu self]
+                        walltimestamp timestamp cpu]
 
       state :root do
         rule /\s+/, Text::Whitespace
