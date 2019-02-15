@@ -30,10 +30,17 @@ $ PATH=/usr/gnu/bin:$PATH RUBY_CFLAGS="-DOPENSSL_NO_MD5" rbenv install 2.6.0
 ```
 
 If you need the `mysql2` gem, like I did, you'll have to point it to
-the right place.
+the right place with
 
 ```cmd
 $ gem install mysql2 -- --with-mysql-config=/usr/mysql/5.7/bin/mysql_config
+```
+
+or, if you're using Bundler
+
+```cmd
+$ bundle config build.mysql2 --with-mysql-config=/usr/mysql/5.7/bin/mysql_config
+
 ```
 
 I haven't had installation difficulties with any other native
