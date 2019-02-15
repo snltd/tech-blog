@@ -309,7 +309,7 @@ fbt::proc_exit:entry
 }' $(uname -n)
 ```
 
-Which gives me this.
+Which gives me this. (I've selected just a few zones, for clarity.)
 
 <script src="https://metrics.wavefront.com/embedded/qlg31jQcpT/js"
 id="wavefront-embedded-qlg31jQcpT" width="700"
