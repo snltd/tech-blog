@@ -230,14 +230,14 @@ id="wavefront-embedded-lCpxntHK8B" width="700"
 height="300"></script>
 
 If you hover over the points, you'll see that the top one is
-`zfs_snapshot`.  But the other two just say `/usr/bin/sh`
+`zfs_snapshot`.  But the other two just say `/usr/bin/sh`.
 
-When you have something simple as your cron task, like
-`/bin/zfs_snapshot`, that gets executed. But anything "shell
+When you have a call to a program as your cron task, like
+`/bin/zfs_snapshot`, that gets executed as-is. But anything "shell
 scripty" gets run through `/usr/bin/sh`. (Which on Solaris is ksh93,
-not that `bash` rubbish.) Looking at the times those jobs fired, and
-the zones they ran on, I see they are things like this. (Line breaks
-for formatting.)
+not that `bash` rubbish.) I looked up the `/usr/bin/sh` jobs in the
+relevant crontabs, and found they looked something like this.
+(Line breaks added for formatting and clarity.)
 
 ```
 0,10,20,30,40,50 * * * * cd /home/rob/work/record-collector/tools && \
