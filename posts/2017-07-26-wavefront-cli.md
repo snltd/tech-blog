@@ -141,7 +141,7 @@ Let's start with some alerts. Wavefront is great at alerts.
 $ wf alert --help
 Usage:
   wf alert list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-al] [-f format] [-o offset] [-L limit]
+          [-al] [-O fields] [-f format] [-o offset] [-L limit]
   wf alert firing [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-o offset] [-L limit]
   wf alert snoozed [-DnV] [-c file] [-P profile] [-E endpoint]
@@ -197,6 +197,7 @@ Options:
   -a, --all                 list all alerts
   -v, --version=INTEGER     describe only this version of alert
   -o, --offset=n            start from nth alert
+  -O, --fields=F1,F2,...    only show given fields
   -L, --limit=COUNT         number of alerts to list
   -T, --time=SECONDS        how long to snooze (default 3600)
   -b, --brief               do not show alert names
@@ -223,8 +224,21 @@ said earlier about wrapping lines to fit the terminal, brief
 listings don't do that. That's so you can always trust a command
 like `wf proxy list | wc -l` to give the answer you expect.
 
+Every command has a sensible set of fields it will `list`, but you
+can use `-O` to give a comma-separated list of your own, should you
+prefer.
+
+```cmd
+$ wf alert list -O id,additionalInformation
+1459508340708  Fires if we exceed our agreed point rate
+1463413550083  A service has failed. Log on to the box and see what it is
+...
+```
+
 You can also `list -l`, which more-or-less dumps all of every
-resource into your terminal. I don't often use that.
+resource into your terminal. I don't often use that. Using `-O` in
+conjunction with `-l` gives you only the fields you request, one
+per-line. Items are separated by a blank line.
 
 By default `list` and `search` will return the first hundred objects
 they find. You will be informed if there are more objects, and can
