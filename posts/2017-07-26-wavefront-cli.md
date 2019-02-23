@@ -955,9 +955,9 @@ everything else.
 You can manage [derived
 metrics](https://docs.wavefront.com/derived_metrics.html) with the
 `derivedmetrics` command. As well as all the usual deleting,
-exporting, importing, tagging and whatnot, you can create derived
-metrics on the command line. You have to supply a name for the
-derived metric, along with the actual metric. So something like:
+describing, importing, and whatnot, you can create derived metrics
+on the command line. You have to supply a name for the derived
+metric, along with the actual metric. So something like:
 
 ```cmd
 $ wf derivedmetric create my_metric 'aliasMetric(ts(real.series), "alias")'
@@ -965,7 +965,7 @@ $ wf derivedmetric list
 1529944840652  my_metric
 ```
 
-Like everything in Wavefront, you can tag derived metrics, and the
+Like most things in Wavefront, derived metrics can be tagged, and the
 `derivedmetric create` subcommand lets you do this on the fly, as
 well as specifying a description; adjusting the interval at
 which the metric runs on the cluster; specifying the amount of
@@ -1085,20 +1085,222 @@ $ wf message list -a
 CLUSTER::LmPJTdQ8  Wavefront Upgrade Notification
 ```
 
+## User Groups
+
+Wavefront used to only have simple user management, but now your
+cluster may support user groups as well.
+
+User groups are the preferred way to manage permissions: make
+suitable groups, and move users in and out of those groups as
+required.
+
+Let's start by seeing what groups are defined. This ought to work:
+
+```cmd
+$ wf usergroup list
+2659191e-aad4-a34d-a94e-9667e1517127  Everyone  4
+```
+
+but if you get
+
+```
+ERROR: API code 406: Cannot process request, RBAC feature is disabled.
+```
+
+then your cluster doesn't support user groups yet. It probably soon
+will.
+
+Returning to the above output, the long UUID string on the left is
+the group ID, which you use in almost all `wf usergroup` commands.
+
+Every cluster has the `Everyone` group, but your `Everyone` will
+have a different ID to mine. By default, `Everyone` has no
+privileges attached.
+
+The other columns are the name of the group, and the number of users
+in it. Who are those users? (None of these are real, because I don't
+want all my users e-mail addresses being harvested for spam.)
+
+```cmd
+$ wf usergroup users 2659191e-aad4-a34d-a94e-9667e1517127
+dev+sysdef@wavefront.com
+rob@example.com
+someone@somewhere.net
+person@job.com
+```
+
+Let's create a new group with some permissions. We'll need to know
+what those permissions could be.
+
+```cmd
+$ wf usergroup --help
+...
+Valid permissions at the time of writing are: agent_management,
+alerts_management, dashboard_management, embedded_charts, events_management,
+external_links_management, host_tag_management, metrics_management, and
+user_management. Check the API docs for an up-to-date list.
+```
+
+Nice disclaimer. The list of permissions might change.  Remember, I
+don't actually work for Wavefront. I make all this stuff by
+reading the public API docs, and the API might change without me
+knowing. (Though I would be extremely surprised if it changed in a
+breaking way, new permissions could appear. The API does quietly
+grow new features.)
+
+It seems likely a normal user might want to manage alerts,
+dashboards and events. Let's make a group whose members will be able
+to do that.
+
+```cmd
+$ wf usergroup create -p alerts_management -p dashboard_management \
+                       -p events_management "normal users"
+id                   f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
+userCount            0
+permissions          alerts_management
+                     dashboard_management
+                     events_management
+customer             sysdef
+createdEpochMillis   1550683825337
+name                 normal users
+```
+
+Now we have a group, we can put some of our users into it.
+
+```cmd
+$ wf usergroup add user f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672 \
+  person@job.com someone@somewhere.net
+Added person@job.com, someone@somewhere.net to f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672.
+$ wf usergroup users f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
+someone@somewhere.net
+person@job.com
+$ wf usergroup permissions f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
+alerts_management
+dashboard_management
+events_management
+```
+
+You could complain about the ordering of the arguments to this
+subcommand.  All other `usergroup` operations put the user group
+last, but here it goes first. This is because I couldn't make
+[docopt](http://docopt.org/), which parses `wf`'s command lines, work
+in the way that, say `cp(1)` works: that is, an arbitrary number of
+source arguments followed by a single destination argument.  I tried
+making the users be defined with a repeated option, but didn't seem
+right: users are not an option in a command called `user add`. User
+interface design is full of compromises, and this is one. The `user
+remove` command works in the same way.
+
+Before long our users will probably start writing [blog posts with
+fancy charts in them](/post/2017-03-03-solaris-proc-wavefront), so
+they'll need the `embedded_charts` privilege.
+
+```cmd
+$ wf usergroup grant embedded_charts to f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
+Granted 'embedded_charts' permission to f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672.
+$ wf usergroup permissions f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
+events_management
+alerts_management
+dashboard_management
+embedded_charts
+```
+
+And if it turns out having asked for it, none of them actually use
+it, we can take it back.
+
+```cmd
+$ wf usergroup revoke embedded_charts from f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
+Revoked 'embedded_charts' permission from f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672.
+```
+
+You'll find that re-running the above commands produces the same
+output. The API guarantees idempotency with a declarative approach.
+You don't so much request the removal of a user from a group as
+assert that said user is not in the group. Therefore you shouldn't
+care whether the user was actually removed or never existed, only
+that it isn't there now.
+
+You can, of course, `delete` groups, export them with `describe`,
+and re-import them with `import`. After an import, the group gets a
+new ID, and will not have any users assigned to it. (Group
+membership is an attribute of a user, rather than users being an
+attribute of a group.)
 
 ## User
 
-As you'd expect, you can `list`, `describe` and `delete` users, but
-more interestingly, you can also `revoke` and `grant` privileges.
+As you'd expect, you can `search` for, `list`, and `describe` users.
+
+```
+wf user list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+        [-l] [-O fields]
+wf user describe [-DnV] [-c file] [-P profile] [-E endpoint]
+        [-t token] [-f format] <id>
+wf user search [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+        [-al] [-f format] [-o offset] [-L limit] <condition>...
+```
+
+The astute reader may notice that the `user` command is unique in that
+its `list` command does not offer the `--offset` and `--limit`
+options. This is because the Wavefront `user` API does not support
+pagination. The `search` API, however, does, so the options are
+present in the `search` sub-command. Let's have a look at those
+commands.
 
 ```cmd
+$ wf user list
+dev+sysdef@wavefront.com
+rob@example.com
+frances@example.com
+services@company.net
+ian@company.net
+...
+$ wf user search id~example
+rob@example.com
+frances@example.com
 $ wf user describe ian@company.net
-identifier   ian@company.net
-customer     sysdef
-groups       embedded_charts
-             browse
+identifier              ian@company.net
+customer                sysdef
+groups                  embedded_charts
+                        browse
+userGroups
+  id                    2659191e-aad4-a34d-a94e-9667e1517127
+  name                  Everyone
+  customer              sysdef
+  properties
+    nameEditable        false
+    permissionsEditable true
+    usersEditable       false
+```
 
-$  wf user grant alerts_management to ian@company.net
+If your cluster does not have RBAC enabled, `describe`'s output will
+not include the `userGroups` section.
+
+We've
+already seen how you can move users in and out of groups with the
+`usergroup` command, but you can also do it from the
+`user` side. I've omitted the output from the `leave` and `join`
+commands: they show you the `describe` output for the user.
+
+```cmd
+$ wf user groups rob@example.com
+2659191e-aad4-a34d-a94e-9667e1517127 (Everyone)
+$ wf user join rob@example.com cb61dae7-b476-43e6-a596-a6b514e7196o9
+...
+$ wf user groups rob@example.com
+2659191e-aad4-a34d-a94e-9667e1517127 (Everyone)
+cb61dae7-b476-43e6-a596-a6b514e71969 (normal users)
+$ wf user leave rob@example.com cb61dae7-b476-43e6-a596-a6b514e7196o9
+...
+$ wf user groups rob@example.com
+2659191e-aad4-a34d-a94e-9667e1517127 (Everyone)
+```
+
+If you don't have RBAC, you can use the `user` command to
+`revoke` and `grant` privileges. Rather confusingly, these are
+called `groups`.
+
+```cmd
+$ wf user grant alerts_management to ian@company.net
 identifier   ian@company.net
 customer     sysdef
 groups       embedded_charts
@@ -1112,8 +1314,29 @@ groups       embedded_charts
              browse
 ```
 
-You can't create users from the CLI for the very good reason that
-you can't create users over the API.
+Wavefront only used to let you create users from the UI, but now
+that API is public, and supported by the CLI. A username is
+mandatory, and must be an email address. You can optionally add
+permissions (AKA "groups") with `-m` (sorry, `-p` and `-P` were
+taken), or user groups with `-g`. Stick a `-e` in there, and the
+user will get an e-mail telling them they have an account.
+
+```cmd
+$ wf user create newuser@id264.net -g cb61dae7-b476-43e6-a596-a6b514e7196
+```
+
+You can also `invite` users, which sends an e-mail in the
+traditional Wavefront way. The syntax is same as
+`create`, minus the `-e` flag. I'm not sure why `invite` and
+`create` are both in the API, but they are, so they're covered. The
+API lets you `invite` multiple users, but as of now, the CLI does
+not, as it can't offer an elegant way to define multiple users with
+different privileges.
+
+Neither `create` or `invite` let you fully automate user creation,
+for instance in the creation of machine accounts. It is not
+currently possible to validate an account or create an API token via
+the API.
 
 ## Metric
 
@@ -1153,26 +1376,15 @@ The `query` command has quite a lot of options (common options removed for
 brevity.)
 
 ```cmd
-[box:/home/rob/work/sites/sysdef.xyz/posts]$ wf query --help
-Usage:
-  wf query aliases [-DV] [-c file] [-P profile]
-  wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-g granularity] [-s time] [-e time] [-f format] [-WikvO] [-S mode]
-          [-N name] [-p points] [-F options] <query>
-  wf query raw [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-H host] [-s time] [-e time] [-f format] [-F options] <metric>
-  wf query run [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-g granularity] [-s time] [-e time] [-f format] [-F options] [-WkivO]
-          [-S mode] [-N name] [-p points] <alias>
-  wf query --help
-
-Global options:
-  -c, --config=FILE            path to configuration file
-  -P, --profile=NAME           profile in configuration file
-  -D, --debug                  enable debug mode
-  -n, --noop                   do not perform API calls
-  -V, --verbose                be verbose
-  -h, --help                   show this message
+wf query aliases [-DV] [-c file] [-P profile]
+wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+         [-g granularity] [-s time] [-e time] [-f format] [-WikvO] [-S mode]
+         [-N name] [-p points] [-F options] <query>
+wf query raw [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+         [-H host] [-s time] [-e time] [-f format] [-F options] <metric>
+wf query run [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+         [-g granularity] [-s time] [-e time] [-f format] [-F options] [-WkivO]
+         [-S mode] [-N name] [-p points] <alias>
 
 Options:
   -E, --endpoint=URI           cluster endpoint
