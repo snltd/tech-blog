@@ -38,7 +38,7 @@ through in this article.
 
 ## Installation and Basics
 
-The CLI and SDK both require Ruby 2.2 or later.  There's no
+The CLI and SDK both require Ruby 2.3 or later.  There's no
 technical reason why they couldn't have been written to work with
 older Rubies, but the sooner we stop our software working with them,
 the sooner they'll hopefully go away.
