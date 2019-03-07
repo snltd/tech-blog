@@ -56,10 +56,6 @@ Options:
 
 Pretty simple, I hope.
 
-> There is also a `report` command, which works identically to
-> `write`, but sends points via the API. This still works, but is
-> deprecated.
-
 ```cmd
 $ wf write point dev.cli.example 10
           sent 1
