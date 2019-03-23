@@ -78,15 +78,16 @@ Commands:
   link               view and manage external links
   message            read and mark user messages
   metric             view metrics
-  notificant         view and manage Wavefront notification targets
+  notificant         view and manage Wavefront alert targets
   proxy              view and manage Wavefront proxies
   query              query the Wavefront API
   savedsearch        view and manage saved searches
   source             view and manage source tags and descriptions
   user               view and manage Wavefront users
+  usergroup          view and manage Wavefront user groups
   webhook            view and manage webhooks
   window             view and manage maintenance windows
-  write              send data to a Wavefront proxy
+  write              send data to Wavefront
 
 Use 'wf <command> --help' for further information.
 ```
@@ -634,23 +635,154 @@ $ wf notificant test CHTo475vsPzSaGhh
 You'll have to trust me, but I promise that just popped up a Slack
 notification on my desktop.
 
-## Dashboards, Proxies, and Sources
+## Dashboards
 
-`dashboard` commands are pretty much a subset of the `alert` ones.
-Obviously you can't `snooze` a dashboard, but most of the others
-work just the same. Dashboard descriptions can be h-u-g-e, so quite
-a lot of information is dropped when you `describe` one in
-human-readable format. Everything I said about exporting and
-templating or manipulating alerts applies just as well to
-dashboards.
+Many `dashboard` commands align with `alert` ones.  Obviously you
+can't `snooze` a dashboard, but most of the others work just the
+same. Dashboard descriptions can be h-u-g-e, so quite a lot of
+information is dropped when you `describe` one in human-readable
+format. Everything I said about exporting and templating or
+manipulating alerts applies just as well to dashboards.
 
-`proxy` is similar to dashboard, but you can't have versions of
-proxies. All the tagging and undeleting goodness is there though.
+There are some things you can do to dashboards that you can't do to
+alerts. For instance, a user can have favourite dashboards. We have
+commands to manage these, carefully chosen to avoid trans-Atlantic
+spelling wars.
 
-And speaking of tagging, the `source` command lets you tag and untag
-your hosts with exactly the same interface as we just saw for
-alerts. You can also set a description for a host. (At the moment
-you can't clear a description, due to a bug in the API.)
+```cmd
+$ wf dashboard favs
+jpc-telegraf
+cube
+$ wf dashboard fav discogs
+discogs
+jpc-telegraf
+cube
+$ wf dashboard unfav discogs
+jpc-telegraf
+cube
+```
+
+(The SDK solves the spelling conundrum by aliasing `#favourite` to
+`#favorite`.)
+
+Dashboards now understand ACLs. These let you grant view or
+view-and-modify privileges to any users or user groups. (We'll learn
+how to manage those in a while.)
+
+By default, everyone can view and modify a dashboard. Let's have a
+little play with privileges. You must specify users and groups by
+their IDs. It just happens that user IDs are the same as their
+names. Let's make a dashboard editable only by our two superstar
+10xers, but viewable by everyone.
+
+```cmd
+$ wf dashboard acls demo
+view and modify
+  Everyone (2659191e-aad4-4302-a94e-9667e1517127)
+view
+  <none>
+$ wf dashboard acl grant modify on demo to user someone@somewhere.com other@elsewhere.net
+view and modify
+  Everyone (2659191e-aad4-4302-a94e-9667e1517127)
+  someone@somewhere.com (someone@somewhere.com)
+  other@elsewhere.net (other@elsewhere.net)
+view
+  <none>
+$ wf dashboard acl revoke modify on demo from group 2659191e-aad4-4302-a94e-9667e1517127
+view and modify
+  someone@somewhere.com (someone@somewhere.com)
+  other@elsewhere.net (other@elsewhere.net)
+view
+  <none>
+$ wf dashboard acl grant view on demo to group 2659191e-aad4-4302-a94e-9667e1517127
+view and modify
+  someone@somewhere.com (someone@somewhere.com)
+  other@elsewhere.net (other@elsewhere.net)
+view
+  Everyone (2659191e-aad4-4302-a94e-9667e1517127)
+```
+
+Did you think the way I moved the `Everyone` group was a bit
+long-winded? Well, there's some (I thought) unexpected behaviour
+when you interact with the dashboard ACL API. Let's continue the
+above, and give the `Everyone` group the right to modify that `demo`
+dashboard.
+
+```cmd
+$ wf dashboard acl grant modify on demo to group 2659191e-aad4-4302-a94e-9667e1517127
+view and modify
+  Everyone (2659191e-aad4-4302-a94e-9667e1517127)
+  someone@somewhere.com (someone@somewhere.com)
+view
+  <none>
+```
+
+You can see it's removed the `view` privilege. Fair enough, `view`
+is a member of `view and modify`. But that means:
+
+```cmd
+$ wf dashboard acl grant view on demo to group 2659191e-aad4-4302-a94e-9667e1517127
+view and modify
+  Everyone (2659191e-aad4-4302-a94e-9667e1517127)
+  someone@somewhere.com (someone@somewhere.com)
+view
+  <none>
+```
+
+You've asked for `Everyone` to have `view`, when the group already
+had it, by virtue of having `view and modify`. So simply adding
+`view` doesn't do anything. That's why I removed it then added it.
+
+If you get in a tangle, `wf` will take you back to square one.
+
+```cmd
+$ ./wf dashboard acl clear demo
+view and modify
+  Everyone (2659191e-aad4-4302-a94e-9667e1517127)
+view
+  <none>
+```
+
+## Proxies
+
+You can't do quite so many things with proxies. `list`, `describe`,
+`delete`, `search` and so-on all work as for other commands, but
+proxies can't be tagged, or have ACLs or histories.
+
+There are a couple of proxy-specific commands though. Proxies can be
+renamed with -- guess what -- `proxy rename`, and you can get a list
+of proxy versions with...
+
+```cmd
+$ wf proxy versions
+b75bf052-9985-407e-b90c-479e0134e261  4.35    Proxy on log.prod.wavefront-proxy
+9997ac72-e755-4f8e-b3c6-1cdf2f991df8  4.35    Proxy on log.prod.wavefront-proxy
+9662e8f1-2255-42cd-acf2-36f44170486f  4.35    Proxy on log.usprod.wavefront-proxy
+8f93737a-5c21-45ea-8329-3adc4f80c215  4.35    Proxy on log.usprod.wavefront-proxy
+88d181a0-2694-4886-b917-625a783e7783  4.35    Proxy on log.usprod.wavefront
+```
+
+Proxies are sorted with the most recent version at the top,
+descending. ([The Go proxy](https://github.com/wavefrontHQ/go-proxy)
+doesn't report a version, so any instances of that come right at the
+end.)
+
+## Sources
+
+You probably won't manipulate sources with the CLI, but if you want
+to, support is there. You can list, tag and describe them. That's
+it.
+
+## Settings
+
+The UI calls them "System Preferences", but the API calls them
+`settings`, and I tend to follow API conventions. The settings (or
+system preferences) are defaults for new users. Things like the
+group memberships or privileges a user has when they are invited to
+use Wavefront.
+
+I doubt anyone will find the `settings` command particularly useful,
+but it is here for completeness.
 
 ## Events
 
@@ -1131,21 +1263,47 @@ person@job.com
 Let's create a new group with some permissions. We'll need to know
 what those permissions could be.
 
+Remember I said the `settings` command wasn't much use? It does
+serve one purpose.
+
 ```cmd
-$ wf usergroup --help
-...
-Valid permissions at the time of writing are: agent_management,
-alerts_management, dashboard_management, embedded_charts, events_management,
-external_links_management, host_tag_management, metrics_management, and
-user_management. Check the API docs for an up-to-date list.
+$ wf settings list permissions
+alerts_management
+batch_query_priority
+embedded_charts
+dashboard_management
+derived_metrics_management
+ingestion
+events_management
+external_links_management
+application_management
+metrics_management
+agent_management
+host_tag_management
+user_management
 ```
 
-Nice disclaimer. The list of permissions might change.  Remember, I
-don't actually work for Wavefront. I make all this stuff by
-reading the public API docs, and the API might change without me
-knowing. (Though I would be extremely surprised if it changed in a
-breaking way, new permissions could appear. The API does quietly
-grow new features.)
+There you go, all the permissions your users and groups can have. If
+any of them seem vague:
+
+```cmd
+$ wf settings list permissions --long
+groupName         alerts_management
+displayName       Alerts
+description       Users with this permission can manage alerts, maintenance
+                  windows, and alert targets.
+requiredDefault   false
+                  --------------------------------------------------------------
+groupName         batch_query_priority
+displayName       Batch Query Priority
+description       Users with this permission will run at a lower priority
+                  level for queries (mainly for users for role accounts
+                  intended for reporting purposes)
+requiredDefault   false
+...
+```
+
+Handy, what?
 
 It seems likely a normal user might want to manage alerts,
 dashboards and events. Let's make a group whose members will be able
@@ -1587,6 +1745,16 @@ Sending a single point is easy.
 
 ```cmd
 $ wf write point cli.example 10
+          sent 1
+      rejected 0
+        unsent 0
+```
+
+To send a negative value, use the standard Unix trick of using `--`
+to tell the command options there are no more options to parse.
+
+```cmd
+$ wf write point cli.example -- -10
           sent 1
       rejected 0
         unsent 0
