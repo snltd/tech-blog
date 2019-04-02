@@ -1182,35 +1182,36 @@ tags
 ## Message
 
 You won't use this one very much, but it's in the API, so the CLI
-covers it. `list` shows any messages you may have (you get them, for
-instance, if your cluster is going to be upgraded).  There isn't a
-`read` command in the API, so to read a message with the CLI, you
-have to do a long listing.
+covers it.
 
-Once you've read a message you can `mark` it as read, and it will go
-away. Read messages can still be retrieved with `list -a`. They
-appear to age out after `endEpochMillis` has passed.
+`wf message list` shows any messages you may have. You get these, for
+instance, if your cluster is going to be upgraded, and you see them
+across the top of the page when you log in to the UI.
+
+You can read a message with `wf message read <id>`, or by using
+`wf message list -l`, which will also show you things like the scope
+and severity of the message.
+
+If you use `read`, the message will be marked as "read", and not
+show up when you list messages. You can do this manually with the
+`mark` command.
+
+Read messages can still be shown with `list -a`, and `read` again.
+They appear to age out after `endEpochMillis` has passed.
 
 
 ```cmd
 $ wf message list
 CLUSTER::743cvsHu  Wavefront Upgrade Notification
-$ wf message list -l
-scope              CLUSTER
-id                 CLUSTER::743cvsHu
-content            Wavefront is upgrading to the latest version within the
-                   next two (2) weeks. -Wavefront Customer Success
-source             system@wavefront.com
-title              Wavefront Upgrade Notification
-severity           INFO
-startEpochMillis   1530553832000
-endEpochMillis     1531763432000
-display            BANNER
-read               false
-$ wf message mark CLUSTER::743cvsHu
-status
-  result OK
-  code   200
+$ wf message read CLUSTER::743cvsHu
+
+Wavefront Upgrade Notification
+------------------------------
+
+Wavefront is upgrading to the latest version within the next two (2)
+weeks. -Wavefront Customer Success
+
+                                                  system@wavefront.com
 $ wf message list
 $ wf message list -a
 CLUSTER::LmPJTdQ8  Wavefront Upgrade Notification
