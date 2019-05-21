@@ -23,16 +23,16 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = %w[lib]
 
-  gem.add_runtime_dependency 'kramdown', '= 1.14.0'
+  gem.add_runtime_dependency 'kramdown', '~> 2.1.0'
+  gem.add_runtime_dependency 'kramdown-parser-gfm', '~> 1.0.1'
   gem.add_runtime_dependency 'puma', '~> 3.11', '>= 3.11.0'
-  gem.add_runtime_dependency 'rouge', '= 1.10.1'
+  gem.add_runtime_dependency 'rouge', '~> 3.3'
   gem.add_runtime_dependency 'sinatra', '~>2.0', '>= 2.0.1'
   gem.add_runtime_dependency 'slim', '~> 3.0', '>= 3.0.0'
   gem.add_runtime_dependency 'tilt', '~> 2.0', '>= 2.0.0'
-  gem.add_runtime_dependency 'wavefront-sdk', '~> 2.3', '>= 2.3.0'
+  gem.add_runtime_dependency 'wavefront-sdk', '~> 3.3'
 
-  gem.add_development_dependency 'bundler', '~> 1.17'
-  gem.add_development_dependency 'faraday', '~> 0.14.0'
+  gem.add_development_dependency 'faraday', '~> 0.15.0'
   gem.add_development_dependency 'minitest', '~> 5.11', '>= 5.11.0'
   gem.add_development_dependency 'nokogiri', '~> 1.8', '>= 1.8.0'
   gem.add_development_dependency 'rack-test', '~> 0.8', '>= 0.8.0'
