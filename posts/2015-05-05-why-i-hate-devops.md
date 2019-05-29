@@ -1,7 +1,7 @@
 ---
 title: "Why I Hate DevOps"
 date: "2015-05-05"
-tags: [DevOps, Rant, "Professsional Suicide"]
+tags: [DevOps, Rant, "professional suicide"]
 layout: post
 category: articles
 ---
