@@ -1,13 +1,13 @@
 ---
-title: "Interviews"
+title: "The World's Worst Interview Question"
 date: "2017-09-28"
 tags: [Interviews]
 layout: post
 category: Rants
 ---
 
-Everyhwere I work, I end up telling this story. So I might as well
-write it down.
+Everyhwere I work, whenever we interview new people, I end up
+telling this story. So I might as well write it down.
 
 About fifteen years ago, I was being interviewed for some sys-admin
 job or other. There were two people, my prospective manager, and
