@@ -69,6 +69,7 @@ Usage:
 
 Commands:
   alert              view and manage alerts
+  apitoken           view and manage API tokens
   cloudintegration   view and manage cloud integrations
   config             create and manage local configuration
   dashboard          view and manage dashboards
@@ -82,6 +83,7 @@ Commands:
   proxy              view and manage Wavefront proxies
   query              query the Wavefront API
   savedsearch        view and manage saved searches
+  settings           view and manage system preferences
   source             view and manage source tags and descriptions
   user               view and manage Wavefront users
   usergroup          view and manage Wavefront user groups
@@ -141,45 +143,65 @@ Let's start with some alerts. Wavefront is great at alerts.
 $ wf alert --help
 Usage:
   wf alert list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-al] [-O fields] [-f format] [-o offset] [-L limit]
+          [-f format] [-al] [-O fields] [-o offset] [-L limit]
   wf alert firing [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-o offset] [-L limit]
-  wf alert snoozed [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-f format] [-o offset] [-L limit]
+  wf alert snoozed [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-o offset] [-L limit]
   wf alert describe [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-v version] <id>
   wf alert delete [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          <id>
+          [-f format] <id>
+  wf alert clone [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-v version] <id>
   wf alert undelete [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id>
-  wf alert history [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-f format] [-o offset] [-L limit] <id>
+          [-t token] [-f format] <id>
+  wf alert history [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-o offset] [-L limit] <id>
+  wf alert clone [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-v version] <id>
+  wf alert latest [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] <id>
   wf alert import [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          <file>
+          [-f format] <file>
   wf alert snooze [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-T time] <id>
+          [-f format] [-T time] <id>
   wf alert update [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          <key=value> <id>
+          [-f format] <key=value> <id>
   wf alert unsnooze [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id>
+          [-t token] [-f format] <id>
   wf alert search [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-al] [-f format] [-o offset] [-L limit] <condition>...
+          [-f format] [-al] [-o offset] [-L limit] <condition>...
   wf alert tags [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
-  wf alert tag set [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id> <tag>...
+  wf alert tag set [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] <id> <tag>...
   wf alert tag clear [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id>
-  wf alert tag add [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id> <tag>
+          [-t token] [-f format] <id>
+  wf alert tag add [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] <id> <tag>
   wf alert tag delete [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id> <tag>
+          [-t token] [-f format] <id> <tag>
+  wf alert tag pathsearch [-DnV] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] [-al] [-o offset] [-L limit] <word>
   wf alert currently [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <state>
-  wf alert queries [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-f format] [-b]
-  wf alert summary [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-f format] [-a]
+  wf alert queries [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-b] [<id>]
+  wf alert install [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] <id>
+  wf alert uninstall [-DnV] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] <id>
+  wf alert acls [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] <id>
+  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] clear <id>
+  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] grant (view | modify) on <id> to <name>...
+  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] revoke (view | modify) on <id> from <name>...
+  wf alert summary [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-a]
   wf alert --help
 
 Global options:
@@ -264,12 +286,16 @@ where the `key` field merely *contains* `value`, use `key~value`.
 If you want objects where the field *starts with* the value, use
 `key^value`. The default display mode for `search` subcommands is
 one object per line, and the fields will be the object's `id`, plus
-whichever other keys you used in your conditions.
+whichever other keys you used in your conditions. You can negate
+conditions by putting a `!` in front of the search operator.
 
 ```cmd
 $ wf alert search name~JPC
 1497275466684  JPC Failed Services
 1463413760189  JPC Memory Shortage
+1490980663852  JPC: no metrics
+$ wf alert search name~JPC name!~Memory
+1497275466684  JPC Failed Services
 1490980663852  JPC: no metrics
 $ wf alert search name~JPC id^149
 1497275466684  JPC Failed Services
@@ -282,9 +308,33 @@ $ wf alert search status=SNOOZED name~' '
 1481553823153  SNOOZED  JVM Memory
 $ wf alert search status=SNOOZED name~' '
 1481553823153  SNOOZED  JVM Memory
-$ wf alert search tags=CLS name~
-1463135909875  [["customerTags", ["CLS"]]]  Fluentd Overflow
-1460546172048  [["customerTags", ["CLS"]]]  Logging Snapshot Failure
+```
+
+Running any `search` with the `-l` (`--long`) flag will show you the
+entire matching object. Using a machine-parseable output format also
+returns the whole of the matching object.
+
+Wavefront gives you a couple of "magic" search keys: `tags` and
+`freetext`. Object tags are a structure, and the `tags` search key
+looks across all tags. `wf` tries to present this potentially
+multi-dimensional data in a simple way.
+
+```cmd
+$ wf alert search tags=physical
+1534951532204  customerTags=backup,home,physical
+1499780986548  customerTags=disk,physical,storage
+1476741941156  customerTags=disk,physical
+```
+
+Freetext searches look at every field in an alert, so can potentially
+return *a lot* of data. If you run a freetext search without `-l`,
+you'll get a list of matching objects paired with a list of the
+fields which matched your pattern.
+
+```cmd
+$ wf alert search freetext=ZFS
+1499780986548  name, event
+1489162558204  additionalInformation
 ```
 
 Getting more detail is best done in a more targeted way. Let's have
@@ -634,6 +684,29 @@ $ wf notificant test CHTo475vsPzSaGhh
 
 You'll have to trust me, but I promise that just popped up a Slack
 notification on my desktop.
+
+## API Tokens
+
+A user can create up to twenty API tokens, and the `apitoken` command
+lets you manage them.
+
+```cmd
+$ wf apitoken list
+fb83495d-9a44-26c5-fe41-1f7dd670734f
+$ wf apitoken create
+d8c5b877-d270-4990-9b5d-351015bf44c6
+$ wf apitoken rename d8c5b877-d270-4990-9b5d-351015bf44c6 "example token"
+tokenID     d8c5b877-d270-4990-9b5d-351015bf44c6
+tokenName   example token
+$ wf apitoken list
+fb83495d-9a44-26c5-fe41-1f7dd670734f
+d8c5b877-d270-4990-9b5d-351015bf44c6  example token
+$ wf apitoken delete d8c5b877-d270-4990-9b5d-351015bf44c6
+Deleted api token 'd8c5b877-d270-4990-9b5d-351015bf44c6'.
+```
+
+Obviously you can't create a token until you have a token, so the API
+isn't quite up to full machine-generation of accounts.
 
 ## Dashboards
 

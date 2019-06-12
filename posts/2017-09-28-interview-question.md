@@ -16,10 +16,8 @@ must have been pretty standard. Then over to the techie, who asked
 me, with some gravitas, the single most stupid question I've ever
 been asked at interview.
 
-```quote
-Four letters of the alphabet are not valid options in GNU `ls`. What
-are they?
-```
+> Four letters of the alphabet are not valid options in GNU `ls`. What
+> are they?
 
 The story kind of breaks down here, because it's so long ago, I
 can't remember what I said. If it had been the late '90s, in my 20s,
