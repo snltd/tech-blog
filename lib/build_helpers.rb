@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def gem_version
   if env?(:CI_BUILD_TAG)
     ENV['CI_BUILD_TAG']
