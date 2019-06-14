@@ -1,7 +1,7 @@
 ---
 title: "Managing Wavefront Source Tags from the CLI"
 tags: [Wavefront, Ruby]
-date: "2016-10-13"
+date: 2016-10-13
 layout: post
 category: Wavefront
 ---

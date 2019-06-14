@@ -1,7 +1,7 @@
 ---
 title: "Replacing a disk with UFS and ZFS filesystems"
 tags: [Solaris, storage, ZFS]
-date: "2009-11-24"
+date: 2009-11-24
 category: Solaris
 layout: post
 ---

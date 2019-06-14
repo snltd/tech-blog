@@ -1,7 +1,7 @@
 ---
 title: "DTrace notes 03: the pid and profile providers"
 tags: [Solaris, DTrace]
-date: "2011-10-08"
+date: 2011-10-08
 layout: post
 category: Solaris
 ---

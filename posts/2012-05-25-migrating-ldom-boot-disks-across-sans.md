@@ -1,7 +1,7 @@
 ---
 title: "Migrating LDOM Boot Disks Across SANs"
 tags: [Solaris, LDOMs]
-date: "2012-05-25"
+date: 2012-05-25
 layout: post
 category: Solaris
 ---

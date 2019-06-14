@@ -1,7 +1,7 @@
 ---
 title: "A Minimal Solaris 8 Build Server"
 tags: [Solaris, minimal, Sun Studio]
-date: "2008-08-08"
+date: 2008-08-08
 layout: post
 category: Solaris
 ---

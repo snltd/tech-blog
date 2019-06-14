@@ -1,7 +1,7 @@
 ---
 title: "Building Ruby 2.2 for SmartOS"
 tags: [SmartOS, Ruby]
-date: "2015-10-04"
+date: 2015-10-04
 category: Illumos
 layout: post
 ---

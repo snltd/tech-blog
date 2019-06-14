@@ -1,7 +1,7 @@
 ---
 title: "DTrace notes 02: the io and syscall providers"
 tags: [Solaris, DTrace]
-date: "2011-10-18"
+date: 2011-10-18
 layout: post
 category: Solaris
 ---

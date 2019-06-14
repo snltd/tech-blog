@@ -1,6 +1,6 @@
 ---
 title: "ZFS Encrypted Workspace"
-date: "2011-04-20"
+date: 2011-04-20
 tags: [Solaris, ZFS, encryption]
 layout: post
 category: Solaris

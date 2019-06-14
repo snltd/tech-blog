@@ -1,7 +1,7 @@
 ---
 title: "Sun Cluster 3.1 on Solaris 9"
 tags: [Solaris, sun cluster, cluster, HA]
-date: "2009-11-26"
+date: 2009-11-26
 category: Sun Cluster
 layout: post
 ---

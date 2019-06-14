@@ -1,7 +1,7 @@
 ---
 title: "Single User mode on Solaris x86"
 tags: [Solaris, x86]
-date: "2009-11-09"
+date: 2009-11-09
 layout: post
 category: Solaris
 ---

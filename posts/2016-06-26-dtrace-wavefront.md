@@ -1,6 +1,6 @@
 ---
 title: "Wavefront and Solaris 03: DTrace"
-date: "2016-06-26"
+date: 2016-06-26
 tags: [Solaris, Wavefront, DTrace]
 layout: post
 category: Wavefront

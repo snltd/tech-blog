@@ -1,6 +1,6 @@
 ---
 title: "Wavefront Events from the CLI"
-date: "2016-07-12"
+date: 2016-07-12
 tags: [Wavefront, Ruby, DTrace]
 layout: post
 category: Wavefront

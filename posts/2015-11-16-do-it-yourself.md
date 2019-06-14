@@ -1,7 +1,7 @@
 ---
 title: "Config Management: Do it Yourself"
 tags: [Puppet, Chef, opinion, rant]
-date: "2015-11-18"
+date: 2015-11-18
 category: Rant
 layout: post
 ---

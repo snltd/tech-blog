@@ -1,7 +1,7 @@
 ---
 title: "Fixing mpxio Multipathing"
 tags: [Solaris, mpxio, SAN]
-date: "2012-06-07"
+date: 2012-06-07
 layout: post
 category: Solaris
 ---

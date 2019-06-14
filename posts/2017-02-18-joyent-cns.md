@@ -1,7 +1,7 @@
 ---
 title: "Joyent CNS"
 tags: [SmartOS, Joyent, DNS]
-date: "2017-02-18"
+date: 2017-02-18
 category: Cloud
 layout: post
 ---

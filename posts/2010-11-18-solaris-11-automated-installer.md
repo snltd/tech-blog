@@ -1,7 +1,7 @@
 ---
 title: "Solaris 11 Automated Installs"
 tags: [Solaris, install, AI]
-date: "2010-11-18"
+date: 2010-11-18
 layout: post
 category: Solaris
 ---

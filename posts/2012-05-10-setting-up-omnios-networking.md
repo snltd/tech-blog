@@ -1,7 +1,7 @@
 ---
 title: "Setting up networking on OmniOS"
 tags: [Solaris, OmniOS]
-date: "2012-05-10"
+date: 2012-05-10
 category: Illumos
 layout: post
 ---

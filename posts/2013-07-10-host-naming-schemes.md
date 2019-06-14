@@ -1,7 +1,7 @@
 ---
 title: "Host Naming Schemes"
 tags: [policy, Chef, anal-retentiveness]
-date: "2013-07-10"
+date: 2013-07-10
 layout: post
 category: Chef
 ---
