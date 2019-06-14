@@ -2,7 +2,6 @@
 title: "Wavefront and Solaris 02: Collecting Metrics, or Adventures in Kstats"
 date: 2016-04-19
 tags: [Solaris, Wavefront, Diamond, kstat]
-layout: post
 category: Wavefront
 ---
 

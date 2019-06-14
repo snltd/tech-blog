@@ -2,7 +2,6 @@
 title: "cron - invalid account"
 tags: [Solaris]
 date: 2010-10-28
-layout: post
 category: Solaris
 ---
 

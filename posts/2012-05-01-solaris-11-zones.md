@@ -3,7 +3,6 @@ title: "Solaris 11 zones part 1"
 tags: [Solaris, Solaris 11, zones]
 date: 2012-05-01
 category: Solaris
-layout: post
 ---
 
 Throughout the lifespan of Solaris 10, zones got more flexible and more

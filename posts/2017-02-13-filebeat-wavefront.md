@@ -3,7 +3,6 @@ title: "nginx | filebeat | Wavefront"
 tags: [SmartOS, Wavefront, Go, Filebeat]
 date: 2017-02-13
 category: Wavefront
-layout: post
 ---
 
 Lately, Wavefront has acquired [log processing

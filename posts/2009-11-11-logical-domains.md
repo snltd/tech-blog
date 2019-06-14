@@ -2,7 +2,6 @@
 title: "Logical Domains"
 tags: [Solaris, virtualization, LDOMs]
 date: 2009-11-11
-layout: post
 category: Solaris
 ---
 

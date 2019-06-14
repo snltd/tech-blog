@@ -2,7 +2,6 @@
 title: "ZFS - Why So Slow?"
 tags: [Solaris, ZFS, pkg]
 date: 2012-07-23
-layout: post
 category: Solaris
 ---
 

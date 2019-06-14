@@ -2,7 +2,6 @@
 title: "Getting a file out of a FLAR"
 tags: [Solaris, install, flash archive]
 date: 2009-09-22
-layout: post
 category: Solaris
 ---
 

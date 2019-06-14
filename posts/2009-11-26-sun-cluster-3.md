@@ -3,7 +3,6 @@ title: "Sun Cluster 3.1 on Solaris 9"
 tags: [Solaris, sun cluster, cluster, HA]
 date: 2009-11-26
 category: Sun Cluster
-layout: post
 ---
 
 The Internet has loads of information on *how* to build a Sun Cluster,

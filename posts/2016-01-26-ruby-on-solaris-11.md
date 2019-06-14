@@ -3,7 +3,6 @@ title: "Building Ruby 2.3 for Solaris 11.3"
 tags: [Solaris, Ruby]
 date: 2016-01-26
 category: Solaris
-layout: post
 ---
 
 A while ago [I did a little write-up on building a nice, dependency

@@ -2,7 +2,6 @@
 title: "Wavefront and Solaris 01: The Proxy"
 date: 2016-03-30
 tags: [Solaris, Wavefront]
-layout: post
 category: Wavefront
 ---
 

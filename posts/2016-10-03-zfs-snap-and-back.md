@@ -2,7 +2,6 @@
 title: "ZFS Snapshot Fun"
 date: 2016-10-03
 tags: [Solaris, ZFS]
-layout: post
 category: ZFS
 ---
 

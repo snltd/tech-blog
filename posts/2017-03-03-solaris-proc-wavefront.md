@@ -2,7 +2,6 @@
 title: "Wavefront and Solaris 04: /proc"
 date: 2017-03-03
 tags: [Solaris, Wavefront, Diamond, /proc]
-layout: post
 category: Wavefront
 ---
 

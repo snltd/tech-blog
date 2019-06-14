@@ -2,7 +2,6 @@
 title: "Monitoring cron with DTrace"
 date: 2019-02-14
 tags: [Solaris, DTrace, Wavefront]
-layout: post
 category: DTrace
 ---
 

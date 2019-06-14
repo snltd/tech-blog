@@ -2,7 +2,6 @@
 title: "How Wavefront Tamed a Wild Puppet"
 tags: [Wavefront, Puppet, Ruby]
 date: 2017-10-01
-layout: post
 category: Wavefront
 ---
 

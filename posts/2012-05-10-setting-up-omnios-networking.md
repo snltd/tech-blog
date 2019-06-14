@@ -3,7 +3,6 @@ title: "Setting up networking on OmniOS"
 tags: [Solaris, OmniOS]
 date: 2012-05-10
 category: Illumos
-layout: post
 ---
 
 I installed OmniOS in a VirtualBox with a bridged network interface, and

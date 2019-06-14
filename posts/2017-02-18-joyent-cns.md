@@ -3,7 +3,6 @@ title: "Joyent CNS"
 tags: [SmartOS, Joyent, DNS]
 date: 2017-02-18
 category: Cloud
-layout: post
 ---
 
 It's a matter of public record that I'm a big fan of all things

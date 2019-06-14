@@ -2,7 +2,6 @@
 title: "Resizing swap on Solaris 11"
 tags: [Solaris]
 date: 2012-04-08
-layout: post
 category: Solaris
 ---
 

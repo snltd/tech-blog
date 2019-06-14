@@ -3,7 +3,6 @@ title: "Replacing a disk with UFS and ZFS filesystems"
 tags: [Solaris, storage, ZFS]
 date: 2009-11-24
 category: Solaris
-layout: post
 ---
 
 One of the disks in one of our v210s was having episodes. It temporarily

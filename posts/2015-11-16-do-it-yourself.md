@@ -3,7 +3,6 @@ title: "Config Management: Do it Yourself"
 tags: [Puppet, Chef, opinion, rant]
 date: 2015-11-18
 category: Rant
-layout: post
 ---
 
 **Don't use wrapper cookbooks. Don't use forge modules. Don't write

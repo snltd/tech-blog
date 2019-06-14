@@ -2,7 +2,6 @@
 title: "Terraforming SmartOS, from SmartOS"
 date: 2017-08-28
 tags: [SmartOS, Terraform, Go]
-layout: post
 category: Terraform
 ---
 

@@ -2,7 +2,6 @@
 title: "SSH as root on Solaris 11"
 tags: [Solaris, Solaris 11, ssh]
 date: 2011-12-05
-layout: post
 category: Solaris
 ---
 

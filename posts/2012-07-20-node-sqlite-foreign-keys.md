@@ -3,7 +3,6 @@ title: "SQLite, Node, and foreign keys"
 tags: [Node, SQLite]
 date: 2012-07-20
 category: Node
-layout: post
 ---
 
 I've been experimenting with writing a new interface to

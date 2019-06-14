@@ -2,7 +2,6 @@
 title: "Building Solaris 11 AI Server in a Dedicated Zone"
 tags: [Solaris, Solaris 11, AI]
 date: 2012-07-28
-layout: post
 category: Solaris
 ---
 

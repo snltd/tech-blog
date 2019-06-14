@@ -2,7 +2,6 @@
 title: Printing a diameter symbol with TexLive
 tags: [TeX]
 date: 2012-05-13
-layout: post
 category: TeX
 ---
 

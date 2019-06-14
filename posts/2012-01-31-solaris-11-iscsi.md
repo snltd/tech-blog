@@ -2,7 +2,6 @@
 title: "Setting Up A Simple iSCSI Target in Solaris 11"
 tags: [Solaris, iscsi, Solaris 11]
 date: 2012-01-31
-layout: post
 category: Solaris
 ---
 
