@@ -1,5 +1,4 @@
 require 'kramdown'
-require 'kramdown-parser-gfm'
 require_relative 'rouge'
 #
 # Reads a given file and returns its content in various ways.

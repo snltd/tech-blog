@@ -1,25 +1,19 @@
 #post_title
-  = @meta[:title]
+  = @page[:meta][:title]
 
 #post_date
-  => @meta[:date].strftime('%d %B %Y')
-  - if @meta[:category]
-    ' ;
-    = @meta[:category]
-  - if @meta[:author]
-    ' ;
-    = @meta[:author]
+  => @page[:meta][:date].strftime('%d %B %Y')
 
-== @content
+== @page[:content]
 
-- if @meta[:tags]
+- if @page[:meta][:tags]
   #post_tags
     ' Tags:
     ul
-      - @meta[:tags].each_with_index do |tag, index|
+      - @page[:meta][:tags].each_with_index do |tag, index|
         li
           a href="/tag/#{tag}"
-            - if index < @meta[:tags].length - 1
+            - if index < @page[:meta][:tags].length - 1
               = tag
               ' ,
             - else

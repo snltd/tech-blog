@@ -1,11 +1,30 @@
-- if @posts && @posts.is_a?(Hash) && @posts.length > 0
-  h3 other pages
-  ul
-    - @posts.sort.reverse.each do |k, post|
-      li
-        - if post == @meta
-          #this_post
-            = post[:title]
-        -else
-          a href=post[:link] => post[:title]
-          = "(#{post[:date].strftime('%d %b %y')})"
+.bartitle
+  | - blog posts -
+ul
+  - list_of_pages.each do |year, pages|
+    li#post_links
+      .page_year
+        == year
+        span.year_toggle id="toggle_#{year}"
+         |-
+      .page_block id="block_#{year}"
+        ul
+          - pages.each do |link, title|
+            li
+              - if @page && \
+                "/date/#{@page[:meta][:date].strftime('%Y-%m-%d')}" == link
+                .this_date
+                  == title
+              - else
+                  a href="#{link}"
+                    == title
+.bartitle
+  | - articles -
+ul
+  - list_of_articles.each do |article|
+    li#article_links
+      - if params[:article] == article[:page]
+        == article[:title]
+      - else
+        a href="#{article[:link]}"
+          == article[:title]
