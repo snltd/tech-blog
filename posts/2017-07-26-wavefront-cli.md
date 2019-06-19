@@ -171,7 +171,7 @@ Usage:
           [-f format] [-u] <file>
   wf alert snooze [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-T time] <id>
-  wf alert modify [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert set [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <key=value> <id>
   wf alert unsnooze [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
@@ -389,7 +389,7 @@ Returning to the output above, we see a failing service is only
 SMOKE? That can't be right, surely. Let's fix it.
 
 ```cmd
-$ wf alert modify severity=SEVERE 1463413550083 | grep severity
+$ wf alert set severity=SEVERE 1463413550083 | grep severity
 severity                     SEVERE
 ```
 
@@ -447,7 +447,7 @@ SMOKE
 ```
 
 What if we wanted to roll back to that alert? Of course, we could
-easily `modify` that single change back to the old value, but what
+easily `set` that single change back to the old value, but what
 if we wanted to go back a number of revisions?  Here's how we'd do
 it.
 
