@@ -1,7 +1,7 @@
 .sidebar_block
   .bartitle
     | blog posts
-  ul
+  ul#post_links
     - list_of_pages.each do |year, pages|
       li
         .page_year
@@ -27,7 +27,7 @@
 .sidebar_block
   .bartitle
     | articles
-  ul
+  ul#article_links
     - list_of_articles.each do |article|
       li
         - if @page && @page[:meta][:title] == article[:title]

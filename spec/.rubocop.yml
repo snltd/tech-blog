@@ -1,7 +1,10 @@
 # Allow long blocks of tests
 #
 Metrics/BlockLength:
-  Max: 120
+  Max: 150
+
+Metrics/ClassLength:
+  Max: 150
 
 Metrics/MethodLength:
   Max: 80
