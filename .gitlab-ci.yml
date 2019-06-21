@@ -1,9 +1,9 @@
 ---
 
-image: ruby:2.5
+image: ruby:2.6
 
 before_script:
-  - gem install bundler -v 1.17.3 --no-document
+  - gem install bundler --no-document
   - bundle install --jobs $(nproc)
 
 build:
