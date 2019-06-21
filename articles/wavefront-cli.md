@@ -735,7 +735,7 @@ had it, by virtue of having `view and modify`. So simply adding
 If you get in a tangle, `wf` will take you back to square one.
 
 ```cmd
-$ ./wf dashboard acl clear demo
+$ wf dashboard acl clear demo
 view and modify
   Everyone (2659191e-aad4-4302-a94e-9667e1517127)
 view
