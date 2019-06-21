@@ -30,14 +30,14 @@ class TestSysdef < MiniTest::Test
     assert_links(last_response.body)
   end
 
-  def _test_all_posts
+  def test_all_posts
     get '/'
     extract_post_links(last_response.body).each do |uri|
       _test_review_post(uri)
     end
   end
 
-  def _test_all_articles
+  def test_all_articles
     get '/'
     extract_article_links(last_response.body).each do |uri|
       _test_article(uri)

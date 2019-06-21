@@ -68,7 +68,7 @@ class SysdefIndexPostsTest < MiniTest::Test
 
       data.each_pair do |link, meta|
         assert_instance_of(String, link)
-        assert link.start_with?('/date/2')
+        assert link.start_with?('/post/2')
         assert_instance_of(Hash, meta)
         assert_instance_of(String, meta[:title])
         assert_instance_of(Date, meta[:date])
