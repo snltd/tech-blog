@@ -1,0 +1,8 @@
+#post_header
+  #post_title
+    = @page[:meta][:title]
+  #post_date
+    ' last updated:
+    == @page[:meta][:mtime].strftime('%d %B %Y')
+
+== @page[:content]

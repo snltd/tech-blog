@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-#require_relative 'common'
-#require_relative 'blog_post_reader'
 require_relative 'chunked_file'
 
 module Sysdef
@@ -25,8 +23,8 @@ module Sysdef
     end
 
     def by_tag(tag)
-      index.select { |i| i[:tags].include?(tag) }.sort_by { |i| i[:date] }.
-        reverse
+      index.select { |i| i[:tags].include?(tag) }.sort_by { |i| i[:date] }
+           .reverse
     end
 
     def top_tags(limit = 10)
@@ -64,6 +62,7 @@ module Sysdef
       meta.tap do |m|
         m[:page] = fname_to_link(file)
         m[:file] = file
+        m[:mtime] = file.mtime
       end
     end
 
@@ -98,8 +97,8 @@ module Sysdef
     end
 
     def menu_item(entry)
-      [format('/date/%<link>s', link: fname_to_link(entry[:file])),
-       entry[:title]]
+      [format('/post/%<link>s', link: fname_to_link(entry[:file])),
+       { title: entry[:title], date: entry[:date] }]
     end
 
     def fname_to_link(fname)
@@ -112,46 +111,8 @@ module Sysdef
 
     def all_tags
       tags = index.map { |i| i[:tags] }.flatten
-      tags.each_with_object(Hash.new(0)) { |i, h| h[i] += 1 }.sort_by { |_k, v| v }.reverse
+      counted_tags = tags.each_with_object(Hash.new(0)) { |i, h| h[i] += 1 }
+      counted_tags.sort_by { |_k, v| v }.reverse
     end
-
-
-    #########################################
-=begin
-    def generate_cache
-      all_files.each_with_object({}) do |f, a|
-        page = BlogPostReader.new(f).raw
-        a[f.basename.to_s] = extract_metadata(f, page.first) if page
-      end
-    end
-
-    def extract_metadata(file, metadata)
-      md = symbolize_keys(metadata)
-      md[:link] = ['', 'post', file.basename].join('/').sub(/\.md$/, '')
-      md[:date] = Date.strptime(md[:date].to_s)
-      md
-    end
-
-    def post_dir
-      Pathname.new(__FILE__).dirname.parent.realpath + dir
-    end
-
-    def all_files
-      post_dir.children.select { |f| f.extname == '.md' && f.file? }.sort
-    end
-
-    def by_date(year, month = '', day = '')
-      pattern = [year, month, day].join('-').squeeze('-')
-      all.select { |k, _v| k.start_with?(pattern) }
-    end
-
-
-    # For the health check, we render a randomly chosen page. This
-    # method returns a list of all available page URIs
-    #
-    def uri_list
-      all.keys.map { |p| p.chomp('.md') }
-    end
-=end
   end
 end

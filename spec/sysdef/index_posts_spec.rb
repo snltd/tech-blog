@@ -46,16 +46,15 @@ class SysdefIndexPostsTest < MiniTest::Test
     out = tu.index.select { |i| i[:title] == 'Why I Hate DevOps' }
     assert_instance_of(Array, out)
     assert_equal(1, out.size)
-    assert_instance_of(Hash, out[0])
-    assert_equal(
-      { title: 'Why I Hate DevOps',
-        date: Date.new(2015, 5, 5),
-        tags: ['DevOps', 'Rant', 'professional suicide'],
-        category: 'articles',
-        page: '2015-05-05-why-i-hate-devops',
-        file: Pathname.new(POST_DIR + '2015-05-05-why-i-hate-devops.md'),
-    }, out[0]
-    )
+    post = out.first
+    assert_instance_of(Hash, post)
+    assert_equal('Why I Hate DevOps', post[:title])
+    assert_equal(Date.new(2015, 5, 5), post[:date])
+    assert_equal(['DevOps', 'Rant', 'professional suicide'], post[:tags])
+    assert_equal('articles', post[:category])
+    assert_equal('2015-05-05-why-i-hate-devops', post[:page])
+    assert_equal(POST_DIR + '2015-05-05-why-i-hate-devops.md', post[:file])
+    assert_instance_of(Time, post[:mtime])
   end
 
   def test_link_index
@@ -67,10 +66,12 @@ class SysdefIndexPostsTest < MiniTest::Test
       assert year.between?(2004, Date.today.year)
       assert_instance_of(Hash, data)
 
-      data.each_pair do |link, title|
+      data.each_pair do |link, meta|
         assert_instance_of(String, link)
         assert link.start_with?('/date/2')
-        assert_instance_of(String, title)
+        assert_instance_of(Hash, meta)
+        assert_instance_of(String, meta[:title])
+        assert_instance_of(Date, meta[:date])
       end
     end
   end

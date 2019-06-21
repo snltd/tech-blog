@@ -1,20 +1,17 @@
-#post_title
-  = @page[:meta][:title]
-
-#post_date
-  => @page[:meta][:date].strftime('%d %B %Y')
+#post_header
+  #post_title
+    = @page[:meta][:title]
+  #post_date
+    => @page[:meta][:date].strftime('%d %B %Y')
 
 == @page[:content]
 
 - if @page[:meta][:tags]
   #post_tags
-    ' Tags:
+    span.tag_label
+      ' tags
     ul
       - @page[:meta][:tags].each_with_index do |tag, index|
         li
           a href="/tag/#{tag}"
-            - if index < @page[:meta][:tags].length - 1
-              = tag
-              ' ,
-            - else
-              = tag
+            ==> tag

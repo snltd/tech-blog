@@ -1,6 +1,8 @@
-h3 top tags
-ul
-  - top_tags.each do |tag, count|
-    li
-      a href="/tag/#{tag}" => tag
-      = "(#{count})"
+.sidebar_block
+  .bartitle
+    | top tags
+  ul
+    - top_tags.each do |tag, count|
+      li
+        a href="/tag/#{tag}" => tag
+        = "(#{count})"

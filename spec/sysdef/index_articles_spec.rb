@@ -2,15 +2,14 @@
 # frozen_string_literal: true
 
 require_relative '../spec_helper'
-require_relative '../../lib/cassingle/index_articles'
 
 # Tests for the article indexer
 #
-class CassingleIndexArticlesTest < MiniTest::Test
+class SysdefIndexArticlesTest < MiniTest::Test
   attr_reader :tu
 
   def setup
-    @tu = Cassingle::IndexArticles.new(ARTICLE_DIR).index
+    @tu = Sysdef::IndexArticles.new(ARTICLE_DIR).index
   end
 
   def test_index
@@ -20,17 +19,19 @@ class CassingleIndexArticlesTest < MiniTest::Test
   end
 
   def test_index_entry
-    idx = tu.select { |i| i[:title] == 'Christmas Spacker' }
+    idx = tu.select { |i| i[:title] == 'A New Wavefront CLI' }
 
     assert_instance_of(Array, idx)
     assert_equal(1, idx.size)
-    assert_instance_of(Hash, idx[0])
-    assert_equal(
-      { title: 'Christmas Spacker',
-        link: '/article/christmas_spacker',
-        page: 'christmas_spacker',
-        file: ARTICLE_DIR + 'christmas_spacker.md',
-        date: Date.new(2018, 12, 25) }, idx[0]
-    )
+
+    article = idx[0]
+
+    assert_instance_of(Hash, article)
+
+    assert_equal('A New Wavefront CLI', article[:title])
+    assert_equal(%w[Wavefront Ruby], article[:tags])
+    assert_instance_of(Date, article[:date])
+    assert_equal(ARTICLE_DIR + 'wavefront-cli.md', article[:file])
+    assert_equal('wavefront-cli', article[:page])
   end
 end

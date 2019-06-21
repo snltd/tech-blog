@@ -1,30 +1,37 @@
-.bartitle
-  | - blog posts -
-ul
-  - list_of_pages.each do |year, pages|
-    li#post_links
-      .page_year
-        == year
-        span.year_toggle id="toggle_#{year}"
-         |-
-      .page_block id="block_#{year}"
-        ul
-          - pages.each do |link, title|
-            li
-              - if @page && \
-                "/date/#{@page[:meta][:date].strftime('%Y-%m-%d')}" == link
-                .this_date
-                  == title
-              - else
-                  a href="#{link}"
-                    == title
-.bartitle
-  | - articles -
-ul
-  - list_of_articles.each do |article|
-    li#article_links
-      - if params[:article] == article[:page]
-        == article[:title]
-      - else
-        a href="#{article[:link]}"
-          == article[:title]
+.sidebar_block
+  .bartitle
+    | blog posts
+  ul
+    - list_of_pages.each do |year, pages|
+      li
+        .page_year
+          == year
+          span.year_toggle id="toggle_#{year}"
+           |-
+        .page_block id="block_#{year}"
+          ul
+            - pages.each do |link, data|
+              li
+                - if @page && @page[:meta][:title] == data[:title]
+                  .this_page
+                    ==> data[:title]
+                    | (
+                    == data[:date].strftime('%B %d')
+                    | )
+                - else
+                    a href="#{link}"
+                      ==> data[:title]
+                    | (
+                    == data[:date].strftime('%B %d')
+                    | )
+.sidebar_block
+  .bartitle
+    | articles
+  ul
+    - list_of_articles.each do |article|
+      li
+        - if @page && @page[:meta][:title] == article[:title]
+            == article[:title]
+        - else
+          a href="/article/#{article[:page]}"
+            => article[:title]

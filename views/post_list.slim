@@ -9,6 +9,6 @@ h2
   ul.post_list
     - @posts.each do |p|
       li
-        a href="/date/#{p[:page]}"
+        a href="/post/#{p[:page]}"
           => p[:title]
         = "(#{p[:date].strftime("%d %B %Y")})"

@@ -2,19 +2,26 @@ doctype html
 html lang='en'
   head
     meta charset='utf-8'
-    title Sysdef Ltd
+    title
+      ' Sysdef
+      - if @page && @page[:meta]
+        ' //
+        == @page[:meta][:title]
     link href='https://fonts.googleapis.com/css?family=Lato:400,700|Lora:400,400i' rel='stylesheet'
     link href='https://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet'
     link href='/css/main.css' rel='stylesheet'
     link href='/css/solarized.css' rel='stylesheet'
+    script src='https://d3js.org/d3.v5.min.js'
   body
     #container
       #header
         #brand_logo
-          | $ sysdef_
+          ' $
+          a href='/'
+            | sysdef_
       #body_copy
         == yield
-      #pages
+      #sidebar
         ==slim :partial_links
         ==slim :partial_tags
       #footer

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'sinatra/base'
 require 'slim'
@@ -12,9 +13,9 @@ ARTICLE_DIR   = ROOT + 'articles'
 POST_INDEX    = Sysdef::IndexPosts.new(POST_DIR)
 ARTICLE_INDEX = Sysdef::IndexArticles.new(ARTICLE_DIR)
 LOG           = Logger.new(STDOUT)
-KRAMDOWN_OPTS = { input:              'GFM',
+KRAMDOWN_OPTS = { input: 'GFM',
                   syntax_highlighter: 'rouge',
-                  hard_wrap:          false }.freeze
+                  hard_wrap: false }.freeze
 
 Slim::Engine.set_options pretty: true, sort_attrs: false
 
@@ -29,9 +30,24 @@ module Sysdef
       slim :front_page
     end
 
-    get '/date/:ident' do
+    # Some blog posts have been promoted to permanent articles
+    #
+    get '/post/2017-07-26-wavefront-cli' do
+      redirect '/article/wavefront-cli'
+    end
+
+    get '/post/2018-04-08-wavefront-writer' do
+      redirect '/article/wavefront-writer'
+    end
+
+    get '/post/:ident' do
       @page = Sysdef::RenderPost.new(params[:ident]).render
       slim :post
+    end
+
+    get '/article/:ident' do
+      @page = Sysdef::RenderArticle.new(params[:ident]).render
+      slim :article
     end
 
     get '/_health' do # render a random page
@@ -44,18 +60,16 @@ module Sysdef
       slim :post_list
     end
 
-=begin
-
-
-    get '/drafts/:page' do
-      render_page(:drafts, params[:page], BlogPosts.new('drafts'))
-    end
-
-    get '/:year/?:month?/?:day?' do
-      @posts = POSTS.by_date(params[:year], params[:month], params[:day])
-      slim :post_list
-    end
-=end
+    #
+    #
+    #     get '/drafts/:page' do
+    #       render_page(:drafts, params[:page], BlogPosts.new('drafts'))
+    #     end
+    #
+    #     get '/:year/?:month?/?:day?' do
+    #       @posts = POSTS.by_date(params[:year], params[:month], params[:day])
+    #       slim :post_list
+    #     end
 
     not_found do
       slim :'404'
