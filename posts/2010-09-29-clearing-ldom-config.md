@@ -1,8 +1,7 @@
 ---
 title: "clearing LDOM config"
 tags: [Solaris, LDOMs]
-date: "2010-09-29"
-layout: post
+date: 2010-09-29
 category: Solaris
 ---
 

@@ -1,8 +1,7 @@
 ---
 title: "DTrace notes 01: the vminfo and sysinfo providers"
 tags: [Solaris, DTrace]
-date: "2011-10-06"
-layout: post
+date: 2011-10-06
 category: Solaris
 ---
 

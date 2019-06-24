@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 def gem_version
-  if env?(:CI_BUILD_TAG)
-    ENV['CI_BUILD_TAG']
-  elsif env?(:CI_BUILD_ID)
-    "0.0.0-#{ENV['CI_BUILD_ID']}"
+  if env?(:CIRCLE_TAG)
+    ENV['CIRCLE_TAG']
+  elsif env?(:CIRCLE_BUILD_NUM)
+    "0.0.0-#{ENV['CIRCLE_BUILD_NUM']}"
   else
     '0.0.0'
   end
 end
 
 def most_recent_gem
-  Pathname.glob("#{ROOT}/*.gem").max
+  Pathname.glob("#{ROOT}/pkg/*.gem").max
 end
 
 def env?(var)

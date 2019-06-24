@@ -1,9 +1,8 @@
 ---
 title: "DNS on OmniOS AWS Image (Learning about dhcpinfo)"
 tags: [Solaris, OmniOS, DHCP, DNS, AWS, EC2]
-date: "2012-10-21"
+date: 2012-10-21
 category: Illumos
-layout: post
 ---
 
 I was working away creating an Amazon EC2 OmniOS AMI, but Andrzej Szeszo

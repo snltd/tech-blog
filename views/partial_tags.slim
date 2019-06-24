@@ -1,8 +1,8 @@
-- if @tags && @tags.is_a?(Array) && @tags.length > 0
-  h3 top tags
-  ul
-    - @tags.each do |tag, count|
+.sidebar_block
+  .bartitle
+    | top tags
+  ul#tag_links
+    - top_tags.each do |tag, count|
       li
         a href="/tag/#{tag}" => tag
         = "(#{count})"
-

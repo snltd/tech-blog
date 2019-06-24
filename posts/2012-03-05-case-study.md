@@ -1,8 +1,7 @@
 ---
 title: "Case Study: Virtualizing an Existing Solaris ISP Environment"
-date: "2012-03-05"
+date: 2012-03-05
 tags: [Solaris, ZFS, zones, virtualization]
-layout: post
 category: articles
 ---
 

@@ -1,8 +1,7 @@
 ---
 title: "The World's Worst Interview Question"
-date: "2017-09-28"
+date: 2017-09-28
 tags: [Interviews]
-layout: post
 category: Rants
 ---
 

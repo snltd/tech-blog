@@ -1,8 +1,7 @@
 ---
 title: "ZFS Snapshotting for Users"
-date: "2016-07-05"
+date: 2016-07-05
 tags: [Solaris, ZFS, RBAC]
-layout: post
 category: Solaris
 ---
 

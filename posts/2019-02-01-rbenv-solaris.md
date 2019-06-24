@@ -1,8 +1,7 @@
 ---
 title: "rbenv on Solaris 11"
-date: "2019-02-01"
+date: 2019-02-01
 tags: [Ruby, Solaris]
-layout: post
 category: Solaris
 ---
 

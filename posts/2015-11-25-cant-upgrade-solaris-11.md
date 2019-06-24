@@ -1,9 +1,8 @@
 ---
 title: "Failing to Upgrade Solaris 11.2"
 tags: [Solaris, beadm, IPS]
-date: "2015-11-25"
+date: 2015-11-25
 category: Solaris
-layout: post
 ---
 
 Wishing to upgrade a Solaris 11.2 box to 11.3, I ran

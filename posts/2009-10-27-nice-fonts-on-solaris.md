@@ -2,7 +2,6 @@
 title: "Nice fonts on Solaris"
 tags: [Solaris, X, fonts, desktop, kde]
 date: 2009-10-27
-layout: post
 category: Solaris
 ---
 

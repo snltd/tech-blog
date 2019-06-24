@@ -1,9 +1,8 @@
 ---
 title: "Properly Mocking Chefspec Search Results"
 tags: [Chef, Chefspec]
-date: "2014-02-24"
+date: 2014-02-24
 category: Chef
-layout: post
 ---
 
 I

@@ -1,9 +1,8 @@
 ---
 title: "DTracing Slow Puppet Runs"
 tags: [Puppet, DTrace, SmartOS]
-date: "2016-02-06"
+date: 2016-02-06
 category: SmartOS
-layout: post
 ---
 
 The site I'm working on builds everything on Ubuntu, with Puppet.

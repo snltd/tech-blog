@@ -1,8 +1,7 @@
 ---
 title: "svc.startd could not set context"
 tags: [Solaris, SMF]
-date: "2010-07-12"
-layout: post
+date: 2010-07-12
 category: Solaris
 ---
 

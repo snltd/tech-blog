@@ -1,8 +1,7 @@
 ---
 title: "Solaris 10 branded zones in SXCE"
 tags: [Solaris, zones, virtualization]
-date: "2009-12-16"
-layout: post
+date: 2009-12-16
 category: Solaris
 ---
 

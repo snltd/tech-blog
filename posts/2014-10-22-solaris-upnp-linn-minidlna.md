@@ -1,9 +1,8 @@
 ---
 title: "Solaris, uPNP, Linn, and MiniDLNA"
 tags: [Solaris, music, audio]
-date: "2014-10-22"
+date: 2014-10-22
 category: Solaris
-layout: post
 ---
 
 Years ago I built a media server on Solaris 11 11/11 with Fuppes. It

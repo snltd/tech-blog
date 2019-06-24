@@ -1,9 +1,8 @@
 ---
 title: "DTracing a Ruby Application"
 tags: [Ruby, DTrace, SmartOS]
-date: "2016-02-11"
+date: 2016-02-11
 category: DTrace
-layout: post
 ---
 
 Though I'm far from an expert, I do enjoy programming in Ruby. Some

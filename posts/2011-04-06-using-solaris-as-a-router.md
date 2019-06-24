@@ -1,8 +1,7 @@
 ---
 title: "Building a Router With a Solaris Zone"
 tags: [Solaris, routing, zones, s-zone.sh]
-date: "2011-04-06"
-layout: post
+date: 2011-04-06
 category: Solaris
 ---
 

@@ -1,8 +1,7 @@
 ---
 title: "Sending Wavefront Data from the CLI"
 tags: [Wavefront, Ruby, DTrace]
-date: "2018-04-08"
-layout: post
+date: 2018-04-08
 category: Wavefront
 ---
 

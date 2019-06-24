@@ -1,9 +1,8 @@
 ---
 title: "NVRAM disk aliases"
 tags: [Solaris install, disk, disksuite, svm]
-date: "2009-10-27"
+date: 2009-10-27
 category: Solaris
-layout: post
 ---
 
 I inherited a T2000 which was configured to use hardware RAID. I know that's

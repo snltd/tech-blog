@@ -1,9 +1,8 @@
 ---
 title: "Building Ruby 2.2 for SmartOS"
 tags: [SmartOS, Ruby]
-date: "2015-10-04"
+date: 2015-10-04
 category: Illumos
-layout: post
 ---
 
 SmartOS's `pkgin` support is great, but, if you're an

@@ -1,9 +1,8 @@
 ---
 title: "Trimming wtmpx"
 tags: [Solaris, sysadmin]
-date: "2010-09-08"
+date: 2010-09-08
 category: Solaris
-layout: post
 ---
 
 We don't use accounting on our systems, so `/var/adm/wtmpx` just

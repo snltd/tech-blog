@@ -1,7 +1,7 @@
 body {
   font-family: 'Lora', serif;
   font-size: 11pt;
-  background-color: #eee;
+  background: #f3f3f3;
   line-height: 140%;
   color: #444;
 }
@@ -20,15 +20,16 @@ a:hover {
   color: #731;
 }
 
-h3 {
+h1, h2, h3 {
   font-weight: 700;
-  font-family: 'Lato', sans-serif;
+  line-height: 200%;
+}
+
+h3 {
   color: #051660;
 }
 
-h1, h2 {
-  font-weight: 700;
-  line-height: 200%;
+h1, h2, h3, #post_header, #post_tags, #links ul, #sidebar, #footer {
   font-family: 'Lato', sans-serif;
 }
 
@@ -39,38 +40,72 @@ h1, h2 {
 }
 
 #body_copy {
-  float: left;
-  width: 75%;
+  vertical-align: top;
+  font-size: 15px;
+  display: table-cell;
+  padding-right: 2em;
 }
 
-#links {
+#sidebar {
+  display: table-cell;
   font-size: small;
-  float: right;
+  font-weight: light;
   width: 20%;
   text-align: left;
 }
 
-#links ul {
-  list-style-type: none;
+pre, #post_header, #sidebar .sidebar_block, #sidebar .bartitle, #post_tags, blockquote, #footer, .this_page {
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-#links li {
-  padding-bottom: 0.4em;
-}
-
-div.score {
-  font-size: 3em;
-  text-align: right;
-  border-bottom: 1px dotted #ccc;
+#sidebar .sidebar_block  {
   margin-bottom: 2em;
+}
+
+#sidebar .bartitle {
+  font-weight: bold;
+  background: #ddd;
+  padding: 0.2em;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+#sidebar ul {
+  list-style-type: none;
+  margin-bottom: 0.5em;
+}
+
+#sidebar li {
+  margin-left: -2.5em;
+  padding-bottom: 0.4em;
+  padding-right: 0.1em;
+}
+
+.page_year {
+  font-weight: bold;
+  padding: 0.3em;
+}
+
+span.year_toggle {
+  float: right;
+  color: #666;
+  font-size: normal;
+}
+
+.this_page {
+  color: #777;
+  margin-left: -0.5em;
+  padding-left: 0.5em;
+  margin-right: 0.5em;
 }
 
 #footer {
   clear: both;
-  text-align: right;
-  padding-top: 4em;
-  font-size: x-small;
-  color: #666;
+  background: #ddd;
+  text-align: center;
+  padding: 0.5em;
+  font-size: small;
 }
 
 code {
@@ -79,42 +114,62 @@ code {
 }
 
 p code {
-  border: 1px solid #ddd;
+  font-weight: bold;
+  font-size: 12pt;
   padding: 0px 2px;
-  color: #555;
+  color: #666;
 }
 
 pre {
-  border-radius: 5px;
+  background: #fdf6e3;
+  font-size: 11pt;
+  color: #586e75;
   padding: 1em;
-  border: 1px solid #ccc;
+}
+
+#post_header {
+  background: #ddd;
+  margin-bottom: 2em;
 }
 
 #post_title {
-  font-weight: 700;
-  font-family: 'Lato', sans-serif;
-  font-size: 2em;
-  border-bottom: 2px solid #222;
-  padding-bottom: 0.3em;
+  font-weight: bold;
+  font-size: x-large;
+  padding: 0.6em;
   text-align: left;
 }
 
 #post_date {
-  padding-top: 1em;
-  padding-bottom: 2em;
-  color: #999;
-  text-align: right;
+  color: #555;
   font-size: 0.8em;
+  background: #eee;
+  border-top: 1px solid #ccc;
+  text-align: right;
+  padding-right: 1em;
 }
 
 #post_tags {
-  border-top: 1px solid #ddd;
+  font-size: small;
   margin-top: 3em;
   padding-top: 0.5;
 }
 
+#post_tags .tag_label {
+  border: 1px solid #ddd;
+  padding: 0.2em 1em 0.2em 1em;
+  background: #ddd;
+}
+
 #post_tags ul, #post_tags li {
   display: inline;
+}
+
+#post_tags ul {
+  margin-left: -2em;
+}
+
+#post_tags li {
+  padding-left: 1em;
 }
 
 ul.big_list, li.big_list {
@@ -130,14 +185,13 @@ ul.big_list, li.big_list {
 
 #links ul {
   color: #666;
-  font-family: 'Lato', sans-serif;
   padding-left: 1em;
   text-indent: -1em;
 }
 
 #header {
   font-family: 'Inconsolata', monospace;
-  background-color:#d9e1f2;
+  background:#d9e1f2;
   width: 100%;
   color: #374374;
   padding: 0.7em 0;
@@ -147,15 +201,15 @@ ul.big_list, li.big_list {
   margin-bottom: 3em;
 }
 
+#header a {
+  color: #374374;
+}
+
 #brand_logo {
   font-size: 35pt;
   width: 80%;
   padding: 0.2em;
   padding-bottom: 0.4em;
-}
-
-#this_post {
-  border-right: 3px solid #787;
 }
 
 .error {
@@ -174,8 +228,18 @@ ul.post_list {
 }
 
 blockquote {
-  border-radius: 5px;
-  border: 1px solid #ddd;
   padding: 1em;
   font-style: italic;
 }
+
+#error_code {
+  font-size: 10em;
+  display: block;
+  text-align: center;
+  padding: 1.5em 0;
+}
+
+#error_message {
+  text-align: center;
+}
+

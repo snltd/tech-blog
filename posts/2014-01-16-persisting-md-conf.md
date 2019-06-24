@@ -1,9 +1,8 @@
 ---
 title: "Persisting madadm.conf"
 tags: [Linux, AWS]
-date: "2014-01-16"
+date: 2014-01-16
 category: Linux
-layout: post
 ---
 
 Scaling up a Graphite cluster, I was restarting the `carbon-cache`

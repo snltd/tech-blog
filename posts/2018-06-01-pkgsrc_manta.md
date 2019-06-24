@@ -1,8 +1,7 @@
 ---
 title: "Making a pkgsrc server with Manta"
-date: "2018-06-01"
+date: 2018-06-01
 tags: [Manta, Serverless]
-layout: post
 category: Serverless
 ---
 
