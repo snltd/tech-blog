@@ -23,7 +23,7 @@ desc 'push to Gemfury'
 task push: :build do
   if !env?(:GEMFURY_TOKEN)
     puts 'No Gemfury token. Not pushing.'
-  elsif !env?(:CI_COMMIT_TAG)
+  elsif !env?(:CIRCLE_TAG)
     puts 'Not tagged. Not pushing.'
   else
     puts 'Pushing to Gemfury.'
