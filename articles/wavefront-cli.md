@@ -68,6 +68,7 @@ Usage:
 
 Commands:
   alert              view and manage alerts
+  apitoken           view and manage API tokens
   cloudintegration   view and manage cloud integrations
   config             create and manage local configuration
   dashboard          view and manage dashboards
@@ -76,17 +77,23 @@ Commands:
   integration        view and manage Wavefront integrations
   link               view and manage external links
   message            read and mark user messages
-  metric             view metrics
+  metric             get metric details
   notificant         view and manage Wavefront alert targets
-  proxy              view and manage Wavefront proxies
-  query              query the Wavefront API
+  proxy              view and manage proxies
+  query              run Wavefront queries
   savedsearch        view and manage saved searches
+  settings           view and manage system preferences
   source             view and manage source tags and descriptions
   user               view and manage Wavefront users
   usergroup          view and manage Wavefront user groups
   webhook            view and manage webhooks
   window             view and manage maintenance windows
   write              send data to Wavefront
+
+Use 'wf <command> --help' for further information.
+
+
+
 
 Use 'wf <command> --help' for further information.
 ```
@@ -140,7 +147,7 @@ Let's start with some alerts. Wavefront is great at alerts.
 $ wf alert --help
 Usage:
   wf alert list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-al] [-O fields] [-f format] [-o offset] [-L limit]
+          [-f format] [-al] [-O fields] [-o offset] [-L limit]
   wf alert firing [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-o offset] [-L limit]
   wf alert snoozed [-DnV] [-c file] [-P profile] [-E endpoint]
@@ -148,59 +155,80 @@ Usage:
   wf alert describe [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-v version] <id>
   wf alert delete [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          <id>
+          [-f format] <id>
+  wf alert clone [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-v version] <id>
   wf alert undelete [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id>
+          [-t token] [-f format] <id>
   wf alert history [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-o offset] [-L limit] <id>
+  wf alert clone [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-v version] <id>
+  wf alert latest [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] <id>
   wf alert import [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          <file>
+          [-f format] [-u] <file>
   wf alert snooze [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-T time] <id>
-  wf alert update [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          <key=value> <id>
+          [-f format] [-T time] <id>
+  wf alert set [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] <key=value> <id>
   wf alert unsnooze [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id>
+          [-t token] [-f format] <id>
   wf alert search [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-al] [-f format] [-o offset] [-L limit] <condition>...
+          [-f format] [-al] [-o offset] [-L limit] <condition>...
   wf alert tags [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
   wf alert tag set [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id> <tag>...
+          [-t token] [-f format] <id> <tag>...
   wf alert tag clear [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id>
+          [-t token] [-f format] <id>
   wf alert tag add [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id> <tag>
+          [-t token] [-f format] <id> <tag>
   wf alert tag delete [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] <id> <tag>
+          [-t token] [-f format] <id> <tag>
+  wf alert tag pathsearch [-DnV] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] [-al] [-o offset] [-L limit] <word>
   wf alert currently [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <state>
   wf alert queries [-DnV] [-c file] [-P profile] [-E endpoint]
-          [-t token] [-f format] [-b]
+          [-t token] [-f format] [-b] [<id>]
+  wf alert install [-DnV] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] <id>
+  wf alert uninstall [-DnV] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] <id>
+  wf alert acls [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] <id>
+  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] clear <id>
+  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] grant (view | modify) on <id> to <name>...
+  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] revoke (view | modify) on <id> from <name>...
   wf alert summary [-DnV] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-a]
   wf alert --help
 
 Global options:
-  -c, --config=FILE         path to configuration file
-  -P, --profile=NAME        profile in configuration file
-  -D, --debug               enable debug mode
-  -n, --noop                do not perform API calls
-  -V, --verbose             be verbose
-  -h, --help                show this message
+  -c, --config=FILE          path to configuration file
+  -P, --profile=NAME         profile in configuration file
+  -D, --debug                enable debug mode
+  -n, --noop                 do not perform API calls
+  -V, --verbose              be verbose
+  -f, --format=STRING        output format
+  -h, --help                 show this message
 
 Options:
-  -E, --endpoint=URI        cluster endpoint
-  -t, --token=TOKEN         Wavefront authentication token
-  -l, --long                list alerts in detail
-  -a, --all                 list all alerts
-  -v, --version=INTEGER     describe only this version of alert
-  -o, --offset=n            start from nth alert
-  -O, --fields=F1,F2,...    only show given fields
-  -L, --limit=COUNT         number of alerts to list
-  -T, --time=SECONDS        how long to snooze (default 3600)
-  -b, --brief               do not show alert names
-  -f, --format=STRING       output format
+  -E, --endpoint=URI         cluster endpoint
+  -t, --token=TOKEN          Wavefront authentication token
+  -l, --long                 list alerts in detail
+  -a, --all                  list all alerts
+  -v, --version=INTEGER      describe only this version of alert
+  -o, --offset=n             start from nth alert
+  -L, --limit=COUNT          number of alerts to list
+  -O, --fields=F1,F2,...     only show given fields
+  -u, --update               update an existing alert
+  -T, --time=SECONDS         how long to snooze (default 3600)
+  -b, --brief                do not show alert names
 ```
 
 Notice the line-wrapping on the help: it automatically adjusts to
@@ -263,12 +291,16 @@ where the `key` field merely *contains* `value`, use `key~value`.
 If you want objects where the field *starts with* the value, use
 `key^value`. The default display mode for `search` subcommands is
 one object per line, and the fields will be the object's `id`, plus
-whichever other keys you used in your conditions.
+whichever other keys you used in your conditions. You can negate
+conditions by putting a `!` in front of the search operator.
 
 ```cmd
 $ wf alert search name~JPC
 1497275466684  JPC Failed Services
 1463413760189  JPC Memory Shortage
+1490980663852  JPC: no metrics
+$ wf alert search name~JPC name!~Memory
+1497275466684  JPC Failed Services
 1490980663852  JPC: no metrics
 $ wf alert search name~JPC id^149
 1497275466684  JPC Failed Services
@@ -281,9 +313,33 @@ $ wf alert search status=SNOOZED name~' '
 1481553823153  SNOOZED  JVM Memory
 $ wf alert search status=SNOOZED name~' '
 1481553823153  SNOOZED  JVM Memory
-$ wf alert search tags=CLS name~
-1463135909875  [["customerTags", ["CLS"]]]  Fluentd Overflow
-1460546172048  [["customerTags", ["CLS"]]]  Logging Snapshot Failure
+```
+
+Running any `search` with the `-l` (`--long`) flag will show you the
+entire matching object. Using a machine-parseable output format also
+returns the whole of the matching object.
+
+Wavefront gives you a couple of "magic" search keys: `tags` and
+`freetext`. Object tags are a structure, and the `tags` search key
+looks across all tags. `wf` tries to present this potentially
+multi-dimensional data in a simple way.
+
+```cmd
+$ wf alert search tags=physical
+1534951532204  customerTags=backup,home,physical
+1499780986548  customerTags=disk,physical,storage
+1476741941156  customerTags=disk,physical
+```
+
+Freetext searches look at every field in an alert, so can potentially
+return *a lot* of data. If you run a freetext search without `-l`,
+you'll get a list of matching objects paired with a list of the
+fields which matched your pattern.
+
+```cmd
+$ wf alert search freetext=ZFS
+1499780986548  name, event
+1489162558204  additionalInformation
 ```
 
 Getting more detail is best done in a more targeted way. Let's have
@@ -332,7 +388,7 @@ Returning to the output above, we see a failing service is only
 SMOKE? That can't be right, surely. Let's fix it.
 
 ```cmd
-$ wf alert update severity=SEVERE 1463413550083 | grep severity
+$ wf alert set severity=SEVERE 1463413550083 | grep severity
 severity                     SEVERE
 ```
 
@@ -390,7 +446,7 @@ SMOKE
 ```
 
 What if we wanted to roll back to that alert? Of course, we could
-easily `update` that single change back to the old value, but what
+easily `set` that single change back to the old value, but what
 if we wanted to go back a number of revisions?  Here's how we'd do
 it.
 
@@ -429,7 +485,9 @@ deleted                   false
 ```
 
 There's the old alert, fully restored. It has a new `id`, but that's
-okay. Everything significant is just the same.
+okay. Everything significant is just the same. (You can also
+`import` an alert, or any other object, over the top of an existing
+one if you add the `--update` flag.)
 
 Once an alert is exported you can, of course, do things to it before
 re-importing.
@@ -633,6 +691,29 @@ $ wf notificant test CHTo475vsPzSaGhh
 
 You'll have to trust me, but I promise that just popped up a Slack
 notification on my desktop.
+
+## API Tokens
+
+A user can create up to twenty API tokens, and the `apitoken` command
+lets you manage them.
+
+```cmd
+$ wf apitoken list
+fb83495d-9a44-26c5-fe41-1f7dd670734f
+$ wf apitoken create
+d8c5b877-d270-4990-9b5d-351015bf44c6
+$ wf apitoken rename d8c5b877-d270-4990-9b5d-351015bf44c6 "example token"
+tokenID     d8c5b877-d270-4990-9b5d-351015bf44c6
+tokenName   example token
+$ wf apitoken list
+fb83495d-9a44-26c5-fe41-1f7dd670734f
+d8c5b877-d270-4990-9b5d-351015bf44c6  example token
+$ wf apitoken delete d8c5b877-d270-4990-9b5d-351015bf44c6
+Deleted api token 'd8c5b877-d270-4990-9b5d-351015bf44c6'.
+```
+
+Obviously you can't create a token until you have a token, so the API
+isn't quite up to full machine-generation of accounts.
 
 ## Dashboards
 
@@ -1110,7 +1191,7 @@ The `integration`, `webhook`, `link` and `savedsearch` commands are
 simpler than those we've seen so far, becaue the API doesn't allow
 tagging or soft-deleting of those resource types. The CLI still
 lets you list, describe, delete and import them though, and each has
-properties you can `update`. The `search` subcommand works for all
+properties you can `modify`. The `search` subcommand works for all
 of them too.
 
 Now let's look at the "oddball" commands.
