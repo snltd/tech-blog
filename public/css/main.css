@@ -20,16 +20,12 @@ a:hover {
   color: #731;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
   font-weight: 700;
   line-height: 200%;
 }
 
-h3 {
-  color: #051660;
-}
-
-h1, h2, h3, #post_header, #post_tags, #links ul, #sidebar, #footer {
+h1, h2, h3, h4, #post_header, #post_tags, #links ul, #sidebar, #footer {
   font-family: 'Lato', sans-serif;
 }
 
