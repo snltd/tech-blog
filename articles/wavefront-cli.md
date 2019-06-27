@@ -6,56 +6,34 @@ category: Wavefront
 ---
 
 The [Wavefront](https://wavefront.com) console is excellent, and its
-API coverage is complete and simple to use. At my client's
-site, we put *everything* in Wavefront, and actively use the data
-for alerts, webhooks, and other automated behaviour. The easier it
-is to do this, the more it will be done, and the more benefit we all
-get.
+API coverage is complete and simple to use, but there are many
+use-cases where even a halfway-decent CLI will be better than the
+finest UI or the simplest API.
 
-There is already [a Wavefront CLI and Ruby
-SDK](https://github.com/wavefrontHQ/ruby-client), to which I was a
-core contributor. But that tool uses API version 1, which is
-somewhat limited. It's also, because it evolved in a "we have a
-problem right now - fix it!" kind of way, it's a bit messy and WET.
+With that in mind, I tried to write a halfway-decent Wavefront CLI.
 
-As Wavefront's API uses [Swagger](https://swagger.io/) it is pretty
-easy to generate an SDK for whatever language you like. But I find
-these machine-generated SDKs hard work to use, and I wanted a nice
-little project to work on in my spare time, so I wrote [yet another
-Wavefront SDK](https://github.com/snltd/wavefront-sdk), in Ruby.
-This has more features, and around 40,000 less lines of code than
-its generated equivalent, and I've tried hard to hide the
-differences in various API paths behind a consistent interface,
-which Swagger would not have done.
-
-Built on top of the SDK is a new [Wavefront
-CLI](https://github.com/snltd/wavefront-cli), which I'm going to run
-through in this article.
-
-> **Note**: This page gets updated from time to time, as the CLI
-> acquires new features.
+**This article is updated whenever the CLI acquires new features.**
 
 ## Installation and Basics
 
-The CLI and SDK both require Ruby 2.3 or later.  There's no
-technical reason why they couldn't have been written to work with
-older Rubies, but the sooner we stop our software working with them,
-the sooner they'll hopefully go away.
+My CLI is written in Ruby. To use it you need a current Ruby
+installation. At the time of writing, that's 2.3 or later.
+
+To install:
 
 ```cmd
 $ gem install wavefront-cli
 ```
 
-This installs the CLI and all its dependencies.  A lot of care has
-been taken to ensure there are no "native extension" gems anywhere
-in the chain, so installation should be quick and painless on any
-host. I *hate* people thinking it's fine to expect me to install a C
-compiler to run a hundred-line tool written in a scripting language.
+A lot of care has been taken to ensure there are no "native
+extension" gems anywhere in the chain, so installation should be
+quick and painless on any host. I *hate* people thinking it's fine
+to expect me to install a C compiler to run a hundred-line tool
+written in a scripting language.
 
 Following the model of [the best designed CLI I
 know](https://illumos.org/man/1M/zfs), there's a single command, with
-subcommands. I chose `wf` to avoid a clash with `wavefront` from
-the old `wavefront-client` gem.
+subcommands.
 
 ```cmd
 $ wf --help
@@ -91,11 +69,6 @@ Commands:
   write              send data to Wavefront
 
 Use 'wf <command> --help' for further information.
-
-
-
-
-Use 'wf <command> --help' for further information.
 ```
 
 The majority of those commands talk to Wavefront's API. To do that,
@@ -105,6 +78,8 @@ credentials.
 You can do this with command-line options (we'll see those in a
 moment), but for everyday interactive use, it's much better to
 create a configuration. file.
+
+### Configuration
 
 You can, of course, create configuration by hand, but the `wf
 config` command will guide you through it. The first time you run
@@ -120,15 +95,15 @@ configuration.
 $ wf config setup
 Creating new configuration file at /home/rob/.wavefront.
 Creating profile 'default'.
-  Wavefront API token:> 820ac1de-4e1f-41a4-f9c3-231c95ae4da1
-  Wavefront API endpoint [metrics.wavefront.com]:>
-  Wavefront proxy endpoint [wavefront]:>
-  default output format [human]:>
+  Wavefront API token:> 820ac1de-4e1f-41a4-f9c3-231c95ae4da1↵
+  Wavefront API endpoint [metrics.wavefront.com]:>↵
+  Wavefront proxy endpoint [wavefront]:> wavefront.localnet↵
+  default output format [human]:>↵
 $ wf config show
 [default]
 token = 820ac1de-4e1f-41a4-f9c3-231c95ae4da1
 endpoint = metrics.wavefront.com
-proxy = wavefront
+proxy = wavefront.localnet
 format = human
 ```
 
@@ -138,10 +113,10 @@ options, and also with environment variables. `WAVEFONT_TOKEN`,
 you have multiple Wavefront accounts, you can add a new stanza for
 each account.
 
+## Alerts
+
 Now we're fully credentialled, we can start exploring the CLI.
 Let's start with some alerts. Wavefront is great at alerts.
-
-## Alert
 
 ```cmd
 $ wf alert --help
@@ -166,6 +141,8 @@ Usage:
           [-f format] [-v version] <id>
   wf alert latest [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
+  wf alert dump [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format]
   wf alert import [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-u] <file>
   wf alert snooze [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
@@ -235,6 +212,8 @@ Notice the line-wrapping on the help: it automatically adjusts to
 fit the width of your terminal, and I'm an unapologetic, hardcore,
 80-column guy. Deal with it.
 
+### Listing
+
 Let's start by having a look at the alerts in my account.
 
 ```cmd
@@ -267,6 +246,8 @@ resource into your terminal. I don't often use that. Using `-O` in
 conjunction with `-l` gives you only the fields you request, one
 per-line. Items are separated by a blank line.
 
+#### Pagination: offset, limits, and "all"
+
 By default `list` and `search` will return the first hundred objects
 they find. You will be informed if there are more objects, and can
 use the `--offset` and `--limit` flags (`-o` and `-L`) to get the
@@ -279,6 +260,8 @@ particularly dashboards.) The commands which do not paginate are
 `user`, because the API doesn't paginate its response, and `source`,
 because there are typically many thousands of sources, and an "all"
 operation takes for ever.
+
+### Searching
 
 We can also `search` for alerts, or, indeed, for any other object
 type. (All commands support the `search` sub-command, so long as
@@ -342,6 +325,8 @@ $ wf alert search freetext=ZFS
 1489162558204  additionalInformation
 ```
 
+### Describing
+
 Getting more detail is best done in a more targeted way. Let's have
 a proper look at that the
 [JPC](https://www.joyent.com/triton/compute) Failed
@@ -384,6 +369,8 @@ and `ruby` dumps a string of the raw Ruby object from which all the
 other output formats are constructed. It could be useful for pasting
 into `irb`, or generating test data.
 
+### Setting Values
+
 Returning to the output above, we see a failing service is only
 SMOKE? That can't be right, surely. Let's fix it.
 
@@ -392,10 +379,13 @@ $ wf alert set severity=SEVERE 1463413550083 | grep severity
 severity                     SEVERE
 ```
 
-I used that `grep` because updating an object will re-display said
-object with its new values, and I didn't want to show you the whole
-lot again. It only updated the `severity`. Trust me. Be aware lots
-of poperties are read-only, at least via the API.
+I used that `grep` because setting a value in an object will
+re-display said object with its new values, and I didn't want to
+show you the whole lot again. It only updated the `severity`. Trust
+me. Be aware lots of poperties are read-only, at least via the API.
+
+
+### Deleting and Undeleting
 
 Actually, you know what? I changed my mind. I don't care if a
 service fails on a box. I monitor my application, not boxes. If the
@@ -419,6 +409,8 @@ $ wf alert undelete 1463413550083
 Undeleted alert '1463413550083'.
 ```
 
+### Histories and Revisions
+
 Remember when we modified the alert earlier? Wavefront does.
 
 ```cmd
@@ -439,6 +431,8 @@ the `SMOKE` to `SEVERE` change, so version 4 should have a severity
 of `SMOKE`. Instead of `grep`ping, let's use JSON output and parse
 the output properly with the  [json](http://trentm.com/json/)
 command.
+
+### Exporting and Importing
 
 ```cmd
 $ wf alert describe 1463413550083 -v 4 -f json | json severity
@@ -489,6 +483,8 @@ okay. Everything significant is just the same. (You can also
 `import` an alert, or any other object, over the top of an existing
 one if you add the `--update` flag.)
 
+#### Programatic Modification
+
 Once an alert is exported you can, of course, do things to it before
 re-importing.
 
@@ -533,6 +529,30 @@ place. Obviously, it would be no more difficult to change any other
 aspect of the alert, or to source it from a version-controlled file
 rather than pulling it out of Wavefront.
 
+#### Bulk Import/Export
+
+To get all of your alerts as a single blob of JSON, run
+
+```cmd
+$ wf alert dump -f json >all_alerts.json
+```
+
+If you wanted a subset of alerts, you could pipe `wf`'s output
+through `jq` or `json`. You can also use `-f yaml`, should you
+prefer it.
+
+This bulk data can be re-imported with a standard `import` command.
+Bulk import/export can be very useful if you were migrating data
+between clusters, but there are things to watch out for. For
+instance, if you migrated your alert targets, the targets would all
+get new IDs, which would mean a bulk import of alerts would likely
+fail, as the old IDs don't exist.
+
+There's no special syntax for a bulk `import`. `wf` detects multiple
+objects in the input, and deals with them automatically.
+
+#### Exporting HCL for Use with Terraform
+
 If you use Terraform, the [Wavefront Terraform
 provider](https://github.com/spaceapegames/terraform-provider-wavefront)
 can create your alerts, alert-targets and dashboards as part of a
@@ -541,6 +561,8 @@ subcommand will export any of those objects in
 [HCL](https://github.com/hashicorp/hcl) format, ready of pasting
 straight into your Terraform configuration. (I discuss this further
 [elsewhere](/post/2017-08-28-terraforming-smartos).
+
+### Snoozing
 
 What else can we do with the alerts CLI? Well, we can easily snooze
 and unsnooze an alert. Let's make an alert that's always going to
@@ -570,7 +592,9 @@ snoozed                  1
 trash                    15
 ```
 
-Ooh, look, a firing alert! Mor info please!
+### Alert Statuses
+
+Ooh, look, a firing alert! More info please!
 
 ```cmd
 $ wf alert firing
@@ -603,9 +627,21 @@ points over their last "would fire" interval.  Valid alert states are
 `firing`, `snoozed`, `in_maintenance`, `invalid`, `none`,
 `checking`, `trash`, and `no_data`.
 
+### What Queries do I Have?
+
 The `alert queries` subcommand will show you the conditions used
 across all your alerts. This can be useful if you're thinking of
 thinning out the metrics you collect.
+
+```cmd
+$ wf alert queries
+1459508340708  sum(deriv(ts(~collector.points.valid))) > 500
+1464128764869  rate(ts("~agent.points.2878.sent", dc=home)) < 1
+1476741941156  msum(3m, rate(ts("disk.error.*errors", !vendor=TSSTcorp)))
+1489162558204  ts("zpool.*.cap") > 79
+```
+
+### Tags
 
 The final batch of `alert` sub-commands are to do with tagging. It's
 probably easiest just to show you those:
@@ -745,6 +781,8 @@ cube
 (The SDK solves the spelling conundrum by aliasing `#favourite` to
 `#favorite`.)
 
+### ACLs
+
 Dashboards now understand ACLs. These let you grant view or
 view-and-modify privileges to any users or user groups. (We'll learn
 how to manage those in a while.)
@@ -833,6 +871,8 @@ There are a couple of proxy-specific commands though. Proxies can be
 renamed with -- guess what -- `proxy rename`, and you can get a list
 of proxy versions with...
 
+### Versions
+
 ```cmd
 $ wf proxy versions
 b75bf052-9985-407e-b90c-479e0134e261  4.35    Proxy on log.prod.wavefront-proxy
@@ -869,6 +909,8 @@ but it is here for completeness.
 The CLI is able to interact more with events than with alerts, or
 proxies, or dashboards, so we gain a couple of new subcommands in
 the `event` space.
+
+### Listing
 
 ```cmd
 $ wf event list
@@ -1610,8 +1652,8 @@ dutifully reports this error.
 
 ## Query
 
-The `query` command has quite a lot of options (common options removed for
-brevity.)
+The `query` command has quite a lot of options (common options
+removed for brevity.)
 
 ```cmd
 wf query aliases [-DV] [-c file] [-P profile]
@@ -1646,13 +1688,8 @@ Options:
   -k, --nospark                do not show sparkline
   -W, --nowarn                 do not show API warning messages
 
-The query command has an additional output format. Using
-'-f wavefront' produces output suitable for feeding back into a proxy.
-Other output formats are 'yaml', 'json', 'ruby', and 'csv'. CSV format
-options are 'headers' (print column headers); 'tagkeys' (print tags as
-key=value rather than value); and 'quote' (force quoting of every CSV
-element).
-```
+Let's run a simple query.
+
 
 ```cmd
 $ wf query 'deriv(ts("nfs.server.v4.read"))'
@@ -1707,6 +1744,8 @@ strategy used on the values in those buckets. Like the UI, the
 default strategy is `MEAN`, but the `-S` option lets you specify
 `MAX`, `LAST` or any of the others offered by the UI.
 
+### Raw Metrics
+
 The `raw` sub-command requires a host and a metric path - *not* a
 time-series expression. It gives you the raw values for that metric,
 on that host, over a given range.
@@ -1721,6 +1760,8 @@ $ wf query raw 'lab.dev.host.nfs.server.v4.read' -H shark -s 13:00 -e 13:01
              12:00:56.000    127493.0
 ```
 
+### Relative Times
+
 Start and end times don't have to be absolute. As of version 2.1.0
 of the CLI, you can specify relative times. So you can run a query
 over a window from "two hours ago" to "one hour ago", with `-s -2h
@@ -1732,6 +1773,8 @@ calendar changes.
 You can specify future times as `+2.5h` or similar. This is useful
 for maintenance windows, but if you try to see into the future on a
 query, the Wavefront API will, not unreasonably, throw an exception.
+
+### Storing Queries with Aliases
 
 Imagine if you got a bit obsessive over running that NFS query.
 You'd soon get tired of typing it in, and remembering to balance the
@@ -1765,9 +1808,15 @@ $ wf query aliases
 nfs
 ```
 
-`wf query` supports additional output formats. `wavefront`
-writes out the points in native Wavefront wire format. It works for
-timeseries and raw queries.
+### Query Output Formats
+
+`wf query` can present its results in all the formats the other
+commands use, but it supports a number of additional output formats.
+
+#### Native Wavefront Output
+
+`wavefront` writes out the points in native Wavefront wire format.
+It works for timeseries and raw queries.
 
 ```cmd
 $ wf query 'ts("solaris.network.obytes64", environment=production)' -f wavefront
@@ -1780,24 +1829,14 @@ solaris.network.obytes64 1219563430.0 1533751241000 source=www-blue nic="net0" r
 solaris.network.obytes64 1219563982.0 1533751261000 source=www-blue nic="net0" role="sinatra"
 ...
 ```
-
-`csv` format outputs points as a CSV table. By default no column
-headers are printed; values are not quoted unless they contain
-whitespace, a comma or a soft quote; and point tags have their
-values printed but not their keys. By using the `-F` option you can
-change all these things. `-F` takes a comma-separated list of
-keywords: `headers` will print the CSV header line; `quote` will
-soft-quote every value; and `tagkeys` will print point tags as
-`key=value`.
-
 You might have noticed that the timeseries query reports the
 point timestamp as epoch seconds, whereas a `raw` query phrases them
 as epoch milliseconds. Don't worry about it: the proxy accepts both.
 
-If you have a lot of data you wish to modify, perhaps to rename a
-metric path, or retrospectively change tags, you
-could pipe the output of these commands through `sed`, `awk`, or
-some other stream editing program, and back into a proxy.
+You can pipe this data straight back into a proxy using `nc`, or
+even `wf` itself.  This is great for cluster migrations. Or, if you
+modify the data in-flight, perhaps with `sed` or `awk`, you can copy
+data to new metric paths, or amend tags.
 
 ```cmd
 $ wf query 'ts("solaris.network.obytes64")' -f wavefront \
@@ -1805,103 +1844,44 @@ $ wf query 'ts("solaris.network.obytes64")' -f wavefront \
   | nc wf-proxy 2878
 ```
 
+#### CSV Output
+
+`csv` format outputs points as a CSV table. By default no column
+headers are printed; values are not quoted unless they contain
+whitespace, a comma or a soft quote; and point tags have their
+values printed but not their keys.
+
+By using the `-F` option you can change all these things. `-F` takes
+a comma-separated list of keywords: `headers` will print the CSV
+header line; `quote` will soft-quote every value; and `tagkeys` will
+print point tags as `key=value`.
+
+```cmd
+$ wf query 'ts("solaris.network.obytes64")' -f csv -F headers | sed 2q
+path,value,timestamp,source,platform,nic,dc
+solaris.network.obytes64,192820246.33333334,1561651740,www-green,JPC,net0,eu-ams-1
+$ wf query 'ts("solaris.network.obytes64")' -f csv -F tagkeys,quote | sed 1q
+"solaris.network.obytes64","192852172.33333334","1561651860","www-green","platform=JPC","nic=net0","dc=eu-ams-1"
+```
+
+Should you forget, running `wf query --help` will tell you all of
+this.
 
 ## Write
 
-Finally we get to the `write` command. This is different from all
-the other commands because it talks to a Wavefront proxy, not the
-API. At the moment there's no way to send metrics to Wavefront via
-the API.
-
-You can set your proxy endpoint with the `-E` option, but better to
-pop a `proxy` entry in your config file, like I did.
-
-
-```cmd
-$ grep proxy ~/.wavefront
-proxy = wavefront.localnet
-```
-
-Sending a single point is easy.
-
-```cmd
-$ wf write point cli.example 10
-          sent 1
-      rejected 0
-        unsent 0
-```
-
-To send a negative value, use the standard Unix trick of using `--`
-to tell the command options there are no more options to parse.
-
-```cmd
-$ wf write point cli.example -- -10
-          sent 1
-      rejected 0
-        unsent 0
-```
-
-You can turn off the summary by supplying `-q` (for "quiet"), but it
-will still be printed if there are any rejected or unsent points.
-
-If you don't specify a timestamp, it's stamped "now". But you can
-specify one if you want, again, in any parseable format. You can
-specify any number of point tags, too.
-
-```cmd
-$ wf write point -T timestamp=given -t 17:03 cli.example 9
-          sent 1
-      rejected 0
-        unsent 0
-$ wf write point -T timestamp=inferred cli.example 12.3
-          sent 1
-      rejected 0
-        unsent 0
-```
-
-<script src="https://metrics.wavefront.com/embedded/cGgfb89wpB/js"
-id="wavefront-embedded-cGgfb89wpB" width="700" height="300"></script>
-
-You can also write content from a file. Each line in the file
-describes a point, so it must contain at least a value, which we
-will call `v`. The line may also contain a metric path we'll call
-`m`, a timestamp (`t`), a host (`h`) and point tags (`T`). You can
-tell the CLI what order those fields are in with the `-f` option.
-So, say you have a file which looks like this:
-
-```
-cli.example 1550077536 31640 tag1=val1 tag2=val2
-cli.example 1550077536 8887 tag1=val1 tag2=val2
-cli.example 1550077536 22038 tag1=val1 tag2=val2
-cli.example 1550077536 5406 tag1=val1 tag2=val2
-```
-
-you'd use `-f mtvT`. There are a couple of rules. Because it can
-contain spaces, the `T` field must come last. And if you don't
-supply a metric path in the file, you have to supply one with `-m`.
-(If you do both, the `-m` one will be treated as a prefix, and
-tagged on to the beginning of the paths in the file.)
-
-The file doesn't have to be a file. Following standard Unix
-conventions, you can give the filename as `-`, and the CLI will read
-from standard in.
-
-```cmd
-$ while true; do echo $RANDOM; sleep 1; done | \
-  wf write file -m cli.example -T tag=randomness -Fv -
-```
-
-<script src="https://metrics.wavefront.com/embedded/CqVs903Gl2/js"
-id="wavefront-embedded-CqVs903Gl2" width="700" height="300"></script>
-
 The `write` command has a lot of options and capabilities, so I
-wrote [a separate article which looks more closely at sending
-metrics](/post/2018-08-08-wavefront-writer) from the CLI.
+wrote [a separate article about sending metrics from the
+CLI](/article/wavefront-writer).
 
-## End
+## Code and Contributions
 
-That, in a nutshell, is my Wavefront CLI. I hope you find it useful,
-and if you find bugs, omissions, or have any great ideas for
-features, please [raise an
-issue](https://github.com/snltd/wavefront-cli/issues). Pull requests
-are even more welcome. Don't forget the tests!
+The CLI, and the SDK on which is built, are open source, available
+under [a BSD
+license](https://github.com/snltd/wavefront-cli/blob/master/LICENSE.txt).
+
+Contributions, bug reports, and feature requests are always welcome.
+
+* [The Wavefront CLI on Github](https://github.com/snltd/wavefront-cli)
+* [The Wavefront SDK on Github](https://github.com/snltd/wavefront-sdk)
+* [CLI Issue Tracker](https://github.com/snltd/wavefront-cli/issues)
+* [Rubygems page](https://rubygems.org/gems/wavefront-cli)

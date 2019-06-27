@@ -5,11 +5,6 @@ date: 2018-04-08
 category: Wavefront
 ---
 
-> Note: This article was originally published in July 2016. It has
-> been updated to cover new ingestion methods, delta metrics,
-> histograms, and the 2.x syntax. I have also written [a complete
-> guide to the Wavefront CLI](/post/2017-07-26-wavefront-cli).
-
 Though Wavefront has a remarkable ability to relentlessly consume
 huge amounts of metrics, from agents like Telgraf or CollectD, it is
 sometimes useful to be able to send data in a more ad-hoc way.
