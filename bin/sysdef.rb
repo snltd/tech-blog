@@ -33,11 +33,11 @@ module Sysdef
     # Some blog posts have been promoted to permanent articles
     #
     get '/post/2017-07-26-wavefront-cli' do
-      redirect '/article/wavefront-cli'
+      redirect 'https://sysdef.xyz/article/wavefront-cli'
     end
 
     get '/post/2018-04-08-wavefront-writer' do
-      redirect '/article/wavefront-writer'
+      redirect 'https://sysdef.xyz/article/wavefront-writer'
     end
 
     get '/post/:ident' do

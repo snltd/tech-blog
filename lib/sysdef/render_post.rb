@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'kramdown'
+require 'kramdown-parser-gfm'
 require_relative 'chunked_file'
 
 module Sysdef
