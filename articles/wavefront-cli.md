@@ -121,67 +121,67 @@ Let's start with some alerts. Wavefront is great at alerts.
 ```cmd
 $ wf alert --help
 Usage:
-  wf alert list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert list [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-al] [-O fields] [-o offset] [-L limit]
-  wf alert firing [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert firing [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-o offset] [-L limit]
-  wf alert snoozed [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert snoozed [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-o offset] [-L limit]
-  wf alert describe [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert describe [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-v version] <id>
-  wf alert delete [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert delete [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
-  wf alert clone [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert clone [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-v version] <id>
-  wf alert undelete [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert undelete [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert history [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert history [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-o offset] [-L limit] <id>
-  wf alert clone [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert clone [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-v version] <id>
-  wf alert latest [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert latest [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
-  wf alert dump [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert dump [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format]
-  wf alert import [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert import [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-u] <file>
-  wf alert snooze [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert snooze [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-T time] <id>
-  wf alert set [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert set [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <key=value> <id>
-  wf alert unsnooze [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert unsnooze [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert search [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert search [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-al] [-o offset] [-L limit] <condition>...
-  wf alert tags [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert tags [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
-  wf alert tag set [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert tag set [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id> <tag>...
-  wf alert tag clear [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert tag clear [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert tag add [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert tag add [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id> <tag>
-  wf alert tag delete [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert tag delete [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id> <tag>
-  wf alert tag pathsearch [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert tag pathsearch [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-al] [-o offset] [-L limit] <word>
-  wf alert currently [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert currently [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <state>
-  wf alert queries [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert queries [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-b] [<id>]
-  wf alert install [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert install [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert uninstall [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert uninstall [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert acls [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert acls [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
-  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert acl [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] clear <id>
-  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert acl [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] grant (view | modify) on <id> to <name>...
-  wf alert acl [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert acl [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] revoke (view | modify) on <id> from <name>...
-  wf alert summary [-DnV] [-c file] [-P profile] [-E endpoint]
+  wf alert summary [-DnVm] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-a]
   wf alert --help
 
@@ -192,6 +192,7 @@ Global options:
   -n, --noop                 do not perform API calls
   -V, --verbose              be verbose
   -f, --format=STRING        output format
+  -M, --items-only           only show items in machine-parseable formats
   -h, --help                 show this message
 
 Options:
@@ -550,6 +551,14 @@ fail, as the old IDs don't exist.
 
 There's no special syntax for a bulk `import`. `wf` detects multiple
 objects in the input, and deals with them automatically.
+
+The `-M` option lets you run other commands in a way which will produce
+importable data. You could get a batch export of all your 'JPC' alerts
+with a command like:
+
+```cmd
+$ wf alert search name~JPC -f json -M >jpc_alerts.json
+```
 
 #### Exporting HCL for Use with Terraform
 
@@ -1511,11 +1520,11 @@ attribute of a group.)
 As you'd expect, you can `search` for, `list`, and `describe` users.
 
 ```
-wf user list [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+wf user list [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
         [-l] [-O fields]
-wf user describe [-DnV] [-c file] [-P profile] [-E endpoint]
+wf user describe [-DnVm] [-c file] [-P profile] [-E endpoint]
         [-t token] [-f format] <id>
-wf user search [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+wf user search [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
         [-al] [-f format] [-o offset] [-L limit] <condition>...
 ```
 
@@ -1657,12 +1666,12 @@ removed for brevity.)
 
 ```cmd
 wf query aliases [-DV] [-c file] [-P profile]
-wf query [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+wf query [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
          [-g granularity] [-s time] [-e time] [-f format] [-WikvO] [-S mode]
          [-N name] [-p points] [-F options] <query>
-wf query raw [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+wf query raw [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
          [-H host] [-s time] [-e time] [-f format] [-F options] <metric>
-wf query run [-DnV] [-c file] [-P profile] [-E endpoint] [-t token]
+wf query run [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
          [-g granularity] [-s time] [-e time] [-f format] [-F options] [-WkivO]
          [-S mode] [-N name] [-p points] <alias>
 
@@ -1682,7 +1691,6 @@ Options:
                                first)
   -O, --obsolete               include metrics unreported for > 4 weeks
   -H, --host=STRING            host or source to query on
-  -f, --format=STRING          output format
   -F, --format-opts=STRING     comma-separated options to pass to output
                                formatter
   -k, --nospark                do not show sparkline
