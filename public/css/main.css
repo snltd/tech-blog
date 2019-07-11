@@ -1,5 +1,5 @@
 body {
-  font-family: 'Lora', serif;
+  font-family: 'Lora', 'Georgia', serif;
   font-size: 11pt;
   background: #f3f3f3;
   line-height: 140%;
@@ -26,7 +26,7 @@ h1, h2, h3, h4 {
 }
 
 h1, h2, h3, h4, #post_header, #post_tags, #links ul, #sidebar, #footer {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Lato', 'Impact', 'Charcoal', sans-serif;
 }
 
 #container {
@@ -102,10 +102,14 @@ span.year_toggle {
   text-align: center;
   padding: 0.5em;
   font-size: small;
+  margin-top: 2em;
+}
+
+code, #header {
+  font-family: "Inconsolata", "Lucida Console", "Monaco", monospace
 }
 
 code {
-  font-family: "Inconsolata";
   font-style: normal;
 }
 
@@ -186,7 +190,6 @@ ul.big_list, li.big_list {
 }
 
 #header {
-  font-family: 'Inconsolata', monospace;
   background:#d9e1f2;
   width: 100%;
   color: #374374;
