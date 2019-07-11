@@ -25,6 +25,10 @@ html lang='en'
         ==slim :partial_links
         ==slim :partial_tags
       #footer
-        | &copy; #{Time.now.year} Sysdef Ltd.
+        .row
+          | &copy; #{Time.now.year} Sysdef Ltd.
+        .row
+        a href='/privacy'
+          | Privacy Policy
 
 script src='/js/link_bar.js'

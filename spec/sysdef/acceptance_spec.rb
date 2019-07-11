@@ -29,6 +29,17 @@ class TestSysdef < MiniTest::Test
     assert_footer(body)
   end
 
+  def test_privacy_policy
+    get '/privacy'
+    assert_equal(200, last_response.status)
+    body = Nokogiri::HTML(last_response.body)
+    assert_header(body)
+    assert body.inner_html.include?('We do not log anything')
+    assert body.css('#post_title').empty?
+    assert_sidebar(body)
+    assert_footer(body)
+  end
+
   def test_all_posts
     get '/'
     extract_post_links(last_response.body).each do |uri|

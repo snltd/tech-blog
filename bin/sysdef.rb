@@ -60,6 +60,10 @@ module Sysdef
       slim :post_list
     end
 
+    get '/privacy' do
+      slim :privacy
+    end
+
     #
     #
     #     get '/drafts/:page' do
