@@ -11,24 +11,24 @@ html lang='en'
     link href='https://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet'
     link href='/css/main.css' rel='stylesheet'
     link href='/css/solarized.css' rel='stylesheet'
-    script src='https://d3js.org/d3.v5.min.js'
+    script src='https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js'
   body
     #container
-      #header
+      header
         #brand_logo
           ' $
           a href='/'
             | sysdef_
-      #body_copy
+      article
         == yield
-      #sidebar
+      nav
         ==slim :partial_links
         ==slim :partial_tags
-      #footer
+      footer
         .row
           | &copy; #{Time.now.year} Sysdef Ltd.
         .row
         a href='/privacy'
           | Privacy Policy
 
-script src='/js/link_bar.js'
+script src='/js/links_toggle.js'
