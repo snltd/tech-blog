@@ -110,7 +110,7 @@ class TestSysdef < MiniTest::Test
   end
 
   def assert_header(body)
-    assert_includes(body.css('#header').inner_text, '$ sysdef_')
+    assert_includes(body.css('header').inner_text, '$ sysdef_')
   end
 
   def assert_body_copy(body)
@@ -126,8 +126,8 @@ class TestSysdef < MiniTest::Test
   end
 
   def assert_footer(body)
-    assert_includes(body.css('#footer').inner_text, 'Sysdef')
-    assert_includes(body.css('#footer').inner_text, Date.today.year.to_s)
+    assert_includes(body.css('footer').inner_text, 'Sysdef')
+    assert_includes(body.css('footer').inner_text, Date.today.year.to_s)
   end
 
   # Get all the review post links in the right-hand panel
