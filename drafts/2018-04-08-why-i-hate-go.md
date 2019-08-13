@@ -1,8 +1,7 @@
 ---
 title: "Why I Hate Go"
-date: "2018-02-26"
+date: 2018-02-26
 tags: [Ruby, Go, Clojure, Python, C, Rust, "professional suicide"]
-layout: post
 category: Rant
 ---
 
@@ -114,9 +113,17 @@ which enforces the same syntax and the same techniques, and whenever
 the 80-hour weeks burn out another 24 year-old, drop in a new one
 and you won't see the join.
 
-Give me the child and I will mould the man. And Go probably does
-seem like fun when your programming experience up to that point has
-mostly been implementing quicksort in Java.
+Give me the child and I will mould the man.
+
+The "fun" thing makes me laugh. Not only that Go the least fun
+language I've ever used (and I've used MATLAB), but more the way
+that almost every Go library and document goes out of its way to
+reiterate WHAT FUN that library will be. I've never seen that in any
+other language. It's like a cult.
+
+But, perhaps Go does seem like fun when you work 90 hour weeks
+and your programming experience up to that point has mostly been
+implementing quicksort in Java.
 
 Like many people in this industry the wrong side of forty, I came to
 programming by a circuitous route.  Many of my age are hobbyists
