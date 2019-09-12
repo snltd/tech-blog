@@ -1,47 +1,53 @@
-const yearsToShow = 4;
-const expandButton = '+';
-const collapseButton = '-'; // must match the Slim template
-
-const collapseBlock = function collapseLinkBlock(element) {
-  element.innerText = expandButton;
-  element.nextElementSibling.style.display = 'none';
-};
-
-const expandBlock = function expandLinkBlock(element) {
-  element.innerText = collapseButton;
-  element.nextElementSibling.style.display = 'block';
-};
+/*
+ * Show or hide blocks of links on the right-hand side of the page
+ **/
 
 const yearInView = function yearOfPostBeingViewed() {
-  return window.location.href.split('/').reverse()[0].split('-')[0];
+  return Number(window.location.href.split('/').reverse()[0].split('-')[0]);
 };
 
-const yearsToCollapse = function (refs) {
-  const recentYears = Object.keys(refs).sort().slice(0, 0 - yearsToShow);
-  const yiv = yearInView();
+const buttonElement = function toggleButtonElement(year) {
+  return document.getElementById(`#toggle_${year}`);
+};
 
-  if (yiv === '') {
-    return recentYears;
+const blockElement = function yearBlockElement(year) {
+  return document.getElementById(`#block_${year}`);
+};
+
+const toggleBlock = function showOrHideYearBlock(year) {
+  const button = buttonElement(year);
+  const block = blockElement(year);
+
+  if (button.innerText == '+') {
+    expandBlock(button, block);
+  } else {
+    collapseBlock(button, block);
   }
-
-  return recentYears.filter((y) => !y.endsWith(yearInView()));
 };
 
-const vm = new Vue({
-  el: 'nav',
-  methods: {
-    toggleBlock(ev) {
-      if (ev.target.innerText === collapseButton) {
-        collapseBlock(ev.target);
-      } else {
-        expandBlock(ev.target);
-      }
-    },
-  },
-  mounted() {
-    console.log(yearsToCollapse(this.$refs));
-    yearsToCollapse(this.$refs).forEach((year) => {
-      collapseBlock(this.$refs[year]);
-    });
-  },
-});
+const expandBlock = function expandYearBlock(button, block) {
+  button.innerText = '-';
+  block.style.display = 'block';
+};
+
+const collapseBlock = function collapseYearBlock(button, block) {
+  button.innerText = '+';
+  block.style.display = 'none';
+};
+
+const collapseOldYears = function collapseOldYearBlocks() {
+  const years = document.getElementsByClassName('year_toggle');
+  const yearToSkip = yearInView();
+
+  for (let i = 5; i < years.length; i++) {
+    const year = years[i].id.replace('#toggle_', '');
+
+    if (year != yearToSkip) {
+      collapseBlock(buttonElement(year), blockElement(year));
+    }
+  }
+};
+
+window.onload = function() {
+  collapseOldYears();
+};
