@@ -6,24 +6,24 @@
       li
         .page_year
           == year
-          span.year_toggle id="toggle_#{year}"
+          span.year_toggle id="#toggle_#{year}" onclick="toggleBlock(#{year})"
            |-
-        .page_block id="block_#{year}"
-          ul
-            - pages.each do |link, data|
-              li
-                - if @page && @page[:meta][:title] == data[:title]
-                  .this_page
-                    ==> data[:title]
-                    | (
-                    == data[:date].strftime('%B %d')
-                    | )
-                - else
-                    a href="#{link}"
+          .page_block id="#block_#{year}"
+            ul
+              - pages.each do |link, data|
+                li
+                  - if @page && @page[:meta][:title] == data[:title]
+                    .this_page
                       ==> data[:title]
-                    | (
-                    == data[:date].strftime('%B %d')
-                    | )
+                      | (
+                      == data[:date].strftime('%B %d')
+                      | )
+                  - else
+                      a href="#{link}"
+                        ==> data[:title]
+                      | (
+                      == data[:date].strftime('%B %d')
+                      | )
 .sidebar_block
   .bartitle
     | articles
