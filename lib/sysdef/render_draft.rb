@@ -14,7 +14,7 @@ module Sysdef
     end
 
     def extra_metadata
-      { mtime: Time.now  }
+      { mtime: Time.now }
     end
   end
 end
