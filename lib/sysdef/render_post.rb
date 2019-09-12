@@ -6,7 +6,7 @@ require_relative 'chunked_file'
 
 module Sysdef
   #
-  # render pages of reviews
+  # render a blog post
   #
   class RenderPost
     attr_reader :chunks, :file

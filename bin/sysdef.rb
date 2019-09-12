@@ -9,6 +9,7 @@ require_relative '../lib/sysdef'
 
 ROOT          = Pathname.new(__dir__).parent.realpath.freeze
 POST_DIR      = ROOT + 'posts'
+DRAFT_DIR     = ROOT + 'drafts'
 ARTICLE_DIR   = ROOT + 'articles'
 POST_INDEX    = Sysdef::IndexPosts.new(POST_DIR)
 ARTICLE_INDEX = Sysdef::IndexArticles.new(ARTICLE_DIR)
@@ -64,11 +65,11 @@ module Sysdef
       slim :privacy
     end
 
-    #
-    #
-    #     get '/drafts/:page' do
-    #       render_page(:drafts, params[:page], BlogPosts.new('drafts'))
-    #     end
+    get '/drafts/:ident' do
+      @page = Sysdef::RenderDraft.new(params[:ident]).render
+      slim :article
+    end
+
     #
     #     get '/:year/?:month?/?:day?' do
     #       @posts = POSTS.by_date(params[:year], params[:month], params[:day])
