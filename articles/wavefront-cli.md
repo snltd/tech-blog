@@ -46,7 +46,7 @@ Usage:
 
 Commands:
   alert              view and manage alerts
-  apitoken           view and manage API tokens
+  apitoken           view and your own API tokens
   cloudintegration   view and manage cloud integrations
   config             create and manage local configuration
   dashboard          view and manage dashboards
@@ -60,6 +60,7 @@ Commands:
   proxy              view and manage proxies
   query              run Wavefront queries
   savedsearch        view and manage saved searches
+  serviceaccount     view and manage service accounts
   settings           view and manage system preferences
   source             view and manage source tags and descriptions
   user               view and manage Wavefront users
@@ -740,7 +741,7 @@ notification on my desktop.
 ## API Tokens
 
 A user can create up to twenty API tokens, and the `apitoken` command
-lets you manage them.
+lets you manage your own tokens.
 
 ```cmd
 $ wf apitoken list
@@ -758,7 +759,7 @@ Deleted api token 'd8c5b877-d270-4990-9b5d-351015bf44c6'.
 ```
 
 Obviously you can't create a token until you have a token, so the API
-isn't quite up to full machine-generation of accounts.
+isn't quite up to full machine-generation of normal user accounts.
 
 ## Dashboards
 
@@ -1626,6 +1627,86 @@ Neither `create` or `invite` let you fully automate user creation,
 for instance in the creation of machine accounts. It is not
 currently possible to validate an account or create an API token via
 the API.
+
+## Service Accounts
+
+Wavefront now supports service accounts. These are great for proxies, and for
+getting your tooling properly wired up to Wavefront. There's *almost*, but not
+quite, full API coverage for service accounts, and this is reflected in the
+CLI. Let's make a service account for our proxies, granting it the `ingestion`
+permission.
+
+```cmd
+$ wf serviceaccount list
+You have no service accounts.
+$ wf serviceaccount create -p ingestion sa::proxy
+identifier                sa::proxy
+tokens                    <none>
+userGroups
+  id                      a7d2e651-cec1-4154-a5e8-1946f57ef5b3
+  name                    Everyone
+  permissions             <none>
+  customer                sysdef
+  properties
+    nameEditable          false
+    permissionsEditable   true
+    usersEditable         false
+  description             System group which contains all users
+active                    true
+groups                    ingestion
+$ wf serviceaccount apitoken list sa::proxy
+Account does not have any API tokens.
+$ wf serviceaccount apitoken create -N "proxy ingestion token" sa::proxy
+tokenID     416f0fc5-628f-4b2d-b3c8-34a9aa6cf74d
+tokenName   proxy ingestion token
+$ wf serviceaccount describe sa::proxy
+identifier                sa::proxy
+tokens
+  tokenID                 416f0fc5-628f-4b2d-b3c8-34a9aa6cf74d
+  tokenName               proxy ingestion token
+userGroups
+  id                      a7d2e651-cec1-4154-a5e8-1946f57ef5b3
+  name                    Everyone
+  permissions             <none>
+  customer                sysdef
+  properties
+    nameEditable          false
+    permissionsEditable   true
+    usersEditable         false
+  description             System group which contains all users
+active                    true
+groups                    ingestion
+```
+
+Assigning permissions to users is are fine, but I think user groups are
+better. So let's make a proxy group and move our service account into that,
+revoking the permission.
+
+```cmd
+$ wf usergroup create -p ingestion proxy_group
+id                   afa04fcd-5e27-495b-9ebc-c732aba42438
+name                 proxy_group
+users                <none>
+userCount            0
+permissions          ingestion
+customer             sysdef
+createdEpochMillis   1569843554718
+$ wf serviceaccount join sa::proxy afa04fcd-5e27-495b-9ebc-c732aba42438
+a7d2e651-cec1-4154-a5e8-1946f57ef5b3 (Everyone)
+afa04fcd-5e27-495b-9ebc-c732aba42438 (proxy_group)
+$ wf serviceaccount revoke ingestion from sa::proxy
+Revoked 'ingestion' from 'sa::proxy'.
+```
+
+Now I've shown you, let's clean up.
+
+```cmd
+$ wf serviceaccount apitoken delete sa::proxy 416f0fc5-628f-4b2d-b3c8-34a9aa6cf74d
+Deleted API token '416f0fc5-628f-4b2d-b3c8-34a9aa6cf74d'.
+```
+
+I'd delete the service account too, but at the moment the API doesn't let you
+do that, so the CLI can't either.
 
 ## Metric
 
