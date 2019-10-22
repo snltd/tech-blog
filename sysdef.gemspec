@@ -3,11 +3,9 @@
 require 'date'
 require 'English'
 
-require_relative 'lib/build_helpers'
-
 Gem::Specification.new do |gem|
   gem.name          = 'sysdef'
-  gem.version       = gem_version
+  gem.version       = '0.0.0'
   gem.date          = Date.today.to_s
 
   gem.summary       = 'Sysdef Ltd company website'
@@ -40,5 +38,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rake', '~> 12.3'
   gem.add_development_dependency 'rubocop', '~> 0.71'
 
-  gem.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
+  gem.required_ruby_version = Gem::Requirement.new('>= 2.6.0')
 end
