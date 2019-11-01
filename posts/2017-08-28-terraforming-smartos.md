@@ -634,7 +634,7 @@ remove the local state files, and rest easy.
 
 ## So?
 
-My considered professional opinion on Terraform puts somewhere near
+My considered professional opinion on Terraform puts it somewhere near
 the top corner of Gartner's "err, yeah, it's okay, and some things
 are really nice but it also feels a bit hacky and I'm not that sure
 how much I trust it" quadrant.
