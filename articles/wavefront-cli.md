@@ -1776,6 +1776,7 @@ Options:
                                formatter
   -k, --nospark                do not show sparkline
   -W, --nowarn                 do not show API warning messages
+```
 
 Let's run a simple query.
 
