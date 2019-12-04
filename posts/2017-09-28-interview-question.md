@@ -10,7 +10,7 @@ telling this story. So I might as well write it down.
 
 About fifteen years ago, I was being interviewed for some sys-admin
 job or other. There were two people, my prospective manager, and
-some techie. I remember nothing of the manager's questions, so they
+a techie. I remember nothing of the manager's questions, so they
 must have been pretty standard. Then over to the techie, who asked
 me, with some gravitas, the single most stupid question I've ever
 been asked at interview.
@@ -19,11 +19,17 @@ been asked at interview.
 > are they?
 
 The story kind of breaks down here, because it's so long ago, I
-can't remember what I said. If it had been the late '90s, me in my 20s, head
+can't remember what I said. If it had been the late '90s, me in my arrogant
+mid-20s, head
 overinflated from picking and choosing ridiculously remunerated
-dotcom jobs, I'd have said something smart-arsed, dropped the mic,
+dotcom jobs, I'd probably have said something smart-arsed, dropped the mic,
 and made myself a better story. But I think it was around 2003-2004
-time, when being able to build clustered E10ks commanded £17.50 an
-hour.  (Really. I was offered that.) So I suspect I said
-something like "I don't know, but `man ls` will tell you. I regret
-that now.
+time, when I was properly grown up and jobs were thin on the ground.
+So I suspect I said something like "I don't know, but `man ls` will tell
+you.
+
+I don't remember if I was offered the job or not.
+
+```ruby
+puts (('a'..'z').to_a - (%x(ls -h).downcase.scan(/^\s+-([a-z])/).uniq.flatten)).join(', ')
+```
