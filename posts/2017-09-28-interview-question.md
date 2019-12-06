@@ -31,5 +31,5 @@ you.
 I don't remember if I was offered the job or not.
 
 ```ruby
-puts (('a'..'z').to_a - (%x(ls -h).downcase.scan(/^\s+-([a-z])/).uniq.flatten)).join(', ')
+ruby -e "puts (('a'..'z').to_a - (%x(ls --help).downcase.scan(/^\s+-([a-z])/).uniq.flatten))"
 ```
