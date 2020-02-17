@@ -86,7 +86,9 @@ By this point I was using Go. I wrote a few toy programs, and I
 wrote extensions to a couple of real ones. It worked fine, and I got
 stuff doing what it needed to do, but I never got close to enjoying
 it.  I felt like a sullen teenager being dragged round a National
-Trust property by his parents.
+Trust property by his parents, at every turn treated like a child. Even using
+[the preferred static analysis tool](https://goreportcard.com) is like going
+back to school: "A+! Excellent!".
 
 I tried to find people like me, who had had eventual success with Go
 despite it being antithetical to their mindset, but found little. It
@@ -123,7 +125,7 @@ other language. It's like a cult.
 
 But, perhaps Go does seem like fun when you work 90 hour weeks
 and your programming experience up to that point has mostly been
-implementing quicksort in Java.
+implementing heap sort in Java.
 
 Like many people in this industry the wrong side of forty, I came to
 programming by a circuitous route.  Many of my age are hobbyists
@@ -157,7 +159,11 @@ If I may get more personal, I think Go is a hypocrite. Go says
 "static typing is the only way" and "generics are wrong", and the
 fanboys spread the gospel, but half the code I look at is stuffed
 with reflection, lazy abuse of the empty interface and crazy amounts
-of casting.
+of casting. I find it bizarre that Go has become the go-to language for ops
+people when the vast majority of what we write are small programs which have
+to deal with some semi-structured data made by someone else. Virtually
+everything I've written in the last couple of years has parsed JSON or YAML,
+and that's a pain in a statically typed language.
 
 Go doesn't trust us with exceptions, so the fanboys tell us this is
 great because exceptions are bad, then manually pass their errors
@@ -171,7 +177,7 @@ Go is a small language. This supposedly makes it simple. I think
 that depends on your definition of simple. Take looping. Go gives
 you any kind of loop you want as long as it's `for`.
 
-In, say Ruby or Clojure, I can look an operation on any collection
+In, say, Ruby or Clojure, I can look an operation on any collection
 and immediately tell what's happening. I see `map`, or `select`, or
 `any?`, and I probably don't need to read the block. obviously it's
 changing what's there, winnowing out a subset, or checking something
@@ -230,10 +236,13 @@ everything.  I like to be correct, so I don't know what it is about
 Go's unilateral my-way-or-the-highway approach that irks me so.
 Perhaps something in me *needs the option* to put braces in the
 wrong place, or include an unused file, even if I don't actually
-want to do it. Rust's compiler is *at least* as picky as Go's, but
+want to do it.
+
+Rust's compiler is *at least* as picky as Go's, but
 you know that everything it wants you to do is for a good reason. It
 needs you to follow strict rules so it can do something
-remarkable. Go makes you follow strict rules because it can.
+remarkable. Go feels like it makes you follow strict rules simply because it
+can.
 
 Treat me like an adult. Give me the rope. I won't complain if I hang
 myself.
@@ -262,7 +271,7 @@ pointers" (and "give 'em locking primitives") approach doesn't just
 feel old, it feels *wrong*. Maybe (maybe!) mutating data in-place is
 faster, but the industry which is worried about shaving a few CPU
 cycles off a transaction is not an industry I recognize any more.
-And you've still got a GC overhead, if you're that bothered about
+And you've still got a GC overhead, if you're *that* bothered about
 performance.
 
 Finally, you can laugh all you like, but I care how my code looks on
@@ -281,8 +290,8 @@ me down, or I won't trust you next time."
 
 And that's Go, isn't it? It's the "I know best", "do as I say not as
 I do", disapproving, finger-wagging-father of programming languages.
-With an infantile mascot to make it just that teeny bit more
-patronising.
+With an awful infantile mascot to make it as patronising as it possibly can
+be.
 
 I'm done. You enjoy your Go, I'll enjoy my Ruby. It's a big world
 with plenty of room for all of us.

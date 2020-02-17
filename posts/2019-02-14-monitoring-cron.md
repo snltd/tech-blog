@@ -50,7 +50,7 @@ covering three cases of execution. One works (exits `0`); one fails
 I set all of them to fire every minute, ("5-star cron job. Will run
 again.") Doing this reminded me of one of the worst design decisions
 in Unix: `crontab -r`. Maybe whoever decided that one used a
-keyboard where the `r`, *wasn't* right next to the `e`.
+keyboard where the `r` *wasn't* right next to the `e`.
 
 [The
 source](https://github.com/illumos/illumos-gate/blob/master/usr/src/cmd/cron/cron.c#L2557)
@@ -269,8 +269,8 @@ not a Turing-complete, general-purpose one.  It's very
 domain-specific, and its top priority is not affecting the system on
 which it runs. If it gave you the ability to write branching
 code it would not be able to comprehensively check what you wanted
-to do and could guarantee the safety of the script and therefore the
-system.  So it doesn't.
+to do, and could not guarantee the safety of the script and therefore the
+system. So it doesn't.
 
 But, DTrace *does* have a ternary operator, and using that I found a
 way to use a couple of clause-local variables (very fast, memory

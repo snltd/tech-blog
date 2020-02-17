@@ -17,7 +17,8 @@ With that in mind, I tried to write a halfway-decent Wavefront CLI.
 ## Installation and Basics
 
 My CLI is written in Ruby. To use it you need a current Ruby
-installation. At the time of writing, that's 2.3 or later.
+installation. At the time of writing, that's 2.4 or later. (Versions prior to
+5.0 supported Ruby 2.3.)
 
 To install:
 
@@ -48,10 +49,12 @@ Commands:
   alert              view and manage alerts
   apitoken           view and your own API tokens
   cloudintegration   view and manage cloud integrations
+  cluster            view and manage monitored clusters
   config             create and manage local configuration
   dashboard          view and manage dashboards
   derivedmetric      view and manage derived metrics
   event              open, close, view, and manage events
+  ingestionpolicy    view and manage ingestion policies
   integration        view and manage Wavefront integrations
   link               view and manage external links
   message            read and mark user messages
@@ -63,6 +66,8 @@ Commands:
   serviceaccount     view and manage service accounts
   settings           view and manage system preferences
   source             view and manage source tags and descriptions
+  spy                monitor traffic going into Wavefront
+  usage              view and manage usage reports
   user               view and manage Wavefront users
   usergroup          view and manage Wavefront user groups
   webhook            view and manage webhooks
@@ -1705,8 +1710,72 @@ $ wf serviceaccount apitoken delete sa::proxy 416f0fc5-628f-4b2d-b3c8-34a9aa6cf7
 Deleted API token '416f0fc5-628f-4b2d-b3c8-34a9aa6cf74d'.
 ```
 
-I'd delete the service account too, but at the moment the API doesn't let you
-do that, so the CLI can't either.
+We can delete the service account too.
+
+```cmd
+$ wf serviceaccount delete sa::proxy
+Deleted service account 'sa::proxy'.
+```
+
+## Ingestion Policies and Usage
+
+Wavefront now has a feature to show you who is responsible for what proportion
+of your ingested point rate.
+
+This is done by assigning accounts an *ingestion policy*. Any system account
+or normal user can belong to one or none ingestion policies. Wavefront
+provides you with dashboards to see how much of your point rate is
+attributable to each policy.
+
+Creating an ingestion policy is very simple. Give it a description with `-d`:
+you'll be glad you did one day.
+
+```cmd
+$ wf ingestionpolicy create -d "example ingestion policy" example-policy
+id                       example-policy-1579802191862
+name                     example-policy
+sampledUserAccounts      <none>
+userAccountCount         0
+sampledServiceAccounts   <none>
+serviceAccountCount      0
+customer                 sysdef
+description              example ingestion policy
+lastUpdatedMs            1579802191878
+lastUpdatedAccountId     rob@sysdef.xyz
+```
+
+We can add any number of users or system accounts.
+
+```cmd
+$ wf user list
+dev+sysdef@wavefront.com
+services@example.com
+$ wf serviceaccount list
+sa::proxy
+$ wf ingestionpolicy add user another-ingestion-policy-1579538401492 \
+  services@example.com sa::proxy
+```
+
+Though you can, of course, `describe` an ingestion policy, `wf` gives you a
+convenience command for showing which users belong to a given policy, and an
+inverse operation to show which policy a given user comes under.
+
+```cmd
+$ wf ingestionpolicy members example-policy-1579802191862
+services@example.com
+sa::proxy
+$ wf ingestionpolicy for sa::proxy
+example-policy-1579802191862
+```
+
+You can get a CSV output of usage breakdown with
+
+```cmd
+$ wf usage export csv
+```
+
+Flags like `-f json` won't work with this: it's a limitation of the Wavefront
+API, not `wf`.
 
 ## Metric
 
@@ -1740,10 +1809,61 @@ The `/metric` API seems a little brittle at the moment, and throws a
 500 if you search for a metric which does not exist. The CLI
 dutifully reports this error.
 
+`wf` also exploits an undocumented API endpoint to offer something akin to the
+UI's metric browser. I can, for instance, find out what metrics I have
+beginning with `dev`.
+
+```cmd
+$ wf metric list under dev
+dev.test.a
+dev.test.b
+```
+
+You can even ask for a list of all the metrics your cluster knows about:
+
+```cmd
+$ wf metric list all
+```
+
+But, I *really* wouldn't recommend you do that. If you imagine your metrics as
+a tree, `wf` must make an API call for every single node of that tree. This
+means the `metric list` commands can take a very, very long time to complete.
+
+I'd like to see an official API path to browse metrics, with recursion done on
+the server. If you agree, lobby your Wavefront representetive!
+
+## Spying
+
+`wf` also speaks to another unofficial API: `spy`. This, as I understand it,
+connects you to a single node of your Wavefront cluster, and shows a sampling
+of the data flowing into it. You can spy on data points, histograms, traces,
+or new source IDs.  For instance, (and with lines folded for formatting)
+
+```cmd
+$ wf spy opi
+"~proxy.push.2003.duration.rate.m1" source="log.prod.wavefront-proxy" 1581977100000
+309.100850087495 "processId"="2204f9eb"
+"hcam.prod.yapp.app.gauges.buffers.direct.count" source="i-050ee5e3584853963"
+1581977145000 98.0 "accountId"="308487525487" "product"="hcam" "environment"="prod"
+"role"="yapp"
+"_wavefront_source"="proxy::hcam.prod.i-0cc9b726ab232b03e"
+"hcam.prod.yapp.app.gauges.memory.pools.Compressed-Class-Space.committed"
+source="i-050ee5e3584853963" 1581977145000
+```
+
+By default `wf` shows you the unexpurgated data it gets from the API, but if
+you want to use the data in some form of investigation, it may be useful to
+supply the `-m`  (or `--timestamp`) option, which will drop a local timestamp
+into the output ahead of each chunk of data. You can adjust the sampling rate
+too, but it tops out at 5% of the data flowing to the node.
+
+If you need detailed spy information, I'd recommend the far more sophisticated
+[`wftop`](https://github.com/wavefrontHQ/wftop) application.
+
 ## Query
 
-The `query` command has quite a lot of options (common options
-removed for brevity.)
+The `query` command has quite a lot of options (common ones removed for
+brevity.)
 
 ```cmd
 wf query aliases [-DV] [-c file] [-P profile]

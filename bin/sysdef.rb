@@ -18,7 +18,7 @@ KRAMDOWN_OPTS = { input: 'GFM',
                   syntax_highlighter: 'rouge',
                   hard_wrap: false }.freeze
 
-Slim::Engine.set_options pretty: true, sort_attrs: false
+Slim::Engine.set_options(pretty: true, sort_attrs: false)
 
 module Sysdef
   # Modularized application
