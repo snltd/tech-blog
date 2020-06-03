@@ -1,6 +1,6 @@
 ---
 title: "Writing Metrics with the Wavefront SDK"
-date: "2019-04-18"
+date: 2019-04-18
 tags: [Wavefront, Ruby]
 layout: post
 category: Wavefront

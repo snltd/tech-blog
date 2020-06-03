@@ -1,6 +1,6 @@
 ---
 title: "Miserable Old Duffer's Guide to Working With Clojure"
-date: "2020-04-08"
+date: 2020-04-08
 tags: [Clojure]
 layout: post
 category: programming

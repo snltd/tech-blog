@@ -1,6 +1,6 @@
 ---
 title: "Wavefront Lambdas"
-date: "2018-04-28"
+date: 2018-04-28
 tags: [Wavefront, AWS, Serverless]
 layout: post
 category: Wavefront

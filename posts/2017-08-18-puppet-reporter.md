@@ -1,6 +1,6 @@
 ---
 title: "Writing a Wavefront Reporter for Puppet"
-date: "2017-08-12"
+date: 2017-08-12
 tags: [Wavefront, Ruby, Puppet]
 layout: post
 category: Wavefront

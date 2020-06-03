@@ -1,6 +1,6 @@
 ---
 title: "Wavefront Deltas - Let Me Count the Ways"
-date: "2018-03-24"
+date: 2018-03-24
 tags: [Wavefront, Ruby]
 layout: post
 category: Wavefront

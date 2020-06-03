@@ -1,6 +1,6 @@
 ---
 title: "ELK Sucks Logs"
-date: "2017-09-28"
+date: 2017-09-28
 tags: [opinion, logs]
 layout: post
 category: Rants
