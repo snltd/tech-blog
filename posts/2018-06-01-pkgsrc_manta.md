@@ -469,6 +469,4 @@ so we'd need to stop using the `~~/public` path, which means
 distributing credentials. We'd probably also like to GPG sign those
 packages.
 
-I'll look at these (and more! -- there are always more) problems
-next time, and explain how I went about integrating my new pkgsrc
-repo into my CI-CD pipelines.
+But for now, what I have is great. An elegant solution.

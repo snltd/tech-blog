@@ -286,19 +286,18 @@ There are a number of things I'm unsure of.
   } sigset_t;
   ```
   I am unsure how to correctly represent the implementation-specific
-  `__sigbits[]`.
+  `\__sigbits[]`.
 * Illumos, as I mentioned, lacks `dprintf()`. In an earlier
   iteration of this work I put if-ladders in the code to use
   `sprintf()` instead, but I haven't done that this time around. It
   felt dirty, and I'm not sure what the "correct" fix should be. I'm
   also sure I heard `dprint()` was coming to Illumos...
 
-There's a [posix binding
-generator](https://github.com/ysbaddaden/posix) to generate the
-`lib_c` stuff for you, presumably, with less guesswork than I used.
-But, it needs a working Crystal port to build it. As soon as I get a
-Solaris Crystal binary I'll revisit the bindings with this tool.
-It's an iterative process.
+There's a [posix binding generator](https://github.com/ysbaddaden/posix) to
+generate the `lib_c` stuff for you, presumably, with less guesswork than I
+used.  But, it needs a working Crystal port to build it. As soon as I get a
+Solaris Crystal binary I'll revisit the bindings with this tool.  It's an
+iterative process.
 
 ## Build a Solaris-aware Crystal
 

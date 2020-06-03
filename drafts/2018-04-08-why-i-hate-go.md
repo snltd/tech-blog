@@ -157,13 +157,38 @@ that's only because I have to.
 
 If I may get more personal, I think Go is a hypocrite. Go says
 "static typing is the only way" and "generics are wrong", and the
-fanboys spread the gospel, but half the code I look at is stuffed
-with reflection, lazy abuse of the empty interface and crazy amounts
-of casting. I find it bizarre that Go has become the go-to language for ops
+fanboys spread the gospel.
+
+"Go is a proper programming language, not a toy scripting language like Ruby.
+It has compile-time type checking so your program can't crash because you pass
+a function the wrong argument type, or `nil`."
+
+So, obviously, you'll never get something like this:
+
+```
+panic: interface conversion: interface {} is nil, not string [recovered]
+	panic: interface conversion: interface {} is nil, not string
+goroutine 20 [running]:
+testing.tRunner.func1(0xc000106100)
+	/usr/local/go/src/testing/testing.go:874 +0x3a3
+```
+
+Half the code I look at seems to spend half its time working around that
+wonderful static typing. Mostly it's lazy abuse of the empty interface, but
+there's reflection too, and crazy amounts of casting.
+
+I find it bizarre that Go has become the go-to language for ops
 people when the vast majority of what we write are small programs which have
 to deal with some semi-structured data made by someone else. Virtually
 everything I've written in the last couple of years has parsed JSON or YAML,
-and that's a pain in a statically typed language.
+and that's a pain in a language with a basic static type system.
+
+I'm broadly with Rich Hickey in believing the problems of dynamic
+typing are greatly overstated. When I write code I want to concentrate on
+logic and data flow, not on painstakingly describing what the data looks
+like. Compare the way Clojure invisibly promotes numbers between underlying
+Java types with Go's nitpicky "well, actually" distinctions between slices and
+arrays.
 
 Go doesn't trust us with exceptions, so the fanboys tell us this is
 great because exceptions are bad, then manually pass their errors
@@ -190,10 +215,13 @@ childish](https://groups.google.com/forum/#!msg/golang-nuts/hJHCAaiL0so/kG3BHV6Q
 lest we forget.)
 
 Every time I start typing `for _, thing := range...` I feel a little
-bit more enthusiasm for programming slip away. Coding in Go feels
-riddled with repetition and boilerplate, and never more so than when
-testing for errors. Or, as Go calls it, calling any function, on any
-data, ever.
+bit more enthusiasm for programming slip away. The slip becomes a slide when I
+remember the language doesn't provide a function which tells you whether a
+slice contains an element and I'll have to write another damn `for` loop...
+
+Everything in Go feels riddled with repetition and boilerplate, and never more
+so than when testing for errors. Or, as Go calls it, calling any function, on
+any data, ever.
 
 I've never been the biggest fan of exceptions, and I initially loved
 that Go decided not to have them. Explicit error checking, clearly,
@@ -231,31 +259,30 @@ steak, but you're all having the rice: it's good for you, and if we
 let you have the steak, you'd probably eat it wrong and be sick or
 something. Or spend all your time arguing about which knife to use.
 
-I'm the kind of person who `rubocop`s, `pep8`s, or `-Wall`s
+I'm the kind of person who `rubocop`s, `jslint`s, `pep8`s, or `-Wall`s
 everything.  I like to be correct, so I don't know what it is about
 Go's unilateral my-way-or-the-highway approach that irks me so.
 Perhaps something in me *needs the option* to put braces in the
 wrong place, or include an unused file, even if I don't actually
 want to do it.
 
-Rust's compiler is *at least* as picky as Go's, but
-you know that everything it wants you to do is for a good reason. It
-needs you to follow strict rules so it can do something
-remarkable. Go feels like it makes you follow strict rules simply because it
-can.
+Rust's compiler is *at least* as picky as Go's, but you know that everything
+it wants you to do is for a good reason. It needs you to follow strict rules
+so it can do something remarkable. Go feels like it makes you follow strict
+rules simply because it can.
 
 Treat me like an adult. Give me the rope. I won't complain if I hang
 myself.
 
 I suppose I'm a contrarian. Being told how to do things -- how to
 think -- doesn't sit well with me, whatever the rewards.  Go is, of
-course, a perfectly fine language. I don't have any technical
+course, a perfectly fine language. I don't have any real technical
 objections to it, I don't want to tell anyone who likes it that they
 are wrong. I'd *love* to like it myself, not least because it's far
 more commercially useful than any of the languages I *do* want to
 use.
 
-Those languages, -- Clojure, Rust, Elixir, and Crystal -- are, I
+Those languages, for instance Clojure, Rust, Elixir, and Crystal are, I
 think, expressive and innovative. They offer new ways of thinking
 and different ways to solve problems.  Each has given me new ideas,
 new understanding, inspired me to code for the sake of coding, and
@@ -291,9 +318,9 @@ me down, or I won't trust you next time."
 And that's Go, isn't it? It's the "I know best", "do as I say not as
 I do", disapproving, finger-wagging-father of programming languages.
 With an awful infantile mascot to make it as patronising as it possibly can
-be.
+be. I hate the Gofer. I hate it so much.
 
-I'm done. You enjoy your Go, I'll enjoy my Ruby. It's a big world
+I'm done. You enjoy your Go, I'll enjoy something else. It's a big world
 with plenty of room for all of us.
 
 We are not rational.
