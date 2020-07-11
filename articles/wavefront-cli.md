@@ -46,10 +46,10 @@ Usage:
   wf --help
 
 Commands:
+  account            view and manage Wavefront accounts
   alert              view and manage alerts
   apitoken           view and your own API tokens
   cloudintegration   view and manage cloud integrations
-  cluster            view and manage monitored clusters
   config             create and manage local configuration
   dashboard          view and manage dashboards
   derivedmetric      view and manage derived metrics
@@ -62,13 +62,13 @@ Commands:
   notificant         view and manage Wavefront alert targets
   proxy              view and manage proxies
   query              run Wavefront queries
+  role               view and manage roles
   savedsearch        view and manage saved searches
   serviceaccount     view and manage service accounts
   settings           view and manage system preferences
   source             view and manage source tags and descriptions
   spy                monitor traffic going into Wavefront
   usage              view and manage usage reports
-  user               view and manage Wavefront users
   usergroup          view and manage Wavefront user groups
   webhook            view and manage webhooks
   window             view and manage maintenance windows
@@ -127,67 +127,68 @@ Let's start with some alerts. Wavefront is great at alerts.
 ```cmd
 $ wf alert --help
 Usage:
-  wf alert list [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert list [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] [-al] [-O fields] [-o offset] [-L limit]
-  wf alert firing [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-f format] [-o offset] [-L limit]
-  wf alert snoozed [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert firing [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-o offset] [-L limit]
-  wf alert describe [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert affected [-DnVM] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] hosts [<id>]
+  wf alert snoozed [-DnVM] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] [-o offset] [-L limit]
+  wf alert describe [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-v version] <id>
-  wf alert delete [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-f format] <id>
-  wf alert clone [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-f format] [-v version] <id>
-  wf alert undelete [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert delete [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert history [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert clone [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
+          [-f format] [-v version] <id>
+  wf alert undelete [-DnVM] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] <id>
+  wf alert history [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-o offset] [-L limit] <id>
-  wf alert clone [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-f format] [-v version] <id>
-  wf alert latest [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-f format] <id>
-  wf alert dump [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert latest [-DnVM] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] <id>
+  wf alert dump [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format]
-  wf alert import [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-f format] [-u] <file>
-  wf alert snooze [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-f format] [-T time] <id>
-  wf alert set [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert import [-DnVM] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] [-uU] <file>
+  wf alert snooze [-DnVM] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] [-T time] <id>
+  wf alert set [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <key=value> <id>
-  wf alert unsnooze [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert unsnooze [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert search [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-          [-f format] [-al] [-o offset] [-L limit] <condition>...
-  wf alert tags [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert search [-DnVM] [-c file] [-P profile] [-E endpoint]
+          [-t token] [-f format] [-al] [-o offset] [-L limit] [-O fields]
+          <condition>...
+  wf alert tags [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
-  wf alert tag set [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert tag set [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id> <tag>...
-  wf alert tag clear [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert tag clear [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert tag add [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert tag add [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id> <tag>
-  wf alert tag delete [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert tag delete [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id> <tag>
-  wf alert tag pathsearch [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert tag pathsearch [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-al] [-o offset] [-L limit] <word>
-  wf alert currently [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert currently [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <state>
-  wf alert queries [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert queries [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-b] [<id>]
-  wf alert install [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert install [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert uninstall [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert uninstall [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] <id>
-  wf alert acls [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert acls [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] <id>
-  wf alert acl [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert acl [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] clear <id>
-  wf alert acl [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert acl [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] grant (view | modify) on <id> to <name>...
-  wf alert acl [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
+  wf alert acl [-DnVM] [-c file] [-P profile] [-E endpoint] [-t token]
           [-f format] revoke (view | modify) on <id> from <name>...
-  wf alert summary [-DnVm] [-c file] [-P profile] [-E endpoint]
+  wf alert summary [-DnVM] [-c file] [-P profile] [-E endpoint]
           [-t token] [-f format] [-a]
   wf alert --help
 
@@ -211,6 +212,7 @@ Options:
   -L, --limit=COUNT          number of alerts to list
   -O, --fields=F1,F2,...     only show given fields
   -u, --update               update an existing alert
+  -U, --upsert               import new or update existing alert
   -T, --time=SECONDS         how long to snooze (default 3600)
   -b, --brief                do not show alert names
 ```
@@ -260,13 +262,13 @@ they find. You will be informed if there are more objects, and can
 use the `--offset` and `--limit` flags (`-o` and `-L`) to get the
 next pages.
 
-But now, all `search` and almost all `list` commands take a `--all`
-(or `-a`) option which fetches all objects of the given type. (This
+All `search` and almost all `list` commands take a `--all`
+(or `-a`) option, which fetches all objects of the given type. This
 can be a heavy operation, if you have a lot of large objects,
-particularly dashboards.) The commands which do not paginate are
-`user`, because the API doesn't paginate its response, and `source`,
-because there are typically many thousands of sources, and an "all"
-operation takes for ever.
+particularly dashboards.
+
+Fetching all `source` objects is such hard work that the `wf source list`
+command does not accept `--all`: it just takes for ever.
 
 ### Searching
 
@@ -642,6 +644,27 @@ points over their last "would fire" interval.  Valid alert states are
 `firing`, `snoozed`, `in_maintenance`, `invalid`, `none`,
 `checking`, `trash`, and `no_data`.
 
+If you want to know what hosts are causing an alert to fire:
+
+```cmd
+$ wf alert affected hosts 1594477854869
+   cube
+   tornado
+```
+
+and if you just want to see who's making noise anywhere in your estate, drop
+the alert ID, and you'll see everything
+
+```cmd
+$ wf alert affected hosts 1594477854869
+./wf alert affected hosts
+1594309125807   cube
+
+1594477854869   cube
+                tornado
+```
+
+
 ### What Queries do I Have?
 
 The `alert queries` subcommand will show you the conditions used
@@ -803,8 +826,8 @@ view-and-modify privileges to any users or user groups. (We'll learn
 how to manage those in a while.)
 
 By default, everyone can view and modify a dashboard. Let's have a
-little play with privileges. You must specify users and groups by
-their IDs. It just happens that user IDs are the same as their
+little play with privileges. You must specify accounts and groups by
+their IDs. It just happens that user account IDs are the same as their
 names. Let's make a dashboard editable only by our two superstar
 10xers, but viewable by everyone.
 
@@ -956,7 +979,7 @@ name          Alert Edited: No discogs update
 annotations
   severity    info
   type        alert-updated
-  userId      slackboy@gmail.com
+  userId      user@example.com
   created     1495232095593
 id            1497313265697:Alert Edited: No discogs update
 table         sysdef
@@ -1010,8 +1033,8 @@ id                  1497366980092:TORNADO!
 table               sysdef
 createdEpochMillis  1497366980746
 updatedEpochMillis  1497366980746
-updaterId           slackboy@gmail.com
-creatorId           slackboy@gmail.com
+updaterId           user@example.com
+creatorId           user@example.com
 createdAt           1497366980746
 updatedAt           1497366980746
 hosts               shark
@@ -1108,8 +1131,8 @@ endTime             2017-07-26 23:48:10.492
 createdAt           2017-07-26 23:47:09.721
 createdEpochMillis  2017-07-26 23:47:09.721
 updatedEpochMillis  2017-07-26 23:48:10.492
-updaterId           slackboy@gmail.com
-creatorId           slackboy@gmail.com
+updaterId           user@example.com
+creatorId           user@example.com
 updatedAt           2017-07-26 23:48:10.492
 isUserEvent         true
 runningState        ENDED
@@ -1157,8 +1180,8 @@ reason                demonstrating the CLI
 customerId            sysdef
 createdEpochMillis    2017-08-04 12:09:20.880
 updatedEpochMillis    2017-08-04 12:09:20.880
-updaterId             slackboy@gmail.com
-creatorId             slackboy@gmail.com
+updaterId             user@example.com
+creatorId             user@example.com
 title                 example window
 startTimeInSeconds    2017-08-04 12:09:20
 endTimeInSeconds      2017-08-04 13:09:20
@@ -1192,8 +1215,8 @@ reason                demonstrating the CLI
 customerId            sysdef
 createdEpochMillis    1501844960880
 updatedEpochMillis    1501845460225
-updaterId             slackboy@gmail.com
-creatorId             slackboy@gmail.com
+updaterId             user@example.com
+creatorId             user@example.com
 eventName             Maintenance Window: example window
 title                 example window
 startTimeInSeconds    1501844960
@@ -1354,75 +1377,65 @@ $ wf message list -a
 CLUSTER::LmPJTdQ8  Wavefront Upgrade Notification
 ```
 
-## User Groups
+## Roles
 
-Wavefront used to only have simple user management, but now your
-cluster may support user groups as well.
-
-User groups are the preferred way to manage permissions: make
-suitable groups, and move users in and out of those groups as
-required.
-
-Let's start by seeing what groups are defined. This ought to work:
+Though accounts can have permissions directly assigned, roles are the
+preferred way to manage privileges.
 
 ```cmd
-$ wf usergroup list
-2659191e-aad4-a34d-a94e-9667e1517127  Everyone  4
+$ wf role list
+07fc5cdd-0979-489e-8f70-325f39d15e55  admin (auto-created)        0 accounts  1 groups
+0a42adf6-e738-4c5d-9e53-fd10bd979a31  testrole                    1 accounts  0 groups
+6009b7e7-aa04-43bb-8c71-caceda6dfac9  proxy_group (auto-created)  0 accounts  1 groups
+6180fbe8-8dbb-4e9c-b73d-8c53424771ef  example role                1 accounts  2 groups
 ```
 
-but if you get
+Hopefully you, the user, aren't *too* offended by `1 groups`. It looks a mess
+if the `s` is dynamic, and `group(s)` is too fussy.
 
-```
-ERROR: API code 406: Cannot process request, RBAC feature is disabled.
-```
-
-then your cluster doesn't support user groups yet. It probably soon
-will.
-
-Returning to the above output, the long UUID string on the left is
-the group ID, which you use in almost all `wf usergroup` commands.
-
-Every cluster has the `Everyone` group, but your `Everyone` will
-have a different ID to mine. By default, `Everyone` has no
-privileges attached.
-
-The other columns are the name of the group, and the number of users
-in it. Who are those users? (None of these are real, because I don't
-want all my users e-mail addresses being harvested for spam.)
+We can, of course `describe` any of those roles and see their various
+properies. But those properties don't necessarily include all the groups or
+accounts which have the given role. But `wf` can help.
 
 ```cmd
-$ wf usergroup users 2659191e-aad4-a34d-a94e-9667e1517127
-dev+sysdef@wavefront.com
-rob@example.com
-someone@somewhere.net
-person@job.com
+$ wf role accounts 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+sa::explorer
+$ wf role groups 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+2352f992-1a52-42c3-9206-9ef7c838a5a0  explorer
+64fc3264-fc43-4b7e-87fc-139c9ed29c2a  demo_group
 ```
 
-Let's create a new group with some permissions. We'll need to know
-what those permissions could be.
+It can tell you a role's permissions too:
 
-Remember I said the `settings` command wasn't much use? It does
-serve one purpose.
+```cmd
+$ wf role permissions 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+Role '6180fbe8-8dbb-4e9c-b73d-8c53424771ef' has no permissions.
+```
+
+That's not a lot of use is it? Let's add some permissions. But what the heck
+are they?
+
+Remember I said the `settings` command wasn't much use? It does serve at least
+one useful purpose.
 
 ```cmd
 $ wf settings list permissions
+agent_management
 alerts_management
+application_management
 batch_query_priority
-embedded_charts
 dashboard_management
 derived_metrics_management
-ingestion
+embedded_charts
 events_management
 external_links_management
-application_management
-metrics_management
-agent_management
 host_tag_management
+ingestion
+metrics_management
 user_management
 ```
 
-There you go, all the permissions your users and groups can have. If
-any of them seem vague:
+If any seem vague:
 
 ```cmd
 $ wf settings list permissions --long
@@ -1441,15 +1454,111 @@ requiredDefault   false
 ...
 ```
 
-Handy, what?
-
-It seems likely a normal user might want to manage alerts,
-dashboards and events. Let's make a group whose members will be able
-to do that.
 
 ```cmd
-$ wf usergroup create -p alerts_management -p dashboard_management \
-                       -p events_management "normal users"
+$ wf role grant alerts_management to 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+Granted 'alerts_management' permission to '6180fbe8-8dbb-4e9c-b73d-8c53424771ef'.
+$ wf role grant dashboard_management to 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+Granted 'dashboard_management' permission to '6180fbe8-8dbb-4e9c-b73d-8c53424771ef'.
+$ wf role permissions 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+alerts_management
+dashboard_management
+```
+
+Nice. We can take permissions away too.
+
+```cmd
+$ wf role revoke dashboard_management from 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+Revoked 'dashboard_management' permission from '6180fbe8-8dbb-4e9c-b73d-8c53424771ef'.
+$ wf role permissions 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+alerts_management
+```
+
+Let's see who our role is assigned to.
+
+```cmd
+$ wf role accounts 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+sa::explorer
+$ wf role groups 6180fbe8-8dbb-4e9c-b73d-8c53424771ef
+2352f992-1a52-42c3-9206-9ef7c838a5a0  explore
+64fc3264-fc43-4b7e-87fc-139c9ed29c2a  another_test
+```
+
+I don't know who the heck any of those are. Let's get rid of them. You can
+treat groups and accounts just the same, and specify many at once.
+
+
+```cmd
+$ wf role take 6180fbe8-8dbb-4e9c-b73d-8c53424771ef from \
+  sa::explorer \
+  2352f992-1a52-42c3-9206-9ef7c838a5a0 \
+  64fc3264-fc43-4b7e-87fc-139c9ed29c2a
+
+Took '6180fbe8-8dbb-4e9c-b73d-8c53424771ef' from 'sa::explorer',
+'2352f992-1a52-42c3-9206-9ef7c838a5a0', '64fc3264-fc43-4b7e-87fc-139c9ed29c'.
+```
+
+You can do all the usual `describe`s, `search`ing, `set`ting of properties,
+and `import`ing of roles. It's also easy to make a new role, with whatever
+permissions you wish it to have.
+
+```cmd
+$ wf role create -d "CLI example" -p ingestion -p embedded_charts example_role
+id                     685b3d44-1c82-46c3-bfde-ea3223512bd0
+name                   example_role
+sampleLinkedGroups     <none>
+linkedGroupsCount      0
+sampleLinkedAccounts   <none>
+linkedAccountsCount    0
+permissions            embedded_charts
+                       ingestion
+customer               sysdef
+description            CLI example
+lastUpdatedMs          1594126095896
+lastUpdatedAccountId   rob@example.com
+```
+
+We can now assign that group directly to accounts, or, as is probably better,
+to groups. Let's have a look at managing those.
+
+## User Groups
+
+Let's start by seeing what groups I already have defined.
+
+```cmd
+$ wf usergroup list
+2659191e-aad4-a34d-a94e-9667e1517127  Everyone  4
+```
+
+The long UUID string on the left is the group ID, which you use in almost all
+`wf usergroup` commands.
+
+Every cluster has the `Everyone` group, but your `Everyone` will
+have a different ID to mine. By default, `Everyone` has no
+privileges attached.
+
+The other columns are the name of the group, and the number of users
+in it. Who are those users? (None of these are real, because I don't
+want all my users e-mail addresses being harvested for spam.)
+
+```cmd
+$ wf usergroup users 2659191e-aad4-a34d-a94e-9667e1517127
+dev+sysdef@wavefront.com
+rob@example.com
+someone@somewhere.net
+person@job.com
+```
+
+Handy.
+
+In the old days you could assign permissions to a usergroup. That's not
+possible any more: you assign permissions to roles, and roles to usergroups.
+
+You can specify the roles a group has when you create it, but you can't
+currently specify the users in the group. This is a limitation of the API.
+
+```cmd
+$ wf usergroup create -r 685b3d44-1c82-46c3-bfde-ea3223512bd0 "normal users"
 id                   f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
 userCount            0
 permissions          alerts_management
@@ -1460,55 +1569,34 @@ createdEpochMillis   1550683825337
 name                 normal users
 ```
 
-Now we have a group, we can put some of our users into it.
+Now we have a group, we can put some of our users into it. We can add as
+many users and/or service accounts as we like.
 
 ```cmd
-$ wf usergroup add user f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672 \
-  person@job.com someone@somewhere.net
-Added person@job.com, someone@somewhere.net to f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672.
-$ wf usergroup users f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
-someone@somewhere.net
-person@job.com
-$ wf usergroup permissions f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
-alerts_management
-dashboard_management
-events_management
+$ wf usergroup add to b4ea2152-a417-430e-af43-d1b7fa69dfbb rob@sysdef.xyz sa::explorer
+Added 'rob@sysdef.xyz', 'sa::explorer' to 'b4ea2152-a417-430e-af43-d1b7fa69dfbb'.
+$ wf usergroup add role b4ea2152-a417-430e-af43-d1b7fa69dfbb 0a42adf6-e738-4c5d-9e53-fd10bd979a31
+Added '0a42adf6-e738-4c5d-9e53-fd10bd979a31' to 'b4ea2152-a417-430e-af43-d1b7fa69dfbb'.
+$ wf usergroup users b4ea2152-a417-430e-af43-d1b7fa69dfbb
+rob@sysdef.xyz
+sa::explorer
+$ wf usergroup roles b4ea2152-a417-430e-af43-d1b7fa69dfbb
+0a42adf6-e738-4c5d-9e53-fd10bd979a31
+$ wf usergroup permissions b4ea2152-a417-430e-af43-d1b7fa69dfbb
+ingestion
 ```
 
-You could complain about the ordering of the arguments to this
-subcommand.  All other `usergroup` operations put the user group
-last, but here it goes first. This is because I couldn't make
+You could complain about the ordering of the arguments here.
+The commands would read better you could, for instance, write `wf usergroup
+add role role-id to group-id`.
+But I couldn't make
 [docopt](http://docopt.org/), which parses `wf`'s command lines, work
-in the way that, say `cp(1)` works: that is, an arbitrary number of
-source arguments followed by a single destination argument.  I tried
-making the users be defined with a repeated option, but didn't seem
-right: users are not an option in a command called `user add`. User
-interface design is full of compromises, and this is one. The `user
-remove` command works in the same way.
+in that way.  I tried making the users be defined with a repeated option, but
+that didn't seem right: users are not an option in a command called `user
+add`.  User interface design is full of compromises, and this is one.  I hope
+you don't find it too objectionable.
 
-Before long our users will probably start writing [blog posts with
-fancy charts in them](/post/2017-03-03-solaris-proc-wavefront), so
-they'll need the `embedded_charts` privilege.
-
-```cmd
-$ wf usergroup grant embedded_charts to f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
-Granted 'embedded_charts' permission to f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672.
-$ wf usergroup permissions f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
-events_management
-alerts_management
-dashboard_management
-embedded_charts
-```
-
-And if it turns out having asked for it, none of them actually use
-it, we can take it back.
-
-```cmd
-$ wf usergroup revoke embedded_charts from f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672
-Revoked 'embedded_charts' permission from f8dc0c14-91a0-4ca9-8a2a-7d47f4db4672.
-```
-
-You'll find that re-running the above commands produces the same
+You'll find that re-running a lot of the commands produces the same
 output. The API guarantees idempotency with a declarative approach.
 You don't so much request the removal of a user from a group as
 assert that said user is not in the group. Therefore you shouldn't
@@ -1521,112 +1609,28 @@ new ID, and will not have any users assigned to it. (Group
 membership is an attribute of a user, rather than users being an
 attribute of a group.)
 
-## User
+## Account
 
-As you'd expect, you can `search` for, `list`, and `describe` users.
+In version 7 of `wavefront-cli`, `wf account` replaces `wf user`. This
+reflects Wavefront's deprecation of the `user` API. I was glad to see it go:
+it didn't work in quite the same way as other paths, and the CLI and SDK had
+to do some messy behind-the-scenes work to make user management function
+similarly to everything else.
 
-```
-wf user list [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-        [-l] [-O fields]
-wf user describe [-DnVm] [-c file] [-P profile] [-E endpoint]
-        [-t token] [-f format] <id>
-wf user search [-DnVm] [-c file] [-P profile] [-E endpoint] [-t token]
-        [-al] [-f format] [-o offset] [-L limit] <condition>...
-```
+We've seen the `list`, `describe`, `import`, `import`, `dump` and `delete`
+commands enough by now to now what they do.  `account` has a lot of other
+things we've kind of seen too: `permissions` shows you the per
 
-The astute reader may notice that the `user` command is unique in that
-its `list` command does not offer the `--offset` and `--limit`
-options. This is because the Wavefront `user` API does not support
-pagination. The `search` API, however, does, so the options are
-present in the `search` sub-command. Let's have a look at those
-commands.
+Some of the account commands include the word `user`. This is to help
+differentiate between accounts for humans and accounts for machines, which
+we'll come to later.
 
-```cmd
-$ wf user list
-dev+sysdef@wavefront.com
-rob@example.com
-frances@example.com
-services@company.net
-ian@company.net
-...
-$ wf user search id~example
-rob@example.com
-frances@example.com
-$ wf user describe ian@company.net
-identifier              ian@company.net
-customer                sysdef
-groups                  embedded_charts
-                        browse
-userGroups
-  id                    2659191e-aad4-a34d-a94e-9667e1517127
-  name                  Everyone
-  customer              sysdef
-  properties
-    nameEditable        false
-    permissionsEditable true
-    usersEditable       false
-```
+As of version 7, when you `create` or `invite` a user, that user has *no
+permissions* unless you explicitly define them. The API's default behaviour
+is, if given no permissions, is to add some. I chose to override this.
 
-If your cluster does not have RBAC enabled, `describe`'s output will
-not include the `userGroups` section.
-
-We've
-already seen how you can move users in and out of groups with the
-`usergroup` command, but you can also do it from the
-`user` side. I've omitted the output from the `leave` and `join`
-commands: they show you the `describe` output for the user.
-
-```cmd
-$ wf user groups rob@example.com
-2659191e-aad4-a34d-a94e-9667e1517127 (Everyone)
-$ wf user join rob@example.com cb61dae7-b476-43e6-a596-a6b514e7196o9
-...
-$ wf user groups rob@example.com
-2659191e-aad4-a34d-a94e-9667e1517127 (Everyone)
-cb61dae7-b476-43e6-a596-a6b514e71969 (normal users)
-$ wf user leave rob@example.com cb61dae7-b476-43e6-a596-a6b514e7196o9
-...
-$ wf user groups rob@example.com
-2659191e-aad4-a34d-a94e-9667e1517127 (Everyone)
-```
-
-If you don't have RBAC, you can use the `user` command to
-`revoke` and `grant` privileges. Rather confusingly, these are
-called `groups`.
-
-```cmd
-$ wf user grant alerts_management to ian@company.net
-identifier   ian@company.net
-customer     sysdef
-groups       embedded_charts
-             browse
-             alerts_management
-
-$ wf user revoke alerts_management from ian@company.net
-identifier   ian@company.net
-customer     sysdef
-groups       embedded_charts
-             browse
-```
-
-Wavefront only used to let you create users from the UI, but now
-that API is public, and supported by the CLI. A username is
-mandatory, and must be an email address. You can optionally add
-permissions (AKA "groups") with `-m` (sorry, `-p` and `-P` were
-taken), or user groups with `-g`. Stick a `-e` in there, and the
-user will get an e-mail telling them they have an account.
-
-```cmd
-$ wf user create newuser@id264.net -g cb61dae7-b476-43e6-a596-a6b514e7196
-```
-
-You can also `invite` users, which sends an e-mail in the
-traditional Wavefront way. The syntax is same as
-`create`, minus the `-e` flag. I'm not sure why `invite` and
-`create` are both in the API, but they are, so they're covered. The
-API lets you `invite` multiple users, but as of now, the CLI does
-not, as it can't offer an elegant way to define multiple users with
-different privileges.
+Though `grant` and `revoke` subcommands are at your disposal, I would not
+recommend using permissions at all. Use roles, via usergroups.
 
 Neither `create` or `invite` let you fully automate user creation,
 for instance in the creation of machine accounts. It is not
