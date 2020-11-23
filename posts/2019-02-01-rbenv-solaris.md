@@ -42,5 +42,11 @@ $ bundle config build.mysql2 --with-mysql-config=/usr/mysql/5.7/bin/mysql_config
 
 ```
 
+To install the gem on OmniOS:
+
+```cmd
+$ MAKE=gmake gem install mysql2 -- --with-mysql-config=/opt/ooce/bin/mysql_config
+```
+
 I haven't had installation difficulties with any other native
 extension gems so far, even `ffi`.
