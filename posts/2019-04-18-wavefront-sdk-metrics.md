@@ -6,21 +6,21 @@ layout: post
 category: Wavefront
 ---
 
-In version 3.0.0 [my Wavefront SDK]() gained the ability to write
-metrics. But it wasn't good enough. So, I've rewritten that part.
-It's a breaking change from 3.0.0, hence version 4.0.0.
+In version 3.0.0 [my Wavefront SDK]() gained the ability to write metrics. But
+it wasn't good enough. So, I've rewritten that part.  It's a breaking change
+from 3.0.0, hence version 4.0.0.
 
-The big new feature is that when you write a metric it goes on a queue,
-which means you get a very quick `return` and can carry on with whatever
-important work you're doing. Points are bundled up and flushed by worker
-threads, without you having to worry about it. The code handles retrying,
-chunking, and point validation, so you don't have to.
+The big new feature is that when you write a metric it goes on a queue, which
+means you get a very quick `return` and can carry on with whatever important
+work you're doing. Points are bundled up and flushed by worker threads,
+without you having to worry about it. The code handles retrying, chunking, and
+point validation, so you don't have to.
 
 ## Getting Started
 
-Assuming you've installed the `wavefront-sdk` gem, and have a
-Wavefront account and whatnot, you only need to `require` the
-`Wavefront::MetricHelper` class. Its initializer looks like this.
+Assuming you've installed the `wavefront-sdk` gem, and have a Wavefront
+account and whatnot, you only need to `require` the `Wavefront::MetricHelper`
+class. Its initializer looks like this.
 
 ```ruby
 def initialize(creds, writer_opts = {}, metric_opts = {})
@@ -28,24 +28,22 @@ def initialize(creds, writer_opts = {}, metric_opts = {})
 end
 ```
 
-`creds` is a mandatory argument, and it must be a hash of things
-which will enable a `Wavefront::Writer` to talk to Wavefront.  The
-easiest way to get this object is via `Wavefront::Credentials`.
-`Wavefront::Writer` will need different information depending on how
-you ask it to send the points. If you're using a proxy, use the
-credential object's `proxy` method, or `creds` if you want to use
-the API. Or play it safe and use `all` to pass in both.
+`creds` is a mandatory argument, and it must be a hash of things which will
+enable a `Wavefront::Writer` to talk to Wavefront.  The easiest way to get
+this object is via `Wavefront::Credentials`.  `Wavefront::Writer` will need
+different information depending on how you ask it to send the points. If
+you're using a proxy, use the credential object's `proxy` method, or `creds`
+if you want to use the API. Or play it safe and use `all` to pass in both.
 
-The `writer_opts` argument lets you pass objects to
-`Wavefront::Writer`. We'll talk more about this later.
+The `writer_opts` argument lets you pass objects to `Wavefront::Writer`. We'll
+talk more about this later.
 
-The final `metric_opts` option lets you control the way metrics are
-bundled up before being sent to Wavefront. The things you're most
-likely to set are `flush_interval`, and `delta_interval`. Metrics go
-into an in-memory buffer, and are flushed to Wavefront every
-`flush_interval` seconds. This defaults to five seconds, but you can
-change it if you wish. We'll come to `delta_interval` when we look
-at counters.
+The final `metric_opts` option lets you control the way metrics are bundled up
+before being sent to Wavefront. The things you're most likely to set are
+`flush_interval`, and `delta_interval`. Metrics go into an in-memory buffer,
+and are flushed to Wavefront every `flush_interval` seconds. This defaults to
+five seconds, but you can change it if you wish. We'll come to
+`delta_interval` when we look at counters.
 
 This, then, is all it takes to set up a metric helper.
 
@@ -56,10 +54,9 @@ creds   = Wavefront::Credentials.new
 metrics = Wavefront::MetricHelper.new(creds.all)
 ```
 
-If you examine the `metrics` object, you'll see it's exposed some
-new methods. The ones we're interested in are `gauge`, `counter`,
-and `dist`. If you look at those, say in `irb`, you'll see
-that they're all independent objects.
+If you examine the `metrics` object, you'll see it's exposed some new methods.
+The ones we're interested in are `gauge`, `counter`, and `dist`. If you look
+at those, say in `irb`, you'll see that they're all independent objects.
 
 ```ruby
 irb(main):021:0> metrics.class
@@ -72,234 +69,157 @@ irb(main):024:0> metrics.dist.class
 => Wavefront::MetricType::Distribution
 ```
 
-All those classes offer the same public interface. They expose a
-Ruby `SimpleQueue`, and your main interaction will be to put points
-on those queues via public methods called `q`, and `qq`.
+All those classes offer the same public interface. They expose a Ruby
+`SimpleQueue`, and your main interaction will be to put points on those queues
+via public methods called `q`, and `qq`.
 
-> I had a lot of trouble picking method names: nothing seemed right.
-> `write` would get mixed up with `Wavefront::Writer#write`, `send`
-> is already a Ruby method, and then I ran out of synonyms. (My
-> cheap thesaurus is rubbish, and rubbish, and also rubbish.) I
-> tried overloading `#<` and `#<<`, but that seemed wrong and dirty,
-> so it's `#q` to queue in short form, and `#qq` to do it in a
-> longer fashion.
+> I had a lot of trouble picking method names: nothing seemed right.  `write`
+> would get mixed up with `Wavefront::Writer#write`, `send` is already a Ruby
+> method, and then I ran out of synonyms. (My cheap thesaurus is rubbish, and
+> rubbish, and also rubbish.) I tried overloading `#<` and `#<<`, but that
+> seemed wrong and dirty, so it's `#q` to queue in short form, and `#qq` to do
+> it in a longer fashion.
 
-Throw points at the relevant objects, short-form or longhand, and
-they will periodically be flushed to Wavefront. It couldn't (I hope)
-be simpler.
+Throw points at the relevant objects, short-form or longhand, and they will
+periodically be flushed to Wavefront. It couldn't (I hope) be simpler.
 
 ## Gauges
 
-Gauges are the simplest metric. They're a path, a value, and maybe
-some tags. That's a point in Wavefront. There are, as I just
-mentioned, two ways to to that.
+Gauges are the simplest metric. They're a path, a value, and maybe some tags.
+That's a point in Wavefront. There are, as I just mentioned, two ways to to
+that.
 
-`q` takes two or three arguments, and lets you very quickly describe
-a point.
+`q` takes two or three arguments, and lets you very quickly describe a point.
 
 ```ruby
-metric.gauge.q('my.metric.path', 123)
-metric.gauge.q('my.metric.path', 123 { tag1: 'value 1', tag2: 'value 2' })
+metrics.gauge.q('my.metric.path', 123)
+metrics.gauge.q('my.metric.path', 123, { tag1: 'value 1', tag2: 'value 2' })
 ```
 
-Wavefront needs to know the source and the timestamp, and `#q`
-fills those in for you. It sets the source as your local hostname,
-and the timestamp as "now", however your environment describes it.
+Wavefront needs to know the source and the timestamp, and `#q` fills those in
+for you. It sets the source as your local hostname, and the timestamp as
+"now", however your environment describes it.
 
-If you need more control over your metric descriptions, that is, you
-need to set the timestamp or the source, you can use `#qq`. This
-takes a hash, which fully describes a point.
+If you need more control over your metric descriptions, that is, you need to
+set the timestamp or the source, you can use `#qq`. This takes a hash, which
+fully describes a point.
 
 ```ruby
-metric.gauge.qq(path: 'my.metric.path',
+metrics.gauge.qq(path: 'my.metric.path',
                 value: 123,
                 source: 'blog_example',
                 ts:     Time.now.to_i,
                 tags:   { tag1: 'value 1', tag2: 'value 2' })
 ```
 
-You can also send `qq` an array of these points, and it will deal
-with them all. Some people might prefer to always use `#qq`, as it
-makes your code more explicit.
+You can also send `qq` an array of these points, and it will deal with them
+all. Some people might prefer to always use `#qq`, as it makes your code more
+explicit.
+
+At any time, you may inspect the queue:
+
+```ruby
+puts metrics.gauge.queue.size
+
+puts metrics.gauge.queue.num_waiting
+
+metrics.gauge.queue.empty?
+```
 
 ## Counters
 
-Wavefront has a one-second resolution, so if you send two gauge
-points with the same path and tags in the same wallclock second,
-only one will end up in Wavefront.
+Wavefront has a one-second resolution, so if you send two gauge points with
+the same path and tags in the same wallclock second, only one will end up in
+Wavefront.
 
-Often though, you want to count these fast moving events, and
-Wavefront gives you delta metrics to do that. But using deltas in a
-very busy application can really push your point rate up, and if
-they're coming in very fast, may not play nicely with direct
-ingestion. To help you out, here is `Wavefront::MetricHelper::Counter`.
+Often though, you want to count these fast moving events, and Wavefront gives
+you delta metrics to do that. But using deltas in a very busy application can
+really push your point rate up, and if they're coming in very fast, may not
+play nicely with direct ingestion. To help you out, here is
+`Wavefront::MetricHelper::Counter`.
 
-You can send as many counter metrics as you like, using exactly the
-same `#q` and `#qq` syntax as we saw for gauges. When the buffer
-flushes, the `MetricHelper` class will bundle up all counters with
-the same path, source, and tags, and turn them into a single delta
-metric. By default they're rolled-up over a five-second window, which
-is the same as the flush interval, but you can change this using
-`delta_interval` in the `metric_opts` hash when you create the
-`MetricHelper` class. The only rule is that `delta_interval` must be
-an exact divisor of `flush_interval`. If it is not, you'll get a
+You can send as many counter metrics as you like, using exactly the same `#q`
+and `#qq` syntax as we saw for gauges. When the buffer flushes, the
+`MetricHelper` class will bundle up all counters with the same path, source,
+and tags, and turn them into a single delta metric. By default they're
+rolled-up over a five-second window, which is the same as the flush interval,
+but you can change this using `delta_interval` in the `metric_opts` hash when
+you create the `MetricHelper` class. The only rule is that `delta_interval`
+must be an exact divisor of `flush_interval`. If it is not, you'll get a
 `Wavefront::Exception::InvalidInterval`.
 
-Let's make a little example. I'm going to deliberately set a short
-flush interval, and an even shorter delta interval so you can see
-the mechanics of the thing.
+Let's make a little example. I'm going to deliberately set a short flush
+interval, and an even shorter delta interval so you can see the mechanics of
+the thing.
 
 ```ruby
-#!/usr/bin/env ruby
-
 require 'wavefront-sdk/credentials'
 require 'wavefront-sdk/metric_helper'
+require 'logger'
 
-creds   = Wavefront::Credentials.new(profile: :beta)
-metrics = Wavefront::MetricHelper.new(creds.all,
-                                      { verbose: true },
-                                      flush_interval: 15,
-                                      delta_interval: 5)
 
-1.upto(5).each do |i|
-  puts "[#{Time.now}] --> gauge 1"
-  metrics.gauge.q('metric_helper.example.001.gauge', i,
-                  { type: 'gauge', method: 'q' })
-
-  3.times do
-    puts "[#{Time.now}] --> counter"
-    metrics.counter.q('metric_helper.example.001.counter', 1,
-                      { type: 'counter', method: 'q' })
-    sleep 0.1
-  end
-
-  puts "[#{Time.now}] --> gauge 2"
-  metrics.gauge.qq({ path:  'metric_helper.example.001.gauge',
-                     value: i * 2,
-                     tags:  { type: 'gauge', method: 'qq' } })
-  sleep 10
-end
-
-puts "[#{Time.now}] loops have finished. Shut down the helper"
-metrics.close!
 ```
 
-Here's the output, pretty much. I've removed a couple of wordy debug
-messages which aren't relevant.
+Here's the output, showing the interleaving
 
 ```cmd
-$ ./example_001
-[2019-04-26 00:16:37 +0100] --> gauge 1
-[2019-04-26 00:16:37 +0100] --> counter
-SDK DEBUG: started thread for Wavefront::MetricType::Counter
-SDK DEBUG: Wavefront::MetricType::Counter sleeping for 15
-SDK DEBUG: started thread for Wavefront::MetricType::Distribution
-SDK DEBUG: started thread for Wavefront::MetricType::Gauge
-SDK DEBUG: Wavefront::MetricType::Gauge sleeping for 15
-SDK DEBUG: Wavefront::MetricType::Distribution sleeping for 15
-[2019-04-26 00:16:38 +0100] --> counter
-[2019-04-26 00:16:38 +0100] --> counter
-[2019-04-26 00:16:38 +0100] --> gauge 2
-[2019-04-26 00:16:48 +0100] --> gauge 1
-[2019-04-26 00:16:48 +0100] --> counter
-[2019-04-26 00:16:48 +0100] --> counter
-[2019-04-26 00:16:48 +0100] --> counter
-[2019-04-26 00:16:48 +0100] --> gauge 2
-SDK DEBUG: flushing 6 points [Wavefront::MetricType::Counter]
-SDK DEBUG: Connecting to wavefront-beta:2878.
-SDK DEBUG: flushing 4 points [Wavefront::MetricType::Gauge]
-SDK DEBUG: Connecting to wavefront-beta:2878.
-SDK INFO: ∆metric_helper.example.001.counter 3 1556234212 source=box type="counter" method="q"
-SDK INFO: ∆metric_helper.example.001.counter 2 1556234202 source=box type="counter" method="q"
-SDK INFO: ∆metric_helper.example.001.counter 1 1556234197 source=box type="counter" method="q"
-SDK DEBUG: Closing connection to proxy.
-SDK INFO: metric_helper.example.001.gauge 1 1556234197 source=box type="gauge" method="q"
-SDK INFO: metric_helper.example.001.gauge 2 1556234198.2589605 source=box type="gauge" method="qq"
-SDK INFO: metric_helper.example.001.gauge 2 1556234208 source=box type="gauge" method="q"
-SDK INFO: metric_helper.example.001.gauge 4 1556234208.5702245 source=box type="gauge" method="qq"
-SDK DEBUG: Closing connection to proxy.
-SDK DEBUG: Wavefront::MetricType::Counter sleeping for 15
-SDK DEBUG: Wavefront::MetricType::Gauge sleeping for 15
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Distribution]
-SDK DEBUG: Wavefront::MetricType::Distribution sleeping for 15
-[2019-04-26 00:16:58 +0100] --> gauge 1
-[2019-04-26 00:16:58 +0100] --> counter
-[2019-04-26 00:16:58 +0100] --> counter
-[2019-04-26 00:16:58 +0100] --> counter
-[2019-04-26 00:16:58 +0100] --> gauge 2
-SDK DEBUG: flushing 2 points [Wavefront::MetricType::Gauge]
-SDK DEBUG: Connecting to wavefront-beta:2878.
-SDK DEBUG: flushing 3 points [Wavefront::MetricType::Counter]
-SDK DEBUG: Connecting to wavefront-beta:2878.
-SDK INFO: metric_helper.example.001.gauge 3 1556234218 source=box type="gauge" method="q"
-SDK INFO: metric_helper.example.001.gauge 6 1556234218.878954 source=box type="gauge" method="qq"
-SDK DEBUG: Closing connection to proxy.
-SDK DEBUG: Wavefront::MetricType::Gauge sleeping for 15
-SDK INFO: ∆metric_helper.example.001.counter 3 1556234222 source=box type="counter" method="q"
-SDK DEBUG: Closing connection to proxy.
-SDK DEBUG: Wavefront::MetricType::Counter sleeping for 15
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Distribution]
-SDK DEBUG: Wavefront::MetricType::Distribution sleeping for 15
-[2019-04-26 00:17:08 +0100] --> gauge 1
-[2019-04-26 00:17:08 +0100] --> counter
-[2019-04-26 00:17:08 +0100] --> counter
-[2019-04-26 00:17:09 +0100] --> counter
-[2019-04-26 00:17:09 +0100] --> gauge 2
-[2019-04-26 00:17:19 +0100] --> gauge 1
-[2019-04-26 00:17:19 +0100] --> counter
-[2019-04-26 00:17:19 +0100] --> counter
-[2019-04-26 00:17:19 +0100] --> counter
-[2019-04-26 00:17:19 +0100] --> gauge 2
-SDK DEBUG: flushing 4 points [Wavefront::MetricType::Gauge]
-SDK DEBUG: Connecting to wavefront-beta:2878.
-SDK DEBUG: flushing 6 points [Wavefront::MetricType::Counter]
-SDK DEBUG: Connecting to wavefront-beta:2878.
-SDK INFO: metric_helper.example.001.gauge 4 1556234228 source=box type="gauge" method="q"
-SDK INFO: metric_helper.example.001.gauge 8 1556234229.190071 source=box type="gauge" method="qq"
-SDK INFO: metric_helper.example.001.gauge 5 1556234239 source=box type="gauge" method="q"
-SDK INFO: metric_helper.example.001.gauge 10 1556234239.5010407 source=box type="gauge" method="qq"
-SDK DEBUG: Closing connection to proxy.
-SDK DEBUG: Wavefront::MetricType::Gauge sleeping for 15
-SDK INFO: ∆metric_helper.example.001.counter 3 1556234242 source=box type="counter" method="q"
-SDK INFO: ∆metric_helper.example.001.counter 3 1556234232 source=box type="counter" method="q"
-SDK DEBUG: Closing connection to proxy.
-SDK DEBUG: Wavefront::MetricType::Counter sleeping for 15
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Distribution]
-SDK DEBUG: Wavefront::MetricType::Distribution sleeping for 15
-[2019-04-26 00:17:29 +0100] loops have finished. Shut down the helper
-SDK DEBUG: closing Wavefront::MetricType::Gauge queue
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Gauge]
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Gauge]
-SDK DEBUG: closing Wavefront::MetricType::Counter queue
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Counter]
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Counter]
-SDK DEBUG: closing Wavefront::MetricType::Distribution queue
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Distribution]
-SDK DEBUG: flushing 0 points [Wavefront::MetricType::Distribution]
+$ ./example_01
+I, [2020-09-30T15:41:09.222877 #3735]  INFO -- : gauge 1
+I, [2020-09-30T15:41:09.223297 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:09.323607 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:09.424194 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:09.524630 #3735]  INFO -- : gauge 2
+I, [2020-09-30T15:41:19.532467 #3735]  INFO -- : gauge 1
+I, [2020-09-30T15:41:19.532814 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:19.633257 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:19.733827 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:19.834384 #3735]  INFO -- : gauge 2
+I, [2020-09-30T15:41:24.227324 #3735]  INFO -- : ∆metric_helper.example.01.counter 3 1601476879 source=box type="counter" method="q"
+I, [2020-09-30T15:41:24.227584 #3735]  INFO -- : ∆metric_helper.example.01.counter 3 1601476869 source=box type="counter" method="q"
+I, [2020-09-30T15:41:24.239931 #3735]  INFO -- : metric_helper.example.01.gauge 1 1601476869 source=box type="gauge" method="q"
+I, [2020-09-30T15:41:24.240055 #3735]  INFO -- : metric_helper.example.01.gauge 2 1601476869.5247834 source=box type="gauge" method="qq"
+I, [2020-09-30T15:41:24.240144 #3735]  INFO -- : metric_helper.example.01.gauge 2 1601476879 source=box type="gauge" method="q"
+I, [2020-09-30T15:41:24.240234 #3735]  INFO -- : metric_helper.example.01.gauge 4 1601476879.83451 source=box type="gauge" method="qq"
+I, [2020-09-30T15:41:29.844477 #3735]  INFO -- : gauge 1
+I, [2020-09-30T15:41:29.844991 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:29.945511 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:30.046152 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:30.146794 #3735]  INFO -- : gauge 2
+I, [2020-09-30T15:41:39.238670 #3735]  INFO -- : ∆metric_helper.example.01.counter 1 1601476894 source=box type="counter" method="q"
+I, [2020-09-30T15:41:39.238908 #3735]  INFO -- : ∆metric_helper.example.01.counter 2 1601476889 source=box type="counter" method="q"
+I, [2020-09-30T15:41:39.255049 #3735]  INFO -- : metric_helper.example.01.gauge 3 1601476889 source=box type="gauge" method="q"
+I, [2020-09-30T15:41:39.255289 #3735]  INFO -- : metric_helper.example.01.gauge 6 1601476890.1469483 source=box type="gauge" method="qq"
+I, [2020-09-30T15:41:40.156389 #3735]  INFO -- : gauge 1
+I, [2020-09-30T15:41:40.156636 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:40.256968 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:40.357829 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:40.458373 #3735]  INFO -- : gauge 2
+I, [2020-09-30T15:41:50.468476 #3735]  INFO -- : gauge 1
+I, [2020-09-30T15:41:50.468840 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:50.569265 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:50.669872 #3735]  INFO -- : counter
+I, [2020-09-30T15:41:50.770446 #3735]  INFO -- : gauge 2
+I, [2020-09-30T15:41:54.243509 #3735]  INFO -- : ∆metric_helper.example.01.counter 3 1601476914 source=box type="counter" method="q"
+I, [2020-09-30T15:41:54.243767 #3735]  INFO -- : ∆metric_helper.example.01.counter 3 1601476904 source=box type="counter" method="q"
+I, [2020-09-30T15:41:54.276223 #3735]  INFO -- : metric_helper.example.01.gauge 4 1601476900 source=box type="gauge" method="q"
+I, [2020-09-30T15:41:54.276983 #3735]  INFO -- : metric_helper.example.01.gauge 8 1601476900.458564 source=box type="gauge" method="qq"
+I, [2020-09-30T15:41:54.277212 #3735]  INFO -- : metric_helper.example.01.gauge 5 1601476910 source=box type="gauge" method="q"
+I, [2020-09-30T15:41:54.277380 #3735]  INFO -- : metric_helper.example.01.gauge 10 1601476910.7705927 source=box type="gauge" method="qq"
+I, [2020-09-30T15:42:00.780483 #3735]  INFO -- : loops have finished. Shut down the helper
 ```
 
-That all looks pretty much as we expected. The "extra" flush at the
-end looks a bit odd because the buffers happened to be already
-empty. We always force a final flush, regardless of the buffer
-state. ("Flushing" an empty buffer is a no-op, so it doesn't cost us
-anything.) Note that we ran `metrics.close!` at the end: this is
-what triggered the flush. If you don't close down the metrics
-object, you risk losing points. You can also force a flush any time
-with `metrics.flush!`.
+And here's a chart.
 
-Here's the chart of those points.
+<script src="https://metrics.wavefront.com/embedded/WCBKCMbBvN/js"
+id="wavefront-embedded-WCBKCMbBvN" width="700" height="300"></script>
 
-<script src="https://metrics.wavefront.com/embedded/vKZqmDPPrZ/js"
-id="wavefront-embedded-vKZqmDPPrZ" width="700" height="300"></script>
+You can see all our counter increments went through as a single point. If I
+ran the script again, I might see two counter points. The final delta
+would be the same, but all our counters wouldn't have landed in the same
+bucket.
 
-The blue delta line points start way up in the air, and late, because, well,
-that's how delta metrics work. Wavefront accumulates points
-periodically, and it just happened that this time all our delta
-points landed in the same bucket. You could re-run the script, hit
-the aggregation point, and get a stepped line, though it would
-finish at the same point. The delta points continue for some time
-because deltas are repeated every thirty seconds until, I
-think there have been no new points in half an hour.
+Note that delta metrics are now a first-class datatype. View them with `cs()`
+rather than `ts()`.
 
 ## Distributions
 

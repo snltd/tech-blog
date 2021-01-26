@@ -13,7 +13,7 @@ DRAFT_DIR     = ROOT + 'drafts'
 ARTICLE_DIR   = ROOT + 'articles'
 POST_INDEX    = Sysdef::IndexPosts.new(POST_DIR)
 ARTICLE_INDEX = Sysdef::IndexArticles.new(ARTICLE_DIR)
-LOG           = Logger.new(STDOUT)
+LOG           = Logger.new($stdout)
 KRAMDOWN_OPTS = { input: 'GFM',
                   syntax_highlighter: 'rouge',
                   hard_wrap: false }.freeze

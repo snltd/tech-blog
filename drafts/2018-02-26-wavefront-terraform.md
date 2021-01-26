@@ -1,282 +1,552 @@
 ---
-title: "Making Telemetry Part of a Deployment"
-date: "2018-02-26"
-tags: [Terraform, Wavefront]
+title: "Wavefront and Terraform"
+date: "2020-09-28"
+tags: [Wavefront]
 layout: post
-category: Terraform
+category: Wavefront
 ---
 
-> This article is based on a segment of [an earlier
-> one](https://sysdef.xyz/post/2017-08-28-terraforming-smartos).
-> The original offers far more opinon on deploying a stack with
-> Terraform, whilst this concentrates solely on integrating
-> Wavefront with Terraform. I'm not going to talk about state files,
-> or secret management, or any of that.
+I currently work on a project to facilitate cloud migrations within a large
+corporation. We customize AWS and Azure accounts, trying to balance the user's
+need for freedom with the regulatory requirements of the business as a whole.
+We offer all our customers easy access to Tanzu Observability by Wavefront.
 
-Once upon a time, I worked in aerospace, and I built boxes for test
-environments. I would spend the morning following a printed list of
-instructions, to the letter, and the afternoon filling in forms to
-confirm I had done what I was told. Virtually nothing was automated.
+Everything we do happens via a pipeline, and when that pipeline applies its
+various guardrails and facilitators to a customer account, it builds Wavefront
+proxies, links Wavefront to the customer's AWS or Azure account with a
+suitable integration, and creates alerts specific to that customer. We use the
+proxies ourselves too, collecting telemetry on the customer's behalf,
+aggregating all manner of useful information in dashboards and alerts.
 
-When Sun released Jumpstart, things changed. We could automate the
-configuration of boxes: in 1998 I wrote a web portal which let users
-deploy hosts with Jumpstart, customising various templated
-configurations. *Plus ça change, plus c'est la même chose*.
+We think of Wavefront as an essential infrastructure component, so it is
+deployed, like all our other infrastructure, with Terraform.
 
-Twenty years later, Terraform takes that idea a layer down the
-stack, allowing you to configure *infrastructure* (and
-Chef/Puppet/Whatever configures the hosts -- assuming you still use
-hosts!).
+I'm going to assume you're at least familiar with the concept of Terraform, so
+I won't be talking about installing it, or ways of managing state, or any of
+that.
 
-People tend to think of Terraform as a thing which deploys VMs, but
-it's more flexible than that. It uses plug-in *providers* to talk to
-different APIs, and there's no reason at all why those APIs should
-end with Amazon, Azure, or Triton. They can be *anything*.
+Instead I want to talk about how we use the Terraform [Wavefront
+provider](https://registry.terraform.io/providers/vmware/wavefront/latest)
+in the context of a CI/CD pipeline, running in AWS CodeBuild.
 
-For example, the very clever people at [Space
-Ape](http://www.spaceapegames.com/) have made a [Wavefront
-provider](https://github.com/spaceapegames/terraform-provider-wavefront),
-which can deploy [Wavefront](https://www.wavefront.com/) alerts and
-dashboards as part of your stack. This is particularly useful
-because, although Wavefront's UI lets you clone dashboards and
-alerts, we don't want to go back to the days of doing things by a
-literal book. We want to stamp out full environments, from the VPC
-subnet layout to the executive dashboard the boss likes on his big
-TV.
+## The Basics
 
-## Introductions
+The Wavefront Terraform provider was born in 2017 at [Space
+Ape](http://www.spaceapegames.com/) (from whom I first heard of Wavefront,
+back before it even had a website). Wavefront took over maintenance in early
+2020, and now it's an official Terraform provider in the VMware namespace.
 
-The Wavefront provider isn't part of the core Terraform
-distribution, so your first job is to install it. This is
-particularly easy if you're on Linux or a Mac, in which case you
-only have to [grab a
-binary](https://github.com/spaceapegames/terraform-provider-wavefront/releases)
-and `mv` it to `~/.terraform/terraform-provider-wavefront_v1.0.2`
-(or whatever the version number is). We're going to use the
-[wavefront-cli](https://sysdef.xyz/post/2017-07-26-wavefront-cli)
-here, so you may wish to install that. That's even easier (assuming
-you have a modern-ish Ruby):
+Because it's an official provider, there's no work to do beyond telling
+Terraform you wish to use it and, since it needs to talk to Wavefront's API,
+declaring your API endpoint and a suitable token.
 
-```cmd
-$ gem install wavefront-cli
+It's good practise to keep your provider definitions in one place. So let's
+make a `versions.tf` file to tell Terraform we want to do Wavefront stuff. As
+of right now, Terraform is at version 0.13.3, so that's what we'll assume
+through this article.
+
+Here's a bare-bones `version.tf`.
+
 ```
-
-Now we can start writing our configuration. I'm going to use a
-standalone file called `wavefront.tf`, but you'd more likely want to
-embed this in a larger file with the resources you plan to monitor.
-
-We have to tell Terraform we want to use our new provider, and
-whilst we're doing that we're going to have to tell the provider
-itself who it needs to talk to.
-
-I'm going to put this in `wavefront.tf`. Your company name will be
-different of course, unless you actually work for MyCompany PLC.
-
-```json
-provider "wavefront" {
-  address = "https://mycompany.wavefront.com"
-  token   = "67a0de4d-2b18-a24e-8cea-2c9ae9b00a15"
-  version = "~> 1.0"
+terraform {
+  required_providers {
+    wavefront = {
+      source = "vmware/wavefront"
+    }
+  }
+  required_version = ">= 0.13"
 }
 ```
 
-That's not a real token, so don't go getting any ideas, okay? On the
-subject of tokens, in real life you'd be storing this config in your
-VCS, so you obviously wouldn't leave any secrets in there. Terraform
-has multiple ways of dealing with this, but they're not in the scope
-of this discussion.
+Though you can pass  the endpoint and token when you initialise the provider,
+it's best not to: after all, this file is likely to go into version control,
+where it might be seen by goodness knows who.
 
-## Let Me Give You My Number
+The provider can also take information from the `WAVEFRONT_ADDRESS` and
+`WAVEFRONT_TOKEN` environment variables, so we populate those early in our
+pipeline, taking them from encrypted values in AWS Parameter Store.  Your
+secret management may be different from ours, but you're going to have to put
+that token somewhere safe, and make it visible to Terraform through that
+`WAVEFRONT_TOKEN` variable.
 
-Dashboards are nice, but alerts are essential, so let's start with
-those. Actually, let's not, because the correct way to handle alerts
-in Wavefront is via *alert targets*, or in API-speak, *notificants*.
+If you want to play along at home, `export` your `WAVEFRONT_ADDRESS` and
+`WAVEFRONT_TOKEN` now. Any kind of user will work, but we have a dedicated
+[service account](https://docs.wavefront.com/accounts.html#service-accounts)
+for our pipeline, with its own token and [ingestion
+policy](https://docs.wavefront.com/ingestion_policies.html).
 
-You can point multiple related alerts at the same target, then if
-the people who need to be notified, or the method by which that is
-done, changes, you only have to update the target. They're smart, so
-let's send our alerts using one.
+Now we can make a `main.tf`:
 
-I've found the simplest way to Terraform my Wavefront stuff is to
-make my alerts and whatnot in the console and get them just right,
-then export them. Let's use the CLI to find out what notificants we
-have,
-
- ```cmd
-$ wf notificant list
-CHTo47HvsPzSaGhh  WEBHOOK  Slack alert webhook
-EKdKFv1rJ6iPahqI  EMAIL    Alerts from lab machines
-T0in8AtVb56Zkzlz  EMAIL    alerts from JPC production instances
-...
+```hcl
+provider "wavefront" {
+}
 ```
 
-I'm going to take everything related to my
-[JPC](https://www.joyent.com/) stack, and control it with Terraform.
-So let's get that last target.
+Then run `terraform init` to install the provider. Now we're ready to make a
+resource.
 
-The CLI has recently (in vesion 2.4.0) acquired the ability to
-output information in a way that is broadly compatible with
-the Wavefront Terraform provider. That is, in
-[HCL](https://www.terraform.io/docs/configuration/syntax.html).
+## Alert Targets
 
-So we can pull an existing alert target out of Wavefront and into
-our configuration-as-code by doing:
+Let's start with an alert target, or in API-speak, a _notificant_. We send all
+our alerts to a Slack channel, and SEVERE ones also go to Pagerduty. Let's
+have a look at the Slack one for now.
 
-```cmd
-$ wf notificant describe -f hcl T0in8AtVb56Zkzlz >>wavefront.tf
+Assuming you have [a Slack channel set up to receive
+alerts](https://docs.wavefront.com/slack.html#slack-setup), making Terraform
+create and manage the target is as simple as putting this into, say,
+`alert_target-slack.tf`.
+
+```hcl
+resource wavefront_alert_target example {
+  name         = "An example Slack hook for example alerts"
+  description  = <<-EODESC
+    An example of how to create a Wavefront alert target from Terraform.
+  EODESC
+  method       = "WEBHOOK"
+  recipient    = "https://hooks.slack.com/services/${var.slack_hook_key}"
+  content_type = "application/json"
+  triggers     = ["ALERT_OPENED", "ALERT_RESOLVED"]
+  template     = file("${path.module}/resources/slack_hook.tmpl")
+}
 ```
 
-The CLI does its best to write compatible HCL, and jumps through a
-few hoops.  Some of the keys chosen for the provider don't quite
-align with the keys used inside Wavefront, and the provider
-sometimes insists a resource has properties which you may not have
-given it. For instance, the provider insists alerts and dashboards
-have tags, but Wavefront itself does not. So if you see this:
+You can create e-mail or Pagerduty targets just as easily. Note that the alert
+template is in a separate file. This lets us have multiple targets which use
+the same Slack template, which we've tailored to our (minimal) needs.  Keeping
+things like templates in their own files also makes for cleaner Terraform
+code, as that big blob of text is a bit unweildy.
 
-```
-$ terraform plan
-1 error(s) occurred:
+The easiest way to get the target template is to create a target in the UI and
+copy and paste the template out.
 
-* wavefront_alert.4030f5b9-18ee-47e9-ad4d-726f5184c74d: "tags":
-* required field is not set
-```
+We pass the `recipient` key in as a variable, so we can use the same Terraform
+module to create targets for different customers using different Slack
+channels. The pipeline, or course, populates the variables.
 
-you'll have to manually add some tags inside the given resource:
+We also create an `outputs.tf` file which we'll use later on. The output for
+the alert target is its ID.
 
-
-```
-tags = ["tag1", "tag2"]
-```
-
-(The array can be empty, but tags are good. Tag. You'll feel better.)
-
-You can see from the error above that Terraform resources
-have a unique identifer. Thi is used when one resource
-cross-references another. The CLI generates a random UUID for each
-resource it creates, but you can change it to something meaningful
-if you want.
-
-Running
-
-```cmd
-$ terraform plan
+```hcl
+output target_id_slack {
+  description = "ID of example Slack alert target"
+  value       = wavefront_alert_target.example.id
+}
 ```
 
-and assuming you don't get the `require field` error, you should see
-that Terraform wants to create an alert target. Great! We have enshrined
-that target in code now, so it should (should!) be safe to delete
-it, either from the console or the CLI.
+If you run `terraform apply` now, you'll see the target configured in
+Wavefront. `terraform destroy` will, of course, remove it.
 
-```cmd
-$ wf notificant delete T0in8AtVb56Zkzlz
+## Alerts
+
+Creating an alert to use that target is no harder. Here is a nice simple one.
+(With a nonsense condition for the sake of brevity.) This might go in
+`alert.tf`.
+
+A `wavefront_alert` resource may have [many
+properties](https://registry.terraform.io/providers/vmware/wavefront/latest/docs/resources/alert)
+Here
+
+example of one. Put it in a file `alert-example.tf`.
+
+```hcl
+resource wavefront_alert example {
+  name                   = "Example alert"
+  condition              = "2 > 1"
+  additional_information = <<-EODESC
+  This is a really simple alert that will always fire.
+  EODESC
+  display_expression     = "2 > 1"
+  severity               = "WARN"
+  alert_type             = "CLASSIC"
+  minutes                = 5
+  resolve_after_minutes  = 5
+  tags                   = ["Wavefront", "example"]
+  target                 = wavefront_alert_target.example.target_id
+}
 ```
 
-## Call Me
+Hopefully it's clear that the `target` property references the alert target we
+created earlier. Terraform is smart enough to know to create the target first,
+get its ID from Wavefront, then use that ID in the API call which makes the
+alert. `target_id` is a special property: alerts reference a target
+not just through its sixteen-character ID, but through a string prefixing that
+ID with `target:`. The `target_id` property does that prefixing for you. If
+you want multiple targets, comma-separate them in a single string.
 
-We have a target that knows how to get hold of us. Let's set up an
-alert. Again, I'm going to export an existing one.
+Our pipeline has a Terraform variable holding the tags we apply to all alerts
+we manage, and we add any extra tags on like this:
 
-```cmd
-$ wf alert list
-...
-1502624543569  CHECKING           JPC zone out of memory
-$ wf alert describe -f hcl 1502624543569 >>wavefront.tf
+```hcl
+tags = concat(var.alert_tags, ["Wavefront", "example"])
 ```
 
-That's added the alert to our Terraform config, but we want to use
-the target we just created, which didn't exist at the time the alert
-was created.  This easy to do with Terraform.
+This makes it easy to identify the alerts we own. We use the
+`additional_information` field for our runbook. When an alert fires, the
+engineer looking at it should not only see what's going wrong, but should get
+useful information on how to diagnose the fault further. We include likely
+causes, links to dashboards, and even contact information. We also try to make
+the `display_expression` as useful as possible. Sometimes it can be quite
+different from the expression which triggers the alert.
 
-In `wavefront.tf`'s `wavefront_alert` block, just change the `target`
-value to
+An interesting problem we found with deploying alerts as part of a pipeline,
+along with the infrastructure they observe is that the alerts are often up and
+running long before the infrastructure exists which will satisfy the alert
+condition. So, we have to think carefully about writing conditions which can
+detect a non-reporting source, but not fire before any data has been seen. Up
+to now we've managed this by wrapping our alerts in `if(lag())`s, but the
+provider now supports maintenance windows, and we are considering applying a
+short maintenance window to alerts in a new deployment, silencing false
+alerts and avoiding potentially confusing logic in the alert conditions.
 
-```
-"target:${wavefront_alert_target.<uuid>.id}"
-```
+## Access Control
 
-where `<uuid>` is the UUID attached to the `wavefront_alert_target`
-resource we made earlier.
+Though our customers are free to create their own alerts in the UI or
+(ideally) through their own pipeline, we don't want them to modify ours.
+Though Terraform would revert any modifications back to the state defined in
+the code, it's better to lock the alerts down with ACLs.
 
-Now, a `terraform plan` will tell you that it wants to create two
-things. Terraform prints out resources alphabetically, but the
-variable reference means that it knows to create the target first.
+Let's make an `alert_managers` group, with a role granting the required
+privilege. You might put these in `groups.tf`.
 
+```hcl
+resource wavefront_user_group alert_managers {
+  name        = "Alert Management"
+  description = "Users with the power to manage alerts"
+}
 
-## What's Up?
-
-Dashboards are big, complicated objects with lots of nested
-properties.
-
-```cmd
-$ wf dashboard describe log -f yaml | wc -l
-1220
-```
-
-The Terraform provider, at the moment, does not cover all of those
-properties, and I've had varying levels of success creating
-dashboards. The CLI code which generates the dashboard HCL is a bit
-hairy and hacky too. Still, it might well work for your use-case,
-and the provider will become more complete over time. As it does,
-the CLI will grow to keep up.
-
-You can tell what's coming, can't you?
-
-```cmd
-$ wf dashboard list | grep JPC
-jpc-telegraf                            JPC telegraf
-jpc-webhost                             JPC Website Host
-$ wf dashboard describe -f hcl jpc-webhost >>wavefront.tf
+resource wavefront_role alert_management {
+  name        = "Alert Management"
+  permissions = ["alerts_management"]
+  assignees   = [wavefront_user_group.alert_managers.id]
+}
 ```
 
-Just like before, we dump and existing dashboard to Terraform, and
-`terraform plan` tells us it's going to create it. If you have
-faith, you may delete the existing one (dashboards deleted once go
-in to the trash, so you can get them back), but you might also
-prefer to change the dashboard name in `wavefront.tf` and see if it
-imports alongside the old one.
+Again, we should add the IDs of those resources to our `outputs.tf`, along
+with the ID of the alert we made earlier.
 
-## We Should Do This More Often
+Now we can add this line to our `wavefront_alert` resource:
 
-So now you have working templates for alerts, notificants, and
-possibly dashboards. You're likely building up and tearing down
-stacks like it's going out of fashion, possibly as part of a CI/CD
-pipeline. Get that Terraform config in there! When you stand up or
-recycle an environment, or product, the alerting and monitoring
-should "just happen" without a second thought.
+```hcl
+  can_modify = [wavefront_user_group.alert_managers.id, "sa::pipeline"]
+```
 
-Any part of any property of any resource can be a variable,
-populated from some other input to Terraform. We already saw HCL's
-variable interpolation when we referenced the alert target earlier,
-so you already know how easy it would be to customize your embedded
-queries with, say the environment name, or to have an alert target
-write to the Slack channel of the team which owns the product.
+Note that we have our pipeline user in that ACL.  It's very easy to forget the
+account doing the Terraforming and end up creating resources your pipeline
+can't modify. Think carefully when using ACLs!
 
-Infrastructure as code is vital today, and monitoring is an
-essential part of any infrastructure. It should be defined in
-code, version-controlled, templated, and repeatable.
+Though we only want Alert Management people to be able to modify the alert, we
+might want anyone to be able to have a look at it. Or, rather, `Everyone`.
+`Everyone` is a default Wavefront group to which new users are added, unless
+they are specifically created as members of some other group.
 
-## Postscript: We're Just Not Compatible
+`Everyone` has a randomly generated ID, and we just saw that ACLs need an ID,
+not a name. Fortunately, the Wavefront provider gives us a _data source_ that
+will let us access it.
 
-What if you don't use Terraform?
+So if we put this in our Terraform code:
 
-At my client's site, they're committed to using AWS services
-wherever possible, so everything is deployed with Cloudformation.
+```hcl
+data wavefront_default_user_group everyone {}
+```
 
-We still wanted to create our alerts and dashboards with our stacks
-though, and have settled on a pattern of exporting everything
-relevant with the CLI, and turning the output into an ERB template.
-Simply, we change a string like `env=dev` to `env=<%= @environment
-%>`. The
-variables are populated, and the template rendered, by a `Rakefile`
-which also kicks off the `cloudformation create` operation. So, the
-telemetry comes up with the stack.
+We can add this to our alert resource.
 
-As a part of the tear-down of a stack, the `Rakefile` invokes the
-CLI to do `delete` operations on the relevant resources.
+```hcl
+  can_view = [data.wavefront_default_user_group.everyone.group_id]
+```
 
-This isn't as nice as the Terraform solution, because nothing
-happens on a `cloudformation update`, so it doesn't let us tweak an
-existing config, or guarantee that what's in Wavefront is what's in
-Git.  On the plus side, since the CLI deals in raw JSON, it's not
-dependent on anyone else's code, and we don't have to wait for the
-provider to cover new features as they arrive.
+That's pretty much a finalized, production-ready alert, in a very little work.
+
+## Cloud Integrations
+
+Installing a proxy isn't done with the Wavefront provider. Proxies sit in,
+say, AWS, or Azure, so they are deployed with the AWS or Azure providers.
+
+Installing a Cloud Integration, however requires teamwork between your cloud
+and Wavefront providers.
+
+So, to integrate with AWS we'll need to revisit `versions.tf` and add the AWS
+provider. We'll also need `time`.
+
+```hcl
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+    wavefront = {
+      source = "vmware/wavefront"
+    }
+    time = {
+      source = "hashicorp/time"
+    }
+
+  }
+  required_version = ">= 0.13"
+}
+```
+
+You'll also need to make your AWS credentials visible to the provider. If
+you're running locally, this is probably as simple as `export
+AWS_PROFILE=profile_name`. You'll also have to re-run `terraform init`.
+
+Here's a much-simplified version of the code we use to create AWS
+integrations. We scrape Cloudwatch metrics, and get the [AWS
+Metrics+](https://docs.wavefront.com/integrations_aws_metrics.html#aws-metrics-data).
+
+```hcl
+resource wavefront_cloud_integration_aws_external_id default {}
+
+resource aws_iam_role wavefront {
+  name               = "example-wf-integration"
+  assume_role_policy = <<-EOPOLICY
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "AWS": "arn:aws:iam::301213811993:root"
+          },
+          "Action": "sts:AssumeRole",
+          "Condition": {
+            "StringEquals": {
+              "sts:ExternalId": "${wavefront_cloud_integration_aws_external_id.default.id}"
+            }
+          }
+        }
+      ]
+    }
+  EOPOLICY
+}
+
+resource aws_iam_role_policy_attachment read-only {
+  role       = aws_iam_role.wavefront.name
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}
+
+resource time_sleep sleep {
+  depends_on      = [aws_iam_role.wavefront]
+  create_duration = "10s"
+}
+
+resource wavefront_cloud_integration_cloudwatch cloudwatch {
+  depends_on                      = [time_sleep.sleep]
+  name                            = "example AWS integration"
+  role_arn                        = aws_iam_role.wavefront.arn
+  external_id                     = wavefront_cloud_integration_aws_external_id.default.id
+  service_refresh_rate_in_minutes = 5
+  force_save                      = false
+}
+
+resource wavefront_cloud_integration_ec2 ec2 {
+  depends_on                      = [time_sleep.sleep]
+  external_id                     = wavefront_cloud_integration_aws_external_id.default.id
+  name                            = "example AWS integration"
+  role_arn                        = aws_iam_role.wavefront.arn
+  service_refresh_rate_in_minutes = 5
+  hostname_tags                   = ["host", "source", "name"]
+  force_save                      = false
+}
+
+output external_id {
+  description = "integration external ID"
+  value       = wavefront_cloud_integration_aws_external_id.default.id
+}
+```
+
+This tells Terraform to fetch an "external ID" from Wavefront. This is a
+random string used a little like a shared secret between Wavefront and AWS.
+Terraform then uses the AWS provider to create an IAM role which allows the
+Wavefront account (301213811993) read-only access, provided it also passes the
+correct external ID. Then it creates two integrations in Wavefront, telling
+them the external ID they must pass, and the ARN of the IAM role they need to
+assume.
+
+Our real code uses a lot of variables, to adapt the allow/deny lists for
+metrics and so-on.  I've left in the `force_save` parameter, because for a
+time we had this set to `true`, and experienced a number of silent failures.
+We prefer our pipeline to fail the moment anything goes wrong.
+
+The `time_sleep` resource and dependency are there because we found that
+sometimes the call to create the integrations happened before the IAM role was
+available, causing the task to fail. The `time_sleep` gives more than enough
+breathing space to fix this. I'm not fan of sleeps in any kind of program as
+any kind of fix, but here it was necessary.
+
+## Dashboards
+
+The Wavefront Terraform provider offers a couple of ways to get dashboards
+into Wavefront.
+
+First, you can write your dashboard in HCL. This, in my opinion, is not a
+great idea. Dashboards can get very big very quickly, and they were never
+meant to be built in a text editor.
+
+Second, there's the `wavefront_dashboard_json` resource type. This simply
+takes a big chunk of JSON and plonks it into the dashboard API. Now, writing
+your dashboards in JSON would be even worse than writing them in HCL, but
+you can easily export an existing dashboard.
+
+In the UI, edit the dashboard, and you'll see a `JSON` button in the bar at
+the top. Click that, then in the editor that opens up, there's a drop down for
+`Tree` or `Code`. Select `Code`, ctrl-a, ctrl-v (or whatever works on whatever
+you use) and you have the raw JSON, ready to paste a
+`wavefront_dashboard_json` resource.
+
+Alternatively, make an API call youself, or use [the `wf` CLI
+tool](https://sysdef.xyz/article/wavefront-cli).
+
+```
+$ wf dashboard export -f json <id>
+```
+
+`wavefront_dashboard_json` is happy for you to embed the JSON in the `.tf`
+file with a `<<-HEREDOC`, but I much prefer to store each dashboard in its own
+file, and pull it in with the `file()` function like we did with the alert
+template.
+
+You may, like us, choose not to Terraform most of your dashboards at all.
+Having used Wavefront for some years now, I find dashbaords are a never-ending
+project.  Every query in every chart constantly proves its value -- or lack of
+value. I find I'm constantly tweaking: honing a query, changing the chart
+type, taking out things I never look at or adding new charts which have just
+helped me out of a tight spot. Our dashboards end up being very collaborative,
+and we encourage everyone to improve them Our dashboards end up being very
+collaborative, and we encourage everyone to improve them.
+
+We want our customers to make Wavefront work for them, so we prefer to clone
+them dashboards as a starting point, which they can adapt to their particular
+needs.
+
+Remember also that Wavefront keeps a history of dashboards: if you want to
+roll back to a previous version, you can do it in the UI. So you don't have to
+dig through Github to get that one chart back.
+
+All of that said, on a previous job, we needed to stamp out immutable,
+finished dashboards for new stacks and new environments. If that's your
+use-case, `wavefront_dashboard_json` is your friend.
+
+## Minority Interests
+
+The provider is still growing, and though it most likely offers all you need,
+it doesn't yet cover every resource type.
+
+The Wavefront API is very good though, and very easy to use. Before Cloud
+Integrations were supported in the Wavefront provider, we  had no problem
+managing them with Mastercard's [REST
+API provider](https://github.com/Mastercard/terraform-provider-restapi).
+
+So if you need to manage external links, or ingestion policies, there is a way
+to do it.
+
+But better still, implement any missing functionality in the provider and
+share it with the world -- it's open source after all!
+
+## Pipeline Stuff
+
+We run our pipeline often, and there are often multiple runs in progress,
+which must all be kept separate. We use Terraform workspaces, and we have
+different phases of our pipeline (dev, integration, gatekeeping) run in
+different accounts. But there's only one Wavefront, and all our pipelines have
+to manipulate that.
+
+To avoid runs treading on each other's toes, we have our pipeline generate a
+random string of fixed length which is appended to the identifiers of all
+resources the pipeline creates. When we do a "real" deployment, that suffix is
+blank.
+
+Don't worry about creating and deleting stuff all the time. The provider
+hard-deletes, so things don't end up hanging around in the trash. (And even if
+they did, trashed alerts don't count towards your quota.)
+
+It's not related to the Terraform provider, but our pipeline, reports lots of
+information into Wavefront, giving us detailed statistics on all our builds
+and deployments.
+
+## Tests
+
+Our pipeline doesn't just deploy to our own accounts, but to those of our
+customers. So, we have to be very careful, and test everything we do.
+
+Mostly this means end-to-end functional tests. When we create Wavefront
+proxies, for instance, we send real data to them, then run real queries against
+Wavefront, guaranteeing the data we see arrives and is as it should be. We
+apply preprocessing rules, so we must guarantee the metrics not only arrive,
+but are tagged correctly. We've written a nice library of `assert_()`
+functions based on [Space Ape's Go
+SDK](https://github.com/spaceapegames/go-wavefront). Sadly I can't share that
+with you at the moment.
+
+Alerts are tricky to test.
+
+Often it is difficult or impossible to deliberately cause an alert to fire.
+For instance, we monitor our point rate, and alert if a significant proportion
+of our telemetry disappears, or if we send more points than we pay for.  We
+can't do either of those things for real.
+
+Some alerts also have very long trigger times, or use long time-window
+functions.  Triggering one of these and waiting to see the alert would add
+many minutes to a pipeline run. So in most cases the testing of our alerts is
+a simple check that the thing we asked to be created has been created.
+
+All our test files contain a function which uses
+[Terratest](https://github.com/gruntwork-io/terratest) to execute our
+Terraform code, capture the outputs (remember I said we'd need them later?),
+then tear down everything it made.  Then we inspect and `assert()` on the
+output objects, checking whatever we feel we should.
+
+With most of the detail removed, it looks something like this:
+
+```go
+func TestWavefrontAlerts(t *testing.T) {
+  testInfra := createInfra(t)
+  testHighPointRateAlert(t, testInfra)
+}
+
+func createInfra(t *testing.T) *terraform.Options {
+  infra := &terraform.Options{
+    TerraformDir: "../examples/wavefront-alert",
+    Vars: map[string]interface{}{ /* we set module variables here */ },
+  }
+
+  t.Cleanup(func() {
+    terraform.Destroy(t, infra)
+  })
+
+ terraform.InitAndApply(t, infra)
+  return infra
+}
+
+func testAlerts(t *testing.T, testInfra *terraform.Options) {
+  id := terraform.Output(t, testInfra, "alert_id_broken_integration")
+  wavefront.AssertObject(t, "alert", id, "target", targetWarn.String())
+  wavefront.AssertObject(t, "alert", id, "severity", "WARN")
+  wavefront.AssertObject(t, "alert", id, "condition", "ts(\"sre.wavefront.integrations\") = 0")
+}
+```
+
+`wavefront.AssertObject()`  has this signature:
+
+```
+func AssertObject(t *testing.T, objType string, id string, chkField string, chkVal string)
+```
+
+It asks Wavefront for an `objType` object (e.g. an alert, or dashboard) with
+with the ID from the object's `output{}`.  Then, if the object exists, the
+function looks to see whether it has a property `chkField` with the value
+`chkVal`.
+
+We test Cloud Integrations similarly: waiting to see the data would take too
+long, so we don't do it. But we do [monitor for Cloud Integrations which are
+not collecting any
+data](https://github.com/snltd/wavefront-integration-checker), so should the
+pipeline break one, or fail to set one up correctly, we'll soon know about it.
+
+## End
+
+Once you start using Wavefront, it quickly becomes a core component of your
+infrastructure. So treat it as such. Automate it, test it, and reassert its
+state just like you would with a VPC, an ALB, or any other first-class
+component.
