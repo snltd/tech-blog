@@ -139,12 +139,10 @@ module Rouge
         rule(/^sccli>.*/, Generic::Strong)
         rule(/^\[[\-\w]+\]$/, Comment)
         rule(/\.\.\./, Comment)
-        rule(/^.*$/, Generic::Prompt)
       end
 
       state :long do
         rule(/.*[^\\]$/, Generic::Strong, :pop!)
-        rule(/.*/, Generic::Strong)
       end
     end
   end
