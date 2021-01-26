@@ -56,6 +56,8 @@ GEM
       parser (>= 2.7.1.5)
     rubocop-minitest (0.10.3)
       rubocop (>= 0.87, < 2.0)
+    rubocop-rake (0.5.1)
+      rubocop
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.4)
     sinatra (2.1.0)
@@ -82,6 +84,7 @@ DEPENDENCIES
   rake (~> 13.0)
   rubocop (~> 1.8)
   rubocop-minitest (~> 0.10)
+  rubocop-rake (~> 0.5)
   sysdef!
 
 BUNDLED WITH
