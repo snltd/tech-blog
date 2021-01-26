@@ -61,7 +61,7 @@ class TestSysdef < MiniTest::Test
     end
   end
 
-  def test_api_404
+  def test_api_not_found
     get '/api/no_such_thing'
     assert_equal(404, last_response.status)
     refute last_response.body.include?('Sinatra doesn’t know this ditty')
