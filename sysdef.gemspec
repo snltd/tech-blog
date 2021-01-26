@@ -27,7 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'kramdown', '~> 2.3'
   gem.add_runtime_dependency 'kramdown-parser-gfm', '~> 1.1.0'
   gem.add_runtime_dependency 'puma', '~> 5.0'
-  gem.add_runtime_dependency 'rouge', '~> 3.19'
+  gem.add_runtime_dependency 'rouge', '~> 3.26'
   gem.add_runtime_dependency 'sinatra', '~>2.1'
   gem.add_runtime_dependency 'slim', '~> 4.1'
   gem.add_runtime_dependency 'tilt', '~> 2.0', '>= 2.0.0'
