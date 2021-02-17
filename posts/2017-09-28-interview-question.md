@@ -18,15 +18,9 @@ been asked at interview.
 > Three letters of the alphabet are not valid options in GNU `ls`. What
 > are they?
 
-The story kind of breaks down here, because it's so long ago, I
-can't remember what I said. If it had been the late '90s, me in my arrogant
-mid-20s, head
-overinflated from picking and choosing ridiculously remunerated
-dotcom jobs, I'd probably have said something smart-arsed, dropped the mic,
-and made myself a better story. But I think it was around 2003-2004
-time, when I was properly grown up and jobs were thin on the ground.
-So I suspect I said something like "I don't know, but `man ls` will tell
-you.
+The story breaks down a little here, because it's so long ago, I can't
+remember the details. But I'm pretty sure "`man ls` will tell you" was not the
+answer he was looking for.
 
 I don't remember if I was offered the job or not.
 
