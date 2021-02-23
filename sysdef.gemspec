@@ -7,7 +7,7 @@ require 'English'
 
 Gem::Specification.new do |gem|
   gem.name          = 'sysdef'
-  gem.version       = ENV['RELEASE_VERSION'] || "0.0.#{Time.now.strftime('%Y%m%d')}"
+  gem.version       = ENV['RELEASE_VERSION'] || '0.0.0'
 
   gem.summary       = 'Sysdef Ltd company website'
   gem.description   = 'Promotional material and online presence for ' \
