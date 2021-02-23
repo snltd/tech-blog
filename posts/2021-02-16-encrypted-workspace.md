@@ -8,7 +8,8 @@ category: Solaris
 This is an update of [a ten-year old
 page](/post/2011-04-20-zfs-encrypted-workspace). describing a task I have to
 do infrequently enough that I *always* forget the command syntax. The original
-page was for Solaris, this one updates it for OmniOS.
+page was for Solaris, this one updates it for OmniOS, because once I looked up
+how to do it on that original post, I always found it didn't work.
 
 ## Encrypted Workspace - Always Mounted
 
