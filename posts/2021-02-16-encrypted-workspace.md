@@ -61,7 +61,7 @@ OmniOS:
   -o encryption=aes-256-ccm \
   -o keyformat=passphrase \
   -o keylocation=prompt \
-  tank/encrypted_dataset_1
+  tank/encrypted_dataset_2
 ```
 
 Solaris:
@@ -70,7 +70,7 @@ Solaris:
 # zfs create \
   -o encryption=aes-256-ccm \
   -o keysource=passphrase,prompt \
-  tank/encrypted_dataset_1
+  tank/encrypted_dataset_2
 ```
 
 You'll have to mount this filesystem manually whenever you want to
