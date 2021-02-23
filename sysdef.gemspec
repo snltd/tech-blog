@@ -19,17 +19,17 @@ Gem::Specification.new do |gem|
 
   gem.bindir        = 'bin'
   gem.executables   = %w[sysdef.rb locate_sysdef]
-  gem.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
-  gem.test_files    = gem.files.grep(%r{^spec/})
-  gem.require_paths = %w[lib]
+  gem.files         = Dir['articles/**', 'bin/**', 'sysdef.gemspec',
+                          'config.ru', 'Gemfile*', 'lib/**', 'posts/*',
+                          'public/**', 'views/**', 'Rakefile', 'robots.txt']
 
-  gem.add_runtime_dependency 'kramdown', '~> 2.3'
-  gem.add_runtime_dependency 'kramdown-parser-gfm', '~> 1.1.0'
-  gem.add_runtime_dependency 'puma', '~> 5.0'
-  gem.add_runtime_dependency 'rouge', '~> 3.26'
-  gem.add_runtime_dependency 'sinatra', '~>2.1'
-  gem.add_runtime_dependency 'slim', '~> 4.1'
-  gem.add_runtime_dependency 'tilt', '~> 2.0', '>= 2.0.0'
+  gem.add_dependency 'kramdown', '~> 2.3'
+  gem.add_dependency 'kramdown-parser-gfm', '~> 1.1.0'
+  gem.add_dependency 'puma', '~> 5.0'
+  gem.add_dependency 'rouge', '~> 3.26'
+  gem.add_dependency 'sinatra', '~>2.1'
+  gem.add_dependency 'slim', '~> 4.1'
+  gem.add_dependency 'tilt', '~> 2.0', '>= 2.0.0'
 
   gem.add_development_dependency 'bundler', '~> 2.0'
   gem.add_development_dependency 'faraday', '~> 1.0.1'
