@@ -25,7 +25,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'kramdown', '~> 2.3'
   gem.add_dependency 'kramdown-parser-gfm', '~> 1.1.0'
-  gem.add_dependency 'puma', '~> 5.0'
+  gem.add_dependency 'puma', '~> 5.0.0'
   gem.add_dependency 'rouge', '~> 3.26'
   gem.add_dependency 'sinatra', '~>2.1'
   gem.add_dependency 'slim', '~> 4.1'
