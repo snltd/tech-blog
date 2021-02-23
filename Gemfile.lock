@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sysdef (0.0.0)
+    sysdef (0.0.20210223)
       kramdown (~> 2.3)
       kramdown-parser-gfm (~> 1.1.0)
       puma (~> 5.0.0)
@@ -73,7 +73,7 @@ GEM
     unicode-display_width (2.0.0)
 
 PLATFORMS
-  x86_64-linux
+  ruby
 
 DEPENDENCIES
   bundler (~> 2.0)

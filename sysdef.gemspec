@@ -7,7 +7,7 @@ require 'English'
 
 Gem::Specification.new do |gem|
   gem.name          = 'sysdef'
-  gem.version       = ENV['RELEASE_VERSION'] || '0.0.0'
+  gem.version       = ENV['RELEASE_VERSION'] || "0.0.#{Time.now.strftime('%Y%m%d')}"
 
   gem.summary       = 'Sysdef Ltd company website'
   gem.description   = 'Promotional material and online presence for ' \
@@ -23,6 +23,7 @@ Gem::Specification.new do |gem|
                           'config.ru', 'Gemfile*', 'lib/**', 'posts/*',
                           'public/**', 'views/**', 'Rakefile', 'robots.txt']
 
+  gem.platform      = Gem::Platform::RUBY
   gem.add_dependency 'kramdown', '~> 2.3'
   gem.add_dependency 'kramdown-parser-gfm', '~> 1.1.0'
   gem.add_dependency 'puma', '~> 5.0.0'
