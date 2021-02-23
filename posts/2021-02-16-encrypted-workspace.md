@@ -33,7 +33,7 @@ OmniOS:
 # zfs create \
   -o encryption=aes-256-ccm \
   -o keyformat=raw \
-  -o keylocation=file:///etc/mykey
+  -o keylocation=file:///etc/mykey \
   tank/encrypted_dataset_1
 ```
 
@@ -73,7 +73,7 @@ Solaris:
   tank/encrypted_dataset_2
 ```
 
-You'll have to mount this filesystem manually whenever you want to
+You'll have to mount this dataset manually whenever you want to
 use it. I have a couple of them, and I usually do
 
 ```cmd
