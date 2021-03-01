@@ -1,4 +1,18 @@
 # frozen_string_literal: true
 
+ruby '2.7.2'
 source 'https://rubygems.org'
-gemspec
+gem 'faraday'
+gem 'kramdown'
+gem 'kramdown-parser-gfm'
+gem 'minitest'
+gem 'nokogiri'
+gem 'puma'
+gem 'rack-test'
+gem 'rake'
+gem 'rouge'
+gem 'rubocop'
+gem 'rubocop-rake'
+gem 'sinatra'
+gem 'slim'
+gem 'tilt'
