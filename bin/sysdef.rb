@@ -58,7 +58,9 @@ module Sysdef
     end
 
     get '/tag/:tag' do
-      @posts = POST_INDEX.by_tag(params[:tag])
+      tag = Addressable::URI.unencode(params[:tag])
+      @tag = tag
+      @posts = POST_INDEX.by_tag(tag)
       slim :post_list
     end
 
