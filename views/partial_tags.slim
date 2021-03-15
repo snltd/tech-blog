@@ -4,5 +4,5 @@
   ul#tag_links
     - top_tags.each do |tag, count|
       li
-        a href="/tag/#{tag}" => tag
+        a href="/tag/#{Addressable::URI.encode(tag)}" => tag
         = "(#{count})"

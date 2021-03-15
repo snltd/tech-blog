@@ -2,6 +2,7 @@
 
 ruby '2.7.2'
 source 'https://rubygems.org'
+gem 'addressable'
 gem 'faraday'
 gem 'kramdown'
 gem 'kramdown-parser-gfm'

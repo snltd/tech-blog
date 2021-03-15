@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'addressable'
 require 'sinatra/base'
 require 'slim'
 require 'logger'
