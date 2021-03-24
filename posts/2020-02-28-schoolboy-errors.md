@@ -10,9 +10,9 @@ I wrote some code for [a site about music](http://cassingle.id264.net). At the
 top of each page, it has a mouseover which tells you what equipment was used
 to play the records discussed below. It does this by way of a hash which
 details all the gear that's ever been in the hi-fi, and when it came and went.
-For each post it filters the hash according to the date the post was written,
-and returns the correct system. It then further filters depending on whether
-the reviewer listened through headphones or speakers.
+When rendering a post it filters the hash according to the date the post was
+written, and returns the correct system. It then further filters depending on
+whether the reviewer listened through headphones or speakers.
 
 It didn't work.
 
@@ -55,7 +55,7 @@ see. And we're probably wrong, and we'll probably regret it.
 
 ## 2. Trusting Your Tests
 
-When came to fix the bug, I immediately looked at my tests. The code had
+When I came to fix the bug, I immediately looked at the tests. The code had
 a build pipeline, and there were unit tests for class which creates the hi-fi
 list, and an acceptance test which looked at the rendered HTML. They passed,
 and they passed because every test set up a nice fresh environment in which to
@@ -79,7 +79,7 @@ it to `reject`. That person might also have pointed out exactly what
 
 I wrote this code a couple of years ago, before I started using Clojure and
 Rust, and had the penny-drop moment about immutability. Now, even when I write
-Ruby, I try to think functionally, and do whatever's reasonable to avoid
+Ruby, I try to think functionally, and do whatever is reasonable to avoid
 mutating *anything*.
 
 If you *can't* change existing objects, you *can* trust those beautifully
