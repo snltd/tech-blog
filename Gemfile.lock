@@ -70,6 +70,7 @@ GEM
 
 PLATFORMS
   x86_64-linux
+  x86_64-solaris-2.11
 
 DEPENDENCIES
   addressable
