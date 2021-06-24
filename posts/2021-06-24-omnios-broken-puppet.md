@@ -16,8 +16,8 @@ Error: Could not prefetch package provider 'pkg': Unknown format pkg: im-[m]
 Error: Failed to apply catalog: Unknown format pkg: im-[m]
 ```
 
-This being Puppet, the error message isn't the clearest, and running with
-`--debug` only confused the issue.
+This being Puppet, the error message isn't the clearest, and running the agent
+with `--debug` didn't show me anything obvious.
 
 But it's Ruby, so it's easy to `grep` for the error message on the
 failing system, and a couple of minutes of `printf` debugging later, I'd
@@ -41,6 +41,7 @@ and it expects the second character of that column to be an `f` or a `-`. But
 in the errant OmniOS zone, I see stuff like this:
 
 ```
+NAME (PUBLISHER)                                  VERSION                    IFO
 ooce/database/mariadb-105 (extra.omnios)          10.5.10-151038.0           im-
 ooce/runtime/ruby-26 (extra.omnios)               2.6.7-151038.0             im-
 ```
@@ -54,9 +55,12 @@ release notes, and a quick search yielded
 > the flags column.
 
 Now the error makes sense, even if the wording made it a little cryptic at
-first.
+first. Perhaps I was unfair.
 
-You can actually nobble the 'm' flag with the `pkg flag` command,
+So there's a new flag in the IFO column, and Puppet doesn't know how to deal
+with it. Options?
+
+You can remove the 'm' flag with the `pkg flag` command,
 
 ```cmd
 # pkg list -H shell/zsh
@@ -70,7 +74,7 @@ shell/zsh                                         5.8-151038.0               i--
 ```
 
 but I can't see an elegant way to fix the problem with that. There are other
-new flag values too, and I think they provide useful info, so muting them
+new flag values too, and I think they all provide useful info, so muting them
 is off the agenda.
 
 The only solution is to educate Puppet.
@@ -80,8 +84,8 @@ I understand why the author wrote the code so defensively. It's better to say
 code.) But, I see no reason why Puppet should care about the any of the new
 flags, at least not with its current feature set.
 
-I suppose we could maybe have Puppet refuse to remove `M` flagged packages,
-which are fulfilled dependencies, but I don't think even that would be a
+I suppose we could have Puppet refuse to remove `M` flagged packages, which
+are fulfilled dependencies, but I don't think even that would be a
 particularly useful feature.
 
 To have Puppet ignore the new flags, just like it always ignored the `-`, we
@@ -91,29 +95,30 @@ only have to change that `when` statement to
 when '-', 'm', 'M', 'r', 'R'
 ```
 
-The greater difficulty is in deploying the fix. That is, not having to do
-something as long-winded as building and deploying our own custom gem; or doing
+The fix was easy, but deploying the fix is harder. I don't want to do
+something long-winded, like building and deploying a forked gem; or doing
 something awful like `sed`ding the stock gem after it's installed.
 
 Ideally, of course, I'd like to get a proper fix back into the official
 distribution. But even if I managed to do that, I use Puppet 5, which is two
-major version numbers out of date now, and I have no idea at all how Puppetlabs
+major version numbers out of date now, and I have no idea at all how Puppet
 deal with backporting fixes. More importantly, I need if fixed *now* because I
-can't build new zones!
+can't build new zones.
 
 My Puppet master already exports [a fork of Oracle's Solaris
-providers](https://github.com/snltd/puppet-solaris_providers), and my first
-thought was to copy a modified version of the provider into there, and hope
-that the master's version of the provider would be preferred to the clients.
-It wasn't. Then I spent a good while trying to coax it into that behaviour with
-`modulepath`, all without success.
+providers](https://github.com/snltd/puppet-solaris_providers), with a few
+tweaks for Illumos, and my first thought was to copy a modified version of the
+provider into there, hoping that the master's version of the provider would
+be preferred to the clients. So I did, and it wasn't. Then I spent a good
+while trying to coax it into that behaviour with `modulepath`, again without
+success.
 
 Eventually I went to [the Puppet community Slack](https://slack.puppet.com/)
 and a couple of very helpful people there explained that because the `pkg`
-provider is a "built in", if Puppet finds multiple versions of it, it will
-*always* choose the bundled one. It was also suggested I subclass the `pkg`
-provider, and use my site manifest to tell the OmniOS clients to use it. So
-that's exactly what I did.
+provider is a "built in", if Puppet finds other versions of it, they will
+*always* be ignored in favour of the bundled one. It was also suggested I
+subclass the `pkg` provider, and use my site manifest to tell the OmniOS
+clients to use it, and that's exactly what I did.
 
 This file is
 `/opt/local/etc/puppetlabs/code/modules/solaris_providers/lib/puppet/provider/package/oopkg.rb`
@@ -164,4 +169,4 @@ I intend to send Puppet a proper patch to deal with the new OmniOS features,
 but I needed a "right now" fix, and I think the one I ended up with wasn't
 *too* messy.
 
-Back to building those zones!
+Enough. I have zones to build.
