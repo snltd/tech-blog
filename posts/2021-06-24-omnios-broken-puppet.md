@@ -16,11 +16,10 @@ Error: Could not prefetch package provider 'pkg': Unknown format pkg: im-[m]
 Error: Failed to apply catalog: Unknown format pkg: im-[m]
 ```
 
-This being Puppet, [the error message isn't the
-best](https://daily-devops.tumblr.com/post/162863742721/malbolge-was-specifically-designed-to-be-almost),
-and running with `--debug` only confused the issue.
+This being Puppet, the error message isn't the clearest, and running with
+`--debug` only confused the issue.
 
-Fortunately it's Ruby, so it's easy to `grep` for the error message on the
+But it's Ruby, so it's easy to `grep` for the error message on the
 failing system, and a couple of minutes of `printf` debugging later, I'd
 tracked it down to [this
 block](https://github.com/puppetlabs/puppet/blob/c28e71c38d26c17b580d9eb672733e67a79a17c7/lib/puppet/provider/package/pkg.rb#L50-L57)
