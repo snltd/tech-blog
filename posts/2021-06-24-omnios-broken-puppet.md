@@ -82,11 +82,7 @@ The only solution is to educate Puppet.
 I understand why the author wrote the code so defensively. It's better to say
 "I don't know" than to wade in and do the wrong thing. (As true in life as in
 code.) But, I see no reason why Puppet should care about the any of the new
-flags, at least not with its current feature set.
-
-I suppose we could have Puppet refuse to remove `M` flagged packages, which
-are fulfilled dependencies, but I don't think even that would be a
-particularly useful feature.
+flags, at least not with its current feature set.[^1]
 
 To have Puppet ignore the new flags, just like it always ignored the `-`, we
 only have to change that `when` statement to
@@ -170,3 +166,7 @@ but I needed a "right now" fix, and I think the one I ended up with wasn't
 *too* messy.
 
 Enough. I have zones to build.
+
+[^1]: I suppose we could have Puppet refuse to remove `M` flagged packages,
+      which are implicitly fulfilled dependencies, but I don't think even that
+      would be a particularly useful feature.
