@@ -1,6 +1,6 @@
 ---
 title: "OmniOS - Broken Puppet"
-date: 2021-02-16
+date: 2021-06-23
 tags: [OmniOS, Puppet, Ruby]
 category: OmniOS
 ---
