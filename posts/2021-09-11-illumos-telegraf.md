@@ -1,6 +1,6 @@
 ---
 title: "Illumos Telegraf Plugins"
-date: 2021-05-25
+date: 2021-09-11
 tags: [Illumos, Telegraf, Go, Wavefront]
 category: articles
 ---
