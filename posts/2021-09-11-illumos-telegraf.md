@@ -218,7 +218,7 @@ a breakdown of the fault FMRI. A fault of
 `zfs://pool=big/vdev=3706b5d93e20f727` will therefore generate a point with a
 constant value of 1 and tags of `module = zfs`, `pool = big`, and `vdev =
 3706b5d93e20f727`. Put these in a table and they're a pretty useful metric.
-Sadly, Wavefront won't let me share table.
+Sadly, Wavefront won't let me share tables with you.
 
 ## IO
 
@@ -525,8 +525,8 @@ WQL> count(ts("dev.telegraf.zones.status"), brand)
 
 ## Zpool
 
-Zpool is another run-external-program cop-out. This time we parse `zpool
-list`, and offer up the various fields as numbers. Here you can see me
+Zpool is another run-external-program cop-out. For starters it parses `zpool
+list`, and offers up the various fields as numbers. Here you can see me
 alerting off >80% capacity.
 
 <script src="https://metrics.wavefront.com/embedded/y9Gck0SvMp/js"
@@ -551,6 +551,24 @@ id="wavefront-embedded-RfrYhrCFv3" width="700" height="300"></script>
 
 ```sql
 WQL> ts("dev.telegraf.zpool.status")
+```
+
+You can also turn on "status" metrics. This takes the output of `zpool status
+-pv <pool>` and turns it into numbers. As well as counting the errors in each
+device of the pool, it also plots the time since the last successful scrub
+(for easy alerting off not-scrubbed-in-forever pools), and plots the time of a
+resilver scrub. The actual elapsed time probably isn't so useful, but it being
+non-zero certainly can be.
+
+Here's a pool being scrubbed. The purple line (left axis) is the time since it
+was scrubbed, the blue line (right axis) the time spent scrubbing.
+
+<script src="https://metrics.wavefront.com/embedded/NZJ6fZYmqR/js"
+id="wavefront-embedded-NZJ6fZYmqR" width="700" height="300"></script>
+
+```sql
+WQL> ts("zpool.status.scrubTime", name="rpool")
+WQL> ts("zpool.status.timeSinceScrub", name="rpool")
 ```
 
 ## Making it Work
