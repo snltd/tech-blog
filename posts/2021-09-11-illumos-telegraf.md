@@ -172,14 +172,15 @@ fields using the real kstat names, but the plugin will `camelCase` them into
 `hardErrors` and `illegalRequest` and so-on. If any of the string-valued stats
 look useful, you can turn them into tags.
 
-The choice to output raw values also makes sense here, because you're probably
-if you're measuring the rate of disk errors, you've got real issues. Better to
+The choice to output raw values also makes sense here, because you're
+measuring the *rate* of errors on a disk, you've got real issues. Better to
 know cumulatively how many there have been.
 
-Here's where the "not specifying anything gets you everything" approach makes
-more sense. You may not know in advance what device IDs your disks will get,
-so by using a blank value, you'll get metrics about them all, wherever they
-land. Add more disks, get more metrics.
+The "not specifying anything gets you everything" approach also makes
+more sense in this context. You may not know in advance what device IDs your
+disks will get, so by using a blank value, you'll get metrics about them all,
+wherever they land. Add more disks, get more metrics, no configuration
+required.
 
 Here's my config, which checks disk health every ten minutes.
 
@@ -191,7 +192,7 @@ Here's my config, which checks disk health every ten minutes.
   devices = []
 ```
 
-Here is a disk dying in agony. Please excuse the screwy "size" tag: that bug
+And here is a disk dying in agony. Please excuse the screwy "size" tag: that bug
 is fixed now. The metric path is different from the others because these are
 production metrics. The alert ends because the disk was taken out of the
 pool.
