@@ -1,18 +1,4 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-gem 'addressable'
-gem 'faraday'
-gem 'kramdown'
-gem 'kramdown-parser-gfm'
-gem 'minitest'
-gem 'nokogiri'
-gem 'puma'
-gem 'rack-test'
-gem 'rake'
-gem 'rouge'
-gem 'rubocop'
-gem 'rubocop-rake'
-gem 'sinatra'
-gem 'slim'
-gem 'tilt'
+gemspec

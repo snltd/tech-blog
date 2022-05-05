@@ -28,10 +28,11 @@ class SysdefIndexPostsTest < MiniTest::Test
   def test_index
     out = tu.index
     assert_instance_of(Array, out)
+    expected_keys = %i[title date file]
 
     out.each do |p|
       assert_instance_of(Hash, p)
-      assert_equal([], %i[title date file] - p.keys)
+      assert_empty(expected_keys - p.keys)
     end
   end
 
