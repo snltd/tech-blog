@@ -25,14 +25,6 @@ Gem::Specification.new do |gem|
                           'public/**', 'views/**', 'Rakefile', 'robots.txt']
 
   gem.platform      = Gem::Platform::RUBY
-  gem.add_dependency 'addressable', '~> 2.8'
-  gem.add_dependency 'kramdown', '~> 2.4'
-  gem.add_dependency 'kramdown-parser-gfm', '~> 1.1'
-  gem.add_dependency 'puma', '~> 5.6'
-  gem.add_dependency 'rouge', '~> 3.26'
-  gem.add_dependency 'sinatra', '~>2.2'
-  gem.add_dependency 'slim', '~> 4.1'
-  gem.add_dependency 'tilt', '~> 2.0'
 
   gem.add_development_dependency 'bundler', '~> 2.3'
   gem.add_development_dependency 'faraday', '~> 2.2'
