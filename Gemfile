@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-gemspec
 
 gem 'addressable', '~> 2.8'
 gem 'kramdown', '~> 2.4'
 gem 'kramdown-parser-gfm', '~> 1.1'
 gem 'puma', '~> 6.4'
+gem 'rackup', '~> 2.1'
 gem 'rake', '~> 13.1'
 gem 'rouge', '~> 4.2'
 gem 'sinatra', '~> 4.0'
 gem 'slim', '~> 5.2'
-gem 'rackup', '~> 2.1'
 
 gem 'faraday', '~> 2.2', group: :development
 gem 'minitest', '~> 5.21', group: :development

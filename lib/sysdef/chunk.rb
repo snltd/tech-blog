@@ -11,7 +11,7 @@ module Sysdef
   class Chunk
     attr_reader :file, :raw, :metadata
 
-    def initialize(file, str, mdata = false)
+    def initialize(file, str, mdata: false)
       @file = file
       @raw = str
       @metadata = mdata || extract_metadata
@@ -34,12 +34,12 @@ module Sysdef
       puts e
       LOG.warn format("%<fname>s: could not parse '%<mdata>s'",
                       fname: file.basename,
-                      mdata: metadata.gsub(/\n/, '\n'))
+                      mdata: metadata.gsub("\n", '\n'))
       {}
     end
 
     def split_off_metadata
-      raw.split(/\n\n/, 2)
+      raw.split("\n\n", 2)
     end
   end
 end

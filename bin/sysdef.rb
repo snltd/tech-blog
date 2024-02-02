@@ -9,9 +9,9 @@ require 'pathname'
 require_relative '../lib/sysdef'
 
 ROOT          = Pathname.new(__dir__).parent.realpath.freeze
-POST_DIR      = ROOT + 'posts'
-DRAFT_DIR     = ROOT + 'drafts'
-ARTICLE_DIR   = ROOT + 'articles'
+POST_DIR      = ROOT.join('posts')
+DRAFT_DIR     = ROOT.join('drafts')
+ARTICLE_DIR   = ROOT.join('articles')
 POST_INDEX    = Sysdef::IndexPosts.new(POST_DIR)
 ARTICLE_INDEX = Sysdef::IndexArticles.new(ARTICLE_DIR)
 LOG           = Logger.new($stdout)

@@ -1,12 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'rack/builder'
+
 %w[minitest minitest/unit minitest/autorun rack/test pathname
    erb nokogiri].each { |f| require f }
 
 APP_ROOT = Pathname.new(__dir__).realpath.parent.parent
 
-OUTER_APP = Rack::Builder.parse_file((APP_ROOT + 'config.ru').to_s).first
+OUTER_APP = Rack::Builder.parse_file(APP_ROOT.join('config.ru').to_s)
 
 # Acceptance tests for the Sysdef website. Just hit the app lots and
 # lots of times

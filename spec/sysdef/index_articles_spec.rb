@@ -31,7 +31,7 @@ class SysdefIndexArticlesTest < MiniTest::Test
     assert_equal('A New Wavefront CLI', article[:title])
     assert_equal(%w[Wavefront Ruby], article[:tags])
     assert_instance_of(Date, article[:date])
-    assert_equal(ARTICLE_DIR + 'wavefront-cli.md', article[:file])
+    assert_equal(ARTICLE_DIR.join('wavefront-cli.md'), article[:file])
     assert_equal('wavefront-cli', article[:page])
   end
 end

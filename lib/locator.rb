@@ -3,5 +3,5 @@
 require 'pathname'
 
 def locate_config_ru
-  Pathname.new(__dir__).parent + 'config.ru'
+  Pathname.new(__dir__).parent.join('config.ru')
 end
