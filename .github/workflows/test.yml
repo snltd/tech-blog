@@ -1,9 +1,7 @@
-name: Test
+name: Test Ruby
 
 on:
   push:
-    tags-ignore:
-      - '\d+.\d+.\d+'
 
 jobs:
   test:
