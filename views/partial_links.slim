@@ -4,10 +4,9 @@
   ul#post_links
     - list_of_pages.each do |year, pages|
       li
-        .page_year
-          == year
-          span.year_toggle id="#toggle_#{year}" onclick="toggleBlock(#{year})"
-           |-
+        details(open=expanders.include?(year))
+          summary 
+            == year
           .page_block id="#block_#{year}"
             ul
               - pages.each do |link, data|
