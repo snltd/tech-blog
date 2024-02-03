@@ -14,7 +14,7 @@ module Sysdef
     # @param ident [String] of the form YYYY-mm-dd-title-of-post
     #
     def initialize(ident)
-      @file = dir + (ident + '.md')
+      @file = dir.join("#{ident}.md")
       @chunks = ChunkedFile.new(file)
     end
 

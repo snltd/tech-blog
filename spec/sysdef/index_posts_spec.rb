@@ -54,7 +54,7 @@ class SysdefIndexPostsTest < MiniTest::Test
     assert_equal(['DevOps', 'Rant', 'professional suicide'], post[:tags])
     assert_equal('articles', post[:category])
     assert_equal('2015-05-05-why-i-hate-devops', post[:page])
-    assert_equal(POST_DIR + '2015-05-05-why-i-hate-devops.md', post[:file])
+    assert_equal(POST_DIR.join('2015-05-05-why-i-hate-devops.md'), post[:file])
     assert_instance_of(Time, post[:mtime])
   end
 

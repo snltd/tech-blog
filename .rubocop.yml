@@ -1,4 +1,5 @@
 ---
+
 require:
   - rubocop-rake
   - rubocop-minitest
@@ -6,13 +7,4 @@ require:
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.7
-
-Style/StringConcatenation:
-  Enabled: false
-
-Style/OptionalBooleanParameter:
-  Enabled: false
-
-Naming/VariableNumber:
-  Enabled: false
+  TargetRubyVersion: 3.2

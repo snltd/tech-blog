@@ -93,7 +93,7 @@ module Sysdef
 
       return aggr[year][datelink] = display unless aggr[year].key?(datelink)
 
-      aggr[year][datelink][:artists].<< entry[:artist]
+      aggr[year][datelink][:artists] << entry[:artist]
     end
 
     def menu_item(entry)

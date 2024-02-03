@@ -1,5 +1,6 @@
-AllCops:
-  NewCops: enable
+---
+inherit_from:
+  - ../.rubocop.yml
 
 # Allow long blocks of tests
 #
@@ -11,6 +12,3 @@ Metrics/AbcSize:
 
 Metrics/ClassLength:
   Max: 300
-
-Style/StringConcatenation:
-  Enabled: false
