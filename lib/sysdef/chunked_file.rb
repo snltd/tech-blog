@@ -25,8 +25,8 @@ module Sysdef
     private
 
     def parse
-      IO.read(file, encoding: 'UTF-8').split(/^---$/, 2).map(&:strip)
-        .reject(&:empty?).map { |str| Sysdef::Chunk.new(file, str) }
+      File.read(file, encoding: 'UTF-8').split(/^---$/, 2).map(&:strip)
+          .reject(&:empty?).map { |str| Sysdef::Chunk.new(file, str) }
     rescue StandardError
       LOG.error format('cannot read file %<file>s', file: file)
       raise Sinatra::NotFound

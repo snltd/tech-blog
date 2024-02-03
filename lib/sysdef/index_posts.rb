@@ -40,7 +40,7 @@ module Sysdef
     # @return [Array[Hash]] of post metadata.
     #
     def build_global_index
-      file_list.map { |f| index_entry(f) }.flatten.reject(&:nil?)
+      file_list.map { |f| index_entry(f) }.flatten.compact
     end
 
     # Read a post and extract from it the YAML metadata block.

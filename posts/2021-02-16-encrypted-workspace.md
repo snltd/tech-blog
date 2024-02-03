@@ -8,7 +8,8 @@ category: Solaris
 This is an update of [a ten-year old
 page](/post/2011-04-20-zfs-encrypted-workspace). describing a task I have to
 do infrequently enough that I *always* forget the command syntax. The original
-page was for Solaris, this one updates it for OmniOS.
+page was for Solaris, this one updates it for OmniOS, because once I looked up
+how to do it on that original post, I always found it didn't work.
 
 ## Encrypted Workspace - Always Mounted
 
@@ -32,7 +33,7 @@ OmniOS:
 # zfs create \
   -o encryption=aes-256-ccm \
   -o keyformat=raw \
-  -o keylocation=file:///etc/mykey
+  -o keylocation=file:///etc/mykey \
   tank/encrypted_dataset_1
 ```
 
@@ -60,7 +61,7 @@ OmniOS:
   -o encryption=aes-256-ccm \
   -o keyformat=passphrase \
   -o keylocation=prompt \
-  tank/encrypted_dataset_1
+  tank/encrypted_dataset_2
 ```
 
 Solaris:
@@ -69,10 +70,10 @@ Solaris:
 # zfs create \
   -o encryption=aes-256-ccm \
   -o keysource=passphrase,prompt \
-  tank/encrypted_dataset_1
+  tank/encrypted_dataset_2
 ```
 
-You'll have to mount this filesystem manually whenever you want to
+You'll have to mount this dataset manually whenever you want to
 use it. I have a couple of them, and I usually do
 
 ```cmd

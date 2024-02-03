@@ -25,5 +25,5 @@ answer he was looking for.
 I don't remember if I was offered the job or not.
 
 ```ruby
-ruby -e "puts (('a'..'z').to_a - (%x(ls --help).downcase.scan(/^\s+-([a-z])/).uniq.flatten))"
+ruby -e "p ('a'..'z').to_a - (%x(ls --help).downcase.scan(/^ +-(\w)/).flatten)
 ```
