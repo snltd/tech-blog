@@ -1,3 +1,5 @@
+- expanders = expand_years
+
 .sidebar_block
   .bartitle
     | blog posts
@@ -7,22 +9,21 @@
         details(open=expanders.include?(year))
           summary 
             == year
-          .page_block id="#block_#{year}"
-            ul
-              - pages.each do |link, data|
-                li
-                  - if @page && @page[:meta][:title] == data[:title]
-                    .this_page
+          ul
+            - pages.each do |link, data|
+              li
+                - if @page && @page[:meta][:title] == data[:title]
+                  .this_page
+                    ==> data[:title]
+                    | (
+                    == data[:date].strftime('%B %d')
+                    | )
+                - else
+                    a href="#{link}"
                       ==> data[:title]
-                      | (
-                      == data[:date].strftime('%B %d')
-                      | )
-                  - else
-                      a href="#{link}"
-                        ==> data[:title]
-                      | (
-                      == data[:date].strftime('%B %d')
-                      | )
+                    | (
+                    == data[:date].strftime('%B %d')
+                    | )
 .sidebar_block
   .bartitle
     | articles

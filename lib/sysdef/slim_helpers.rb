@@ -15,4 +15,11 @@ module SlimHelpers
   def top_tags
     POST_INDEX.top_tags
   end
+
+  def expand_years
+    this_year = Date.today.year
+    ret = this_year.downto(2020).to_a
+    ret << @page[:meta][:date].year if @page&.dig(:meta, :date)
+    ret
+  end
 end
