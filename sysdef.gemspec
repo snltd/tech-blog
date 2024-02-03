@@ -26,17 +26,6 @@ Gem::Specification.new do |gem|
 
   gem.platform      = Gem::Platform::RUBY
 
-  gem.add_development_dependency 'bundler', '~> 2.3'
-  gem.add_development_dependency 'faraday', '~> 2.2'
-  gem.add_development_dependency 'minitest', '~> 5.15'
-  gem.add_development_dependency 'nokogiri', '~> 1.13'
-  gem.add_development_dependency 'rack-test', '~> 1.1'
-  gem.add_development_dependency 'rake', '~> 13.0'
-  gem.add_development_dependency 'rubocop', '~> 1.8'
-  gem.add_development_dependency 'rubocop-minitest', '~> 0.10'
-  gem.add_development_dependency 'rubocop-performance', '~> 1.3'
-  gem.add_development_dependency 'rubocop-rake', '~> 0.5'
-
-  gem.required_ruby_version = Gem::Requirement.new('>= 2.7.2')
+  gem.required_ruby_version = Gem::Requirement.new('>= 3.2.2')
   gem.metadata['rubygems_mfa_required'] = 'true'
 end

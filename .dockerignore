@@ -1,0 +1,6 @@
+# flyctl launch added from .gitignore
+**/.yardoc
+doc
+**/.*swp
+**/*.gem
+drafts/
