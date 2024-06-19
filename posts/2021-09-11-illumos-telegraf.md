@@ -40,7 +40,7 @@ collected. This was partly down to the "just get it done" first iteration, but
 I've found it works perfectly well.
 
 Most of my charts, as you'll see later, simply convert the raw values with a
-`rate()` function, which is no effort at all, and I've even found that
+`rate()`-type function, which is no effort at all, and I've even found that
 raw values can even be better than rates, in some circumstances.
 Often I wish to alert off changes over time, rather than thresholds, and it's
 far easier to reliably turn a counter into a rate than the other way round.
@@ -89,12 +89,10 @@ Here is a chart of some of those `sys` metrics, along with the Wavefront
 generate it. Hover over the points to see the extra dimensions, or tags, or
 labels, or whatever you prefer to call them.
 
-<script src="https://metrics.wavefront.com/embedded/whY52xZSmT/js"
-id="wavefront-embedded-whY52xZSmT" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/1RfCywk1jc/js" id="wavefront-embedded-1RfCywk1jc" width="800" height="300"></script>
 
 ```sql
-WQL> rate(sum(ts("dev.telegraf.cpu.nsec.*"), metrics)) / 4e7
-WQL> mavg(10m, rate(sum(ts("dev.telegraf.cpu.nsec.*"))) / 4e7)
+WQL> deriv(sum(ts("cpu.nsec.*", source=${host}), coreID)) / (count(ts("cpu.nsec.dtrace", source=${host})) * 1e7)
 ```
 
 The first query sums the different types of CPU usage presented by the kstats
@@ -112,16 +110,15 @@ Pretty standard stuff.
 It might be more interesting to look at a per-zone breakdown. To turn this on,
 set `zone_cpu_stats` to true, and you'll get something like this.
 
-<script src="https://metrics.wavefront.com/embedded/vqwbpMqbcQ/js"
-id="wavefront-embedded-vqwbpMqbcQ" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/RMnJHWBWwW/js" id="wavefront-embedded-RMnJHWBWwW" width="800" height="300"></script>
 
 ```sql
-WQL> rate(sum(ts("dev.telegraf.cpu.zone.*"), name)) / 4e7
+WQL> sum(deriv(ts("cpu.zone.*", source=${host})), name) / (count(ts("cpu.nsec.user", source=${host})) * 1e7)
 ```
 
-This is a largely idle system: the spikes are Puppet running in
-each zone, with the global burbling along running things, and it looks like
-something maxed out a core in `cube-ws` for about five minutes. You get
+You can see a few builds happening in `serv-build`; `serv-fs` booting up about
+halfway along, and a bit of spikiness where Ansible ran and asserted the state
+of all the zones. The kernel exposes, and the collector collects,
 system and user times for each zone, but here I've summed them for a "total
 CPU per zone" metric.
 
@@ -129,11 +126,10 @@ Turning on `cpu_info_stats` looks at the `cpu_info`. It produces a single
 metric at the moment: the current speed of the VCPU, tagged with some other,
 potentially useful, information.
 
-<script src="https://metrics.wavefront.com/embedded/X12RSlWQ6C/js"
-id="wavefront-embedded-X12RSlWQ6C" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/lq3rkyW124/js" id="wavefront-embedded-lq3rkyW124" width="800" height="300"></script>
 
 ```sql
-WQL> ts("dev.telegraf.cpu.info.speed")
+WQL> ts("cpu.info.speed", source=${host})
 ```
 
 ## Disk Health
@@ -192,16 +188,20 @@ Here's my config, which checks disk health every ten minutes.
   devices = []
 ```
 
-And here is a disk dying in agony. Please excuse the screwy "size" tag: that bug
-is fixed now. The metric path is different from the others because these are
-production metrics. The alert ends because the disk was taken out of the
-pool.
+I used to have a lovely chart here of 
+a disk dying in agony. Sadly, the data expired, so now the best I can do is
+show you a few illegal request errors from a USB drive I use for backups.
 
-<script src="https://metrics.wavefront.com/embedded/pdnzbqzdKN/js"
-id="wavefront-embedded-pdnzbqzdKN" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/JMNZ75XT6P/js" id="wavefront-embedded-JMNZ75XT6P" width="800" height="300"></script>
 
 ```sql
-WQL> ts("diskHealth.transportErrors", serialNo="WD-WCC7K3ZVCRH6")
+WQL> ceil(deriv(ts("diskHealth.*", source=${host})))
+```
+
+<script src="https://metrics.wavefront.com/embedded/11hnPSbXT2/js" id="wavefront-embedded-11hnPSbXT2" width="800" height="300"></script>
+
+```sql
+WQL> sum(ts("diskHealth.*", source=${host}), product, serialNo)
 ```
 
 ## FMA
@@ -281,21 +281,12 @@ and, as usual, selecting none gets you all of them. You can also select the
 kstat fields you wish to collect, and they're emitted as raw values, so you'll
 likely need to get your `rate()` on.
 
-<script src="https://metrics.wavefront.com/embedded/dq77sN9L2J/js"
-id="wavefront-embedded-dq77sN9L2J" width="700" height="300"></script>
+This is a view of bytes written, broken down by zpool:
+
+<script src="https://metrics.wavefront.com/embedded/WfhfvnnrFs/js" id="wavefront-embedded-WfhfvnnrFs" width="800" height="300"></script>
 
 ```sql
-WQL> rate(ts("dev.telegraf.io.nwritten", module="sd"))
-```
-
-You can see from that that I have mirrored disks. Here's the same view by
-pool, which probably makes more sense.
-
-<script src="https://metrics.wavefront.com/embedded/71w2KZrxRg/js"
-id="wavefront-embedded-71w2KZrxRg" width="700" height="300"></script>
-
-```sql
-WQL> rate(ts("dev.telegraf.io.nwritten", module="zfs"))
+WQL> rate(ts("io.nwritten", source=${host} and module="zfs"))
 ```
 
 ## Memory
@@ -321,21 +312,13 @@ optional. Here's the config:
 `swap` (as in `on` and `fields`) uses the output of `swap -s`, turning the
 numbers into bytes.
 
-<script src="https://metrics.wavefront.com/embedded/ZvcD7WTmFD/js"
-id="wavefront-embedded-ZvcD7WTmFD" width="700" height="300"></script>
-
-```sql
-WQL> ts("dev.telegraf.memory.swap.*")
-```
-
 `vminfo` looks at the `unix:0:vminfo` kstat, and converts the values it finds
 there, which are in pages, into bytes.
 
-<script src="https://metrics.wavefront.com/embedded/XgNdmP6l2j/js"
-id="wavefront-embedded-XgNdmP6l2j" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/wW9TBYyS8W/js" id="wavefront-embedded-wW9TBYyS8W" width="800" height="300"></script>
 
 ```sql
-WQL> ts("dev.telegraf.memory.vminfo.*")
+WQL> deriv(ts("memory.vminfo.*", source=${host}))
 ```
 
 `cpuvm` uses the `cpu:n:vm` kstats:
@@ -384,24 +367,48 @@ level seemed excessive to me, so I added the `cpuvm_aggregate` switch, which
 adds everything together and puts them under an `aggregate` metric path. I use
 these numbers to look for paging and swapping.
 
-<script src="https://metrics.wavefront.com/embedded/F2c1ZWJZt8/js"
-id="wavefront-embedded-F2c1ZWJZt8" width="700" height="300"></script>
-
-```sql
-WQL> ts("dev.telegraf.memory.cpuVm.vm.aggregate.*")
-```
-
 Finally, there are the `extra` fields, which look for the size of the kernel,
 ZFS ARC, and the freelist. These are all kstats, but they're gauge values, so
 there's no need to process them further.
 
-<script src="https://metrics.wavefront.com/embedded/Ps5KNvtD4d/js"
-id="wavefront-embedded-Ps5KNvtD4d" width="700" height="300"></script>
+This is their view of a machine booting:
+
+<script src="https://metrics.wavefront.com/embedded/n6nkZwswxH/js" id="wavefront-embedded-n6nkZwswxH" width="800" height="300"></script>
 
 ```sql
-WQL> ts("dev.telegraf.memory.arcsize")
-WQL> ts("dev.telegraf.memory.kernel")
-WQL> ts("dev.telegraf.memory.freelist")
+WQL> ts("memory.arcsize", source=${host})
+WQL> ts("memory.kernel", source=${host})
+WQL> ts("memory.freelist", source=${host})
+```
+
+Per-zone memory stats are also available, via `memory_cap`
+
+```cmd
+$ kstat memory_cap:1            
+module: memory_cap                      instance: 1     
+name:   serv-dns                        class:    zone_memory_cap
+        anon_alloc_fail                 0
+        anonpgin                        0
+        crtime                          67.911936037
+        execpgin                        0
+        fspgin                          0
+        nover                           0
+        pagedout                        0
+        pgpgin                          0
+        physcap                         314572800
+        rss                             59822080
+        snaptime                        41874.005818820
+        swap                            66465792
+        swapcap                         314572800
+        zonename                        serv-dns
+```
+
+These are gauge metrics, so no need to process them further. Let's look at RSS:
+
+<script src="https://metrics.wavefront.com/embedded/RgB6GpCz6s/js" id="wavefront-embedded-RgB6GpCz6s" width="800" height="300"></script>
+
+```sql
+WQL> ts("memory.zone.rss", source=${host} and zone=${zone})
 ```
 
 ## Network
@@ -410,12 +417,11 @@ The network plugin tries to be at least a little smart. If you hover over this
 chart and look at the legend you'll see it's collecting network metrics for
 all VNICs, and attempting to add meaningful tags to them.
 
-<script src="https://metrics.wavefront.com/embedded/79ZCn47NHH/js"
-id="wavefront-embedded-79ZCn47NHH" width="700" height="300"></script>
-
+<script src="https://metrics.wavefront.com/embedded/kmCpMfQTBV/js" id="wavefront-embedded-kmCpMfQTBV" width="800" height="300"></script>
 
 ```sql
-WQL> rate(ts("dev.telegraf.net.obytes64"))
+WQL> rate(ts("net.obytes64", source=${host} and zone != "global" and zone = "${zone}"))
+WQL> rate(ts("net.obytes64", source=${host} and zone = "global")) - sum(${zones})
 ```
 
 It can work out the zone, by running `dlamd(1m)` each time it is invoked, and
@@ -436,13 +442,14 @@ of `kstat(1m)`, but doing things cleanly, it's not possible. So if NGZ NFS is
 a big thing to you, you're stuck using per-zone Telegrafs.
 
 You can choose which NFS protocol versions you require, and then you just pick
-your kstats like all the other plugins. The NFS version is a tag.
+your kstats like all the other plugins. The NFS version is a tag. This chart
+aggregates my main global zone Telegraf with another which runs in a local 
+NFS server zone.
 
-<script src="https://metrics.wavefront.com/embedded/QWYfDZnQSQ/js"
-id="wavefront-embedded-QWYfDZnQSQ" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/nBcXXXKWY3/js" id="wavefront-embedded-nBcXXXKWY3" width="800" height="300"></script>
 
 ```sql
-WQL> rate(ts("dev.telegraf.nfs.server.*", nfsVersion="v4"))
+WQL> rate(ts("nfs.server.*"))
 ```
 
 ## Packages
@@ -453,13 +460,11 @@ see into NGZs from the global, but I haven't got round to it yet.
 
 Here you can see me upgrading my dev server.
 
-<script src="https://metrics.wavefront.com/embedded/DkSnTyfwYX/js"
-id="wavefront-embedded-DkSnTyfwYX" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/0frZqVvmdF/js" id="wavefront-embedded-0frZqVvmdF" width="800" height="300"></script>
 
 
 ```sql
-WQL> ts("dev.telegraf.packages.upgradeable")
-WQL> events(name="patch cube")
+WQL> ts("packages.upgradeable", source=${host})
 ```
 
 The caveat here is that something needs to continually refresh the package
@@ -474,22 +479,9 @@ it see the states of services in all non-global zones. Here's just one NGZ,
 seen from the global. You can, of course, specify which zones you're
 interested in, and specifying none gets you the lot.
 
-<script src="https://metrics.wavefront.com/embedded/dNbS8yyBQ1/js"
-id="wavefront-embedded-dNbS8yyBQ1" width="700" height="300"></script>
+The tagging is rich enough that you can get a table of errant services.
 
-```sql
-WQL> ts("dev.telegraf.smf.states", zone="cube-pkgsrc")
-```
-
-You can also get more detailed breakdowns of errant services. Normally I
-present this data as a table, but that won't work here.
-
-<script src="https://metrics.wavefront.com/embedded/sXr43DY9NN/js"
-id="wavefront-embedded-sXr43DY9NN" width="700" height="300"></script>
-
-```sql
-WQL> ts("dev.telegraf.smf.errors", zone="cube-pkgsrc")
-```
+<script src="https://metrics.wavefront.com/embedded/zDS1GWH7DK/js" id="wavefront-embedded-zDS1GWH7DK" width="800" height="200"></script>
 
 If you don't want the detailed service view, or you're worried applying
 service names as tags will cause high cardinality, you can set
@@ -513,28 +505,25 @@ been rebuilt in too long.
 
 Each point on these metric paths comes with a bunch of tags like brand, IP
 type and status. Filtering and grouping on these can turn up lots of useful
-and interesting data.
+and interesting data. Or you can just count zones.
 
-I display this as a pie chart, but Wavefront can't share those either.
-
-<script src="https://metrics.wavefront.com/embedded/z9mF2cL0wd/js"
-id="wavefront-embedded-z9mF2cL0wd" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/3SqBlyfrTl/js" id="wavefront-embedded-3SqBlyfrTl" width="800" height="300"></script>
 
 ```sql
-WQL> count(ts("dev.telegraf.zones.status"), brand)
+WQL> count(ts("zones.uptime", source=${host}), brand)
 ```
 
 ## Zpool
 
 Zpool is another run-external-program cop-out. For starters it parses `zpool
-list`, and offers up the various fields as numbers. Here you can see me
-alerting off >80% capacity.
+list`, and offers up the various fields as numbers. 
 
-<script src="https://metrics.wavefront.com/embedded/y9Gck0SvMp/js"
-id="wavefront-embedded-y9Gck0SvMp" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/9wFhqVLtnW/js" id="wavefront-embedded-9wFhqVLtnW" width="300" height="200"></script>
+
+<script src="https://metrics.wavefront.com/embedded/vkwVf62qL9/js" id="wavefront-embedded-vkwVf62qL9" width="800" height="300"></script>
 
 ```sql
-WQL> ts("dev.telegraf.zpool.cap")
+WQL> ts("zpool.cap", source=${host})
 ```
 
 There's a synthetic "health" metric too. This converts the health of the pool
@@ -544,15 +533,7 @@ to a number. I put the mapping in my chart annotation:
 0 = ONLINE, 1 = DEGRADED, 2 = SUSPENDED, 3 = UNAVAIL, 4 = unknown
 ```
 
-and as you can see from this chart, I alert off non-zero values. Here's an
-errant pool being fixed:
-
-<script src="https://metrics.wavefront.com/embedded/RfrYhrCFv3/js"
-id="wavefront-embedded-RfrYhrCFv3" width="700" height="300"></script>
-
-```sql
-WQL> ts("dev.telegraf.zpool.status")
-```
+And I can alert off non-zero states.
 
 You can also turn on "status" metrics. This takes the output of `zpool status
 -pv <pool>` and turns it into numbers. As well as counting the errors in each
@@ -561,15 +542,10 @@ device of the pool, it also plots the time since the last successful scrub
 resilver scrub. The actual elapsed time probably isn't so useful, but it being
 non-zero certainly can be.
 
-Here's a pool being scrubbed. The purple line (left axis) is the time since it
-was scrubbed, the blue line (right axis) the time spent scrubbing.
-
-<script src="https://metrics.wavefront.com/embedded/NZJ6fZYmqR/js"
-id="wavefront-embedded-NZJ6fZYmqR" width="700" height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/5qrNjXX23K/js" id="wavefront-embedded-5qrNjXX23K" width="800" height="200"></script>
 
 ```sql
-WQL> ts("zpool.status.scrubTime", name="rpool")
-WQL> ts("zpool.status.timeSinceScrub", name="rpool")
+WQL> ts("zpool.status.timeSinceScrub", host=${host})
 ```
 
 ## Making it Work

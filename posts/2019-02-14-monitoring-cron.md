@@ -224,12 +224,7 @@ Because we need a real timestamp now, I changed the declaration of
 script, and piping it into `nc wavefront 2878` I had data. Here are
 the times of cron jobs running in my global zone.
 
-<script src="https://metrics.wavefront.com/embedded/lCpxntHK8B/js"
-id="wavefront-embedded-lCpxntHK8B" width="700"
-height="300"></script>
-
-If you hover over the points, you'll see that the top one is
-`zfs_snapshot`.  But the other two just say `/usr/bin/sh`.
+<script src="https://metrics.wavefront.com/embedded/nF1mv04pFw/js" id="wavefront-embedded-nF1mv04pFw" width="800" height="300"></script>
 
 When you have a call to a program as your cron task, like
 `/bin/zfs_snapshot`, that gets executed as-is. But anything "shell
@@ -310,9 +305,10 @@ fbt::proc_exit:entry
 
 Which gives me this. (I've selected just a few zones, for clarity.)
 
-<script src="https://metrics.wavefront.com/embedded/qlg31jQcpT/js"
-id="wavefront-embedded-qlg31jQcpT" width="700"
-height="300"></script>
+<script src="https://metrics.wavefront.com/embedded/KlY8rsDyTD/js" id="wavefront-embedded-KlY8rsDyTD" width="800" height="300"></script>
+
+There is a separate table display for failed jobs, which was pretty much
+the point of the exercise.
 
 I wrapped everything up in an SMF manifest, running as a normal user
 but granting DTrace privileges.
