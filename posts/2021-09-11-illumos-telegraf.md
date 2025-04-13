@@ -7,7 +7,7 @@ category: articles
 
 Some time ago I made [some Solaris collectors for
 Diamond](https://github.com/snltd/sunos-diamond-collectors), and I also
-[wrote about making them](https://sysdef.xyz/tag/Diamond). Those collectors
+[wrote about making them](/tag/Diamond). Those collectors
 work great: I've had them running for about four years with no issue, in
 conjunction with [a Wavefront
 output](https://github.com/python-diamond/Diamond/pull/632) that ain't never
@@ -21,8 +21,8 @@ So I cobbled together [some really sketchy Telegraf
 inputs](https://github.com/snltd/solaris-telegraf-plugins/tree/28949e2ad61e9d02b0a033d36420289eee7f27d9).
 They worked well enough, but they weren't well written, had no tests, and they
 didn't have anything like the coverage of the Diamond ones. Because I was
-using the lamented Joyent Public Cloud at the time, I targeted them
-specifically for non-global SmartOS zones, so they weren't much good for
+using the lamented Joyent Public Cloud at the time, I tailored them
+specifically for non-global SmartOS zones, which meant they weren't much good for
 monitoring servers.
 
 Recently I decided to rework the Telegraf plugins, hoping to replace my creaky
@@ -208,7 +208,8 @@ WQL> sum(ts("diskHealth.*", source=${host}), product, serialNo)
 
 The `illumos_fma` collector shells out to `fmstat(1m)` and `fmadm(1m)`,
 turning their output into numbers. I don't think there's a huge amount of
-value in the `fmstat` metrics, though they do give a little insight into how
+value in the `fmstat` metrics, at least on the little home machines I have,
+though they do give a little insight into how
 FMA actually works. I don't collect them now.
 
 I do, however, collect, and alert off, the `fma.fmadm.faults` metric. Anything
@@ -219,7 +220,6 @@ a breakdown of the fault FMRI. A fault of
 `zfs://pool=big/vdev=3706b5d93e20f727` will therefore generate a point with a
 constant value of 1 and tags of `module = zfs`, `pool = big`, and `vdev =
 3706b5d93e20f727`. Put these in a table and they're a pretty useful metric.
-Sadly, Wavefront won't let me share tables with you.
 
 ## IO
 
@@ -294,19 +294,21 @@ WQL> rate(ts("io.nwritten", source=${host} and module="zfs"))
 The memory plugin takes its info from a number of sources, all of which are
 optional. Here's the config:
 
-
 ```toml
 [[inputs.illumos_memory]]
- swap_on = true
- swap_fields = ["allocated", "reserved", "used", "available"]
- extra_on = true
- extra_fields = ["kernel", "arcsize", "freelist"]
- vminfo_on = true
- vminfo_fields = ["freemem", "swap_alloc", "swap_avail", "swap_free", "swap_resv"]
- cpuvm_on =true
- cpuvm_fields = ["pgin", "anonpgin", "pgpgin", "pgout", "anonpgout", "pgpgout",
-                 "swapin", "swapout", "pgswapin", "pgswapout"]
- cpuvm_aggregate = true
+  swap_on = true
+  swap_fields = ["allocated", "reserved", "used", "available"]
+  extra_on = true
+  extra_fields = ["kernel", "arcsize", "freelist"]
+  vminfo_on = true
+  vminfo_fields = ["freemem", "swap_alloc", "swap_avail", "swap_free", "swap_resv"]
+  cpuvm_on =true
+  cpuvm_fields = ["pgin", "anonpgin", "pgpgin", "pgout", "anonpgout", "pgpgout",
+                  "swapin", "swapout", "pgswapin", "pgswapout"]
+  cpuvm_aggregate = true
+  zone_memcap_on = true
+  zone_memcap_zones = []
+  zone_memcap_fields = ["physcap", "rss", "swap"]
 ```
 
 `swap` (as in `on` and `fields`) uses the output of `swap -s`, turning the
@@ -441,8 +443,9 @@ could do something horrible, like `zlogin` into the NGZ and parse the output
 of `kstat(1m)`, but doing things cleanly, it's not possible. So if NGZ NFS is
 a big thing to you, you're stuck using per-zone Telegrafs.
 
-You can choose which NFS protocol versions you require, and then you just pick
-your kstats like all the other plugins. The NFS version is a tag. This chart
+You can choose which NFS protocol versions you require with the `nfs_versions`
+setting, and then you just pick
+your kstat `fields` like all the other plugins. The NFS version is a tag. This chart
 aggregates my main global zone Telegraf with another which runs in a local 
 NFS server zone.
 
@@ -452,11 +455,39 @@ NFS server zone.
 WQL> rate(ts("nfs.server.*"))
 ```
 
+## OS
+
+This one is so dumb you can't even configure it. Its value is always one, but
+the tags might be useful for something. I completely ripped it off from Prometheus
+Node Exporter.
+
+<script src="https://metrics.wavefront.com/embedded/7hNM4dkc6F/js" id="wavefront-embedded-7hNM4dkc6F" width="800" height="200"></script>
+
 ## Packages
 
-This just counts the number of packages which can be upgraded. It works in a
-`pkg(5)` or `pkgin` zone, but can't see other zones. I plan to make it able to
-see into NGZs from the global, but I haven't got round to it yet.
+This just counts the number of packages which can be upgraded. It works in 
+`pkg(5)` or `pkgin` zones, and if it runs in the global zone, it can attempt
+to `zlogin` to NGZs and get their information.
+
+```
+[[inputs.illumos_packages]]
+## Whether you wish this plugin to try to refresh the package database. Personally, I wouldn't.
+	# refresh = false
+	## Whether to report the number of installed packages
+	# installed = true
+	## Whether to report the number of upgradeable packages
+	# upgradeable = true
+  ## Which zones, other than the current one, to inspect
+  # zones = []      
+	## Use this command to get the elevated privileges run commands in other zones via zlogin. 
+	## and to run pkg refresh anywhere. Should be a path, like "/bin/sudo" "/bin/pfexec", but can 
+	## also be "none", which will collect only the local zone.
+	# elevate_privs_with = "/bin/sudo"
+```
+
+You can see there's an option to refresh the package database on every run. This
+might be very heavy if you have a lot of zones, and if you have config
+management, that's probably already doing it.
 
 Here you can see me upgrading my dev server.
 
@@ -467,15 +498,43 @@ Here you can see me upgrading my dev server.
 WQL> ts("packages.upgradeable", source=${host})
 ```
 
-The caveat here is that something needs to continually refresh the package
-cache. For me, Puppet does that as part of its normal duties.
+You can also report the number of installed packages, should that be of any
+use to you.
+
+## Process
+
+The most complicated, and probably least useful input plugin is `process`. It
+works a bit like `prstat(8)`, sampling CPU and/or memory usage at a given
+interval.
+
+```
+[[inputs.illumos_process]]
+  ## A list of the kstat values you wish to turn into metrics. Each value
+  ## will create a new timeseries. Look at the plugin source for a full
+  ## list of values.
+  # Values = ["rtime", "rsssize", "inblk", "oublk", "prtcpu", "prtmem"]
+  ## Tags you wish to be attached to ALL metrics. Again, see source for
+  ## all your options.
+  # Tags = ["name", "zoneid", "uid", "contract"]
+  ## How many processes to send metrics for. You get this many process for
+  ## EACH of the Values you listed above. Don't set it to zero.
+  # TopK = 10
+  ## It's slightly expensive, but we can expand zone IDs and contract IDs
+  ## to zone names and service names.
+  # ExpandZoneTag = true
+  # ExpandContractTag = true
+```
+
 
 ## SMF
 
 This shells out to `svcs(1m)` to give you an overview of the health
-of your SMF services. It runs `svcs` with the `-Z` flag, via `pfexec`, which,
-assuming the user running Telegraf has the `file_dac_search` privilege, lets
-it see the states of services in all non-global zones. Here's just one NGZ,
+of your SMF services. It runs `svcs` with the `-Z` flag, and, like the `packages`
+input, you can specify a privilege-elavator (`sudo` or `pfexec`) to make this
+work. Alternatively, run your Telegraf service with the `file_dac_search` privilege, which
+does the business on its own.
+
+Here's just one NGZ,
 seen from the global. You can, of course, specify which zones you're
 interested in, and specifying none gets you the lot.
 
@@ -517,8 +576,6 @@ WQL> count(ts("zones.uptime", source=${host}), brand)
 
 Zpool is another run-external-program cop-out. For starters it parses `zpool
 list`, and offers up the various fields as numbers. 
-
-<script src="https://metrics.wavefront.com/embedded/9wFhqVLtnW/js" id="wavefront-embedded-9wFhqVLtnW" width="300" height="200"></script>
 
 <script src="https://metrics.wavefront.com/embedded/vkwVf62qL9/js" id="wavefront-embedded-vkwVf62qL9" width="800" height="300"></script>
 
