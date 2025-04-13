@@ -5,6 +5,11 @@ date: 2017-10-01
 category: Wavefront
 ---
 
+There used to be charts in this page, but the infrastructure which backed them
+no longer exists.
+
+[Here is an edited-for-marketing version which contains embedded images](https://blogs.vmware.com/tanzu/how-wavefront-tamed-a-wild-puppet/).
+
 Show of hands: who's old enough to remember when config management was the hot
 new thing?
 
@@ -86,7 +91,7 @@ obvious the amount of data in `/var` was growing at pretty much the same rate as
 the `file_time`. Extracting those two metrics and removing the `normalize()`
 gave me something very much like this:
 
-<script src="https://virunga.wavefront.com/embedded/3pc3PH675v/js"
+<script src="https://metrics.wavefront.com/embedded/3pc3PH675v/js"
 id="wavefront-embedded-3pc3PH675v" width="700" height="300"></script>
 
 > The chart above is an after-the-fact reconstruction, made by duplicating in
@@ -171,7 +176,7 @@ with point tags. Every point in one of our new reports gets the following tags:
 Here is a snippet of one of our real-life charts:
 
 <script
-src="https://connectedhome.wavefront.com/embedded/zxlDzX3V1Q/js"
+src="https://metrics.wavefront.com/embedded/zxlDzX3V1Q/js"
 id="wavefront-embedded-zxlDzX3V1Q" width="700"
 height="300"></script>
 
@@ -194,7 +199,7 @@ Taking the lesson from the `collectd` syslog issue, we have charts which show
 the mean run times for bootstrap and "normal" runs (filtered by the value of the
 `run_by` tag). Having those separate lets us alert on two time thresholds.
 
-<script src="https://connectedhome.wavefront.com/embedded/FW5pGvTKVS/js"
+<script src="https://metrics.wavefront.com/embedded/FW5pGvTKVS/js"
 id="wavefront-embedded-FW5pGvTKVS" width="700" height="300"></script>
 
 If our bootstrap runs, which include a patching phase, consistently take more
@@ -207,7 +212,7 @@ Tags and events should help us quickly pinpoint the likely cause.
 There's also a stacked-area view of the time breakdown, which can be useful. Can
 you spot the bootstrap runs?
 
-<script src="https://connectedhome.wavefront.com/embedded/5KphnQKfQ7/js"
+<script src="https://metrics.wavefront.com/embedded/5KphnQKfQ7/js"
 id="wavefront-embedded-5KphnQKfQ7" width="700" height="300"></script>
 
 We also alert on "unexpected changes". Points tagged with `new_code = false` and
