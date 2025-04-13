@@ -8,28 +8,39 @@ body {
 a {
   color: #ae631a;
   text-decoration: none;
-  -o-transition:.5s;
-  -ms-transition:.5s;
-  -moz-transition:.5s;
-  -webkit-transition:.5s;
-  transition:.7s;
+  -o-transition: .5s;
+  -ms-transition: .5s;
+  -moz-transition: .5s;
+  -webkit-transition: .5s;
+  transition: .7s;
 }
 
 a:hover {
   color: #731;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: 700;
   line-height: 200%;
 }
 
-h1, h2, h3, h4, #post_header, #post_tags, #links ul, nav, footer {
+h1,
+h2,
+h3,
+h4,
+#post_header,
+#post_tags,
+#links ul,
+nav,
+footer {
   font-family: 'Lato', 'Charcoal', sans-serif;
 }
 
 #container {
-  width: 80em;
+  width: 60em;
   margin-left: auto;
   margin-right: auto;
 }
@@ -49,12 +60,19 @@ nav {
   text-align: left;
 }
 
-pre, #post_header, nav .sidebar_block, nav .bartitle, #post_tags, blockquote, footer, .this_page {
+pre,
+#post_header,
+nav .sidebar_block,
+nav .bartitle,
+#post_tags,
+blockquote,
+footer,
+.this_page {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
-nav .sidebar_block  {
+nav .sidebar_block {
   margin-bottom: 2em;
 }
 
@@ -108,7 +126,8 @@ footer {
   margin-top: 2em;
 }
 
-code, header {
+code,
+header {
   font-family: "Inconsolata", "Lucida Console", "Monaco", monospace
 }
 
@@ -163,7 +182,8 @@ pre {
   background: #ddd;
 }
 
-#post_tags ul, #post_tags li {
+#post_tags ul,
+#post_tags li {
   display: inline;
 }
 
@@ -175,7 +195,8 @@ pre {
   padding-left: 1em;
 }
 
-ul.big_list, li.big_list {
+ul.big_list,
+li.big_list {
   list-style: none;
   font-size: 14pt;
 }
@@ -193,7 +214,7 @@ ul.big_list, li.big_list {
 }
 
 header {
-  background:#d9e1f2;
+  background: #d9e1f2;
   width: 100%;
   color: #374374;
   padding: 0.7em 0;
@@ -245,3 +266,6 @@ blockquote {
   text-align: center;
 }
 
+.chart {
+  text-align: center;
+}

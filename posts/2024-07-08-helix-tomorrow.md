@@ -5,8 +5,9 @@ tags: [Helix]
 category: articles
 ---
 
-I started out on straight `vi`. Once, with a proper Space Cadet keyboard, I
-flirted with Emacs, then finally saw sense and settled down with vim.
+I started out on straight `vi`. Once, in an office with a proper Space Cadet
+keyboard, I flirted with Emacs, then finally saw sense and settled down with
+vim.
 
 Every now and again I have a play with one of these fancy IDEs that they they
 have now. But for me, IDE will always be a disk interface, and I didn't even
@@ -54,7 +55,7 @@ Tomorrow theme for Helix. Here it is. Stick it in your\
 "markup.link.text" = "yellow"
 "markup.link.label" = "green"
 "markup.quote" = "yellow"
-"diff.plus" =  "green"
+"diff.plus" = "green"
 "diff.minus" = "red"
 "diff.delta" = "yellow"
 # My Ruby Things
@@ -65,7 +66,7 @@ Tomorrow theme for Helix. Here it is. Stick it in your\
 "toml.variable.other.member" = "black"
 
 # Interface
-"ui.background"= { bg = "background" }
+"ui.background" = { bg = "background" }
 "ui.cursor" = { fg = "white", bg = "yellow" }
 "ui.cursor.primary" = { fg = "white", bg = "orange" }
 "ui.cursor.match" = "orange"
@@ -84,7 +85,7 @@ Tomorrow theme for Helix. Here it is. Stick it in your\
 "ui.text.info" = "foreground"
 "ui.virtual.whitespace" = "gray"
 "ui.virtual.ruler" = { bg = "gray" }
-"ui.virtual.inlay-hint" = { fg = "#c0c0c0", bg = "background" }  # bg original #ffaa3333
+"ui.virtual.inlay-hint" = { fg = "#c0c0c0", bg = "background" } # bg original #ffaa3333
 "ui.menu" = { fg = "dark_gray", bg = "light_gray" }
 "ui.menu.selected" = { bg = "gray", fg = "black" }
 "ui.selection" = { bg = "gray", fg = "black" }
@@ -92,13 +93,13 @@ Tomorrow theme for Helix. Here it is. Stick it in your\
 "error" = { fg = "red", modifiers = ["italic"] }
 "info" = { fg = "gray", modifiers = ["italic"] }
 "hint" = { fg = "blue", modifiers = ["italic"] }
-"diagnostic.hint"= { underline = { color = "blue", style = "curl" } }
-"diagnostic.info"= { underline = { color = "blue", style = "curl" } }
-"diagnostic.warning"= { underline = { color = "yellow", style = "curl" } }
-"diagnostic.error"= { underline = { color = "red", style = "curl" } }
+"diagnostic.hint" = { underline = { color = "blue", style = "curl" } }
+"diagnostic.info" = { underline = { color = "blue", style = "curl" } }
+"diagnostic.warning" = { underline = { color = "yellow", style = "curl" } }
+"diagnostic.error" = { underline = { color = "red", style = "curl" } }
 "ui.bufferline" = { fg = "gray", bg = "background" }
 "ui.bufferline.active" = { fg = "foreground", bg = "dark_gray" }
-"ui.debug" = { fg = "orange"  }
+"ui.debug" = { fg = "orange" }
 "ui.highlight.frameline" = { bg = "#cfe0f2" }
 
 "special" = "orange"
