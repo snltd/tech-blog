@@ -64,10 +64,6 @@ module Sysdef
       slim :post_list
     end
 
-    get '/privacy' do
-      slim :privacy
-    end
-
     get '/drafts/:ident' do
       @page = Sysdef::RenderDraft.new(params[:ident]).render
       slim :article

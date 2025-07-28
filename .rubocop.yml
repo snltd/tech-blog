@@ -1,10 +1,10 @@
 ---
 
-require:
+plugins:
   - rubocop-rake
   - rubocop-minitest
   - rubocop-performance
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.4
