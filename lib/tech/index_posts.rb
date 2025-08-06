@@ -2,7 +2,7 @@
 
 require_relative 'chunked_file'
 
-module Sysdef
+module Tech
   #
   # Read all the posts (markdown files) in a given directory, and
   # create a hash of filename => metadata. This is done once, when

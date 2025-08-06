@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require 'yaml'
-
-module Sysdef
+module Tech
   #
-  # Sysdef::ChunkedFile breaks a file down into "chunks". Each chunk
+  # Tech::ChunkedFile breaks a file down into "chunks". Each chunk
   # has some YAML metadata, and a body. This class creates and
   # manipulates them.
   #

@@ -1,26 +1,22 @@
 # frozen_string_literal: true
 
-require 'date'
-require 'English'
-
 # Github actions sets the RELEASE_VERSION environment variable
 
 Gem::Specification.new do |gem|
-  gem.name          = 'sysdef'
+  gem.name          = 'tech-blog'
   gem.version       = ENV.fetch('RELEASE_VERSION',
                                 "0.0.#{Time.now.strftime('%Y%m%d')}")
 
-  gem.summary       = 'Sysdef Ltd company website'
-  gem.description   = 'Promotional material and online presence for ' \
-                      'Sysdef Ltd, a UK-registered IT company'
+  gem.summary       = 'Nerdy scribblings'
+  gem.description   = 'Nerdy scribblings on obscure tech'
   gem.authors       = ['Robert Fisher']
-  gem.email         = 'info@sysdef.xyz'
-  gem.homepage      = 'https://sysdef.xyz'
+  gem.email         = 'services@id264.net'
+  gem.homepage      = 'https://tech.id264.net'
   gem.license       = 'BSD-2-Clause'
 
   gem.bindir        = 'bin'
-  gem.executables   = %w[sysdef.rb locate_sysdef]
-  gem.files         = Dir['articles/**', 'bin/**', 'sysdef.gemspec',
+  gem.executables   = %w[tech.rb]
+  gem.files         = Dir['articles/**', 'bin/**', 'tech.gemspec',
                           'config.ru', 'Gemfile*', 'lib/**', 'posts/*',
                           'public/**', 'views/**', 'Rakefile', 'robots.txt']
 

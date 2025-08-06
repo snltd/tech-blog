@@ -10,7 +10,7 @@ ROOT = Pathname(__dir__)
 task default: %i[rubocop test]
 
 Rake::TestTask.new do |t|
-  t.pattern = 'spec/sysdef/*_spec.rb'
+  t.pattern = 'spec/*/*_spec.rb'
   t.warning = false
 end
 

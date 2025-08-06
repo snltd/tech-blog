@@ -4,7 +4,7 @@ require 'kramdown'
 require 'kramdown-parser-gfm'
 require_relative 'chunked_file'
 
-module Sysdef
+module Tech
   #
   # render a blog post
   #

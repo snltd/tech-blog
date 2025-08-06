@@ -2,18 +2,18 @@
 # frozen_string_literal: true
 
 require_relative '../spec_helper'
-require_relative '../../lib/sysdef/render_article'
+require_relative '../../lib/tech/render_article'
 
 unless defined?(POST_INDEX)
-  POST_INDEX = Sysdef::IndexPosts.new(POST_DIR)
-  ARTICLE_INDEX = Sysdef::IndexArticles.new(ARTICLE_DIR)
+  POST_INDEX = Tech::IndexPosts.new(POST_DIR)
+  ARTICLE_INDEX = Tech::IndexArticles.new(ARTICLE_DIR)
 end
 
 # Tests for article rendering
 #
-class SysdefRenderArticleTest < MiniTest::Test
+class TechRenderArticleTest < MiniTest::Test
   def test_render
-    r = Sysdef::RenderArticle.new('wavefront-cli').render
+    r = Tech::RenderArticle.new('wavefront-cli').render
     assert_instance_of(Hash, r)
     assert_instance_of(String, r[:content])
     assert_instance_of(Hash, r[:meta])
