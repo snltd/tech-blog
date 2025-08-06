@@ -91,8 +91,7 @@ obvious the amount of data in `/var` was growing at pretty much the same rate as
 the `file_time`. Extracting those two metrics and removing the `normalize()`
 gave me something very much like this:
 
-<script src="https://metrics.wavefront.com/embedded/3pc3PH675v/js"
-id="wavefront-embedded-3pc3PH675v" width="700" height="300"></script>
+!["broadcom deleted my account"](/i/deleted.png)
 
 > The chart above is an after-the-fact reconstruction, made by duplicating in
 > the lab the issue I described. I can't show you the original data because it
@@ -175,10 +174,7 @@ with point tags. Every point in one of our new reports gets the following tags:
 
 Here is a snippet of one of our real-life charts:
 
-<script
-src="https://metrics.wavefront.com/embedded/zxlDzX3V1Q/js"
-id="wavefront-embedded-zxlDzX3V1Q" width="700"
-height="300"></script>
+!["broadcom deleted my account"](/i/deleted.png)
 
 You can see the bootstrap runs as points, because they have a different tag.
 Note that we aren't using the `release` or `run_no` tags here. Some teams do,
@@ -199,8 +195,7 @@ Taking the lesson from the `collectd` syslog issue, we have charts which show
 the mean run times for bootstrap and "normal" runs (filtered by the value of the
 `run_by` tag). Having those separate lets us alert on two time thresholds.
 
-<script src="https://metrics.wavefront.com/embedded/FW5pGvTKVS/js"
-id="wavefront-embedded-FW5pGvTKVS" width="700" height="300"></script>
+!["broadcom deleted my account"](/i/deleted.png)
 
 If our bootstrap runs, which include a patching phase, consistently take more
 than a couple of minutes, it probably means we're upgrading or installing too
@@ -212,8 +207,7 @@ Tags and events should help us quickly pinpoint the likely cause.
 There's also a stacked-area view of the time breakdown, which can be useful. Can
 you spot the bootstrap runs?
 
-<script src="https://metrics.wavefront.com/embedded/5KphnQKfQ7/js"
-id="wavefront-embedded-5KphnQKfQ7" width="700" height="300"></script>
+!["broadcom deleted my account"](/i/deleted.png)
 
 We also alert on "unexpected changes". Points tagged with `new_code = false` and
 `run_by != bootstrapper` are neither bootstrap runs nor new code releases.
@@ -235,8 +229,7 @@ environments or groups of hosts are all on the same release. If you deploy your
 application via Puppet, you'd want to know if the tier wasn't uniform by the end
 of any rolling release.
 
-<script src="https://connectedhome.wavefront.com/embedded/vxtdy9FTB6/js"
-id="wavefront-embedded-vxtdy9FTB6" width="700" height="200"></script>
+!["broadcom deleted my account"](/i/deleted.png)
 
 Here, you can see everything has the same release. Wavefront lets you colour the
 text in a single-value chart depending on the value. Green is good, as they
@@ -262,7 +255,7 @@ immediately get visibility, alerting, and sophisticated analytics on that data.
 
 I couldn't share the code for the Puppet reporter I talked about, as it belongs
 to my client. But it's been so useful I decided I needed something similar in
-the infrastrucutre I manage for myself. So, I wrote a similar reporter from
+the infrastructure I manage for myself. So, I wrote a similar reporter from
 scratch, using the
 [new, far more comprehensive SDK](https://github.com/snltd/wavefront-sdk). The
 tags are different, and though it supports various operating systems, I've only

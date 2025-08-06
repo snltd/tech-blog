@@ -103,9 +103,7 @@ Here is a chart of some of those `sys` metrics, along with the Wavefront
 generate it. Hover over the points to see the extra dimensions, or tags, or
 labels, or whatever you prefer to call them.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/1RfCywk1jc/js" id="wavefront-embedded-1RfCywk1jc"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> deriv(
@@ -126,9 +124,7 @@ standard stuff.
 It might be more interesting to look at a per-zone breakdown. To turn this on,
 set `zone_cpu_stats` to true, and you'll get something like this.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/RMnJHWBWwW/js" id="wavefront-embedded-RMnJHWBWwW"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> sum(
@@ -148,9 +144,7 @@ Turning on `cpu_info_stats` looks at the `cpu_info`. It produces a single metric
 at the moment: the current speed of the VCPU, tagged with some other,
 potentially useful, information.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/lq3rkyW124/js" id="wavefront-embedded-lq3rkyW124"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> ts("cpu.info.speed", source=${host})
@@ -215,17 +209,13 @@ I used to have a lovely chart here of a disk dying in agony. Sadly, the data
 expired, so now the best I can do is show you a few illegal request errors from
 a USB drive I use for backups.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/JMNZ75XT6P/js" id="wavefront-embedded-JMNZ75XT6P"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> ceil(deriv(ts("diskHealth.*", source=${host})))
 ```
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/11hnPSbXT2/js" id="wavefront-embedded-11hnPSbXT2"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> sum(ts("diskHealth.*", source=${host}), product, serialNo)
@@ -244,9 +234,8 @@ non-zero here ain't good.
 For each FMA error, it sees, the collector will produce a point whose tags are a
 breakdown of the fault FMRI. A fault of `zfs://pool=big/vdev=3706b5d93e20f727`
 will therefore generate a point with a constant value of 1 and tags of
-`module = zfs`, `pool = big`, and `vdev =
-3706b5d93e20f727`. Put these in a table
-and they're a pretty useful metric.
+`module = zfs`, `pool = big`, and `vdev = 3706b5d93e20f727`. Put these in a
+table and they're a pretty useful metric.
 
 ## IO
 
@@ -307,9 +296,7 @@ values, so you'll likely need to get your `rate()` on.
 
 This is a view of bytes written, broken down by zpool:
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/WfhfvnnrFs/js" id="wavefront-embedded-WfhfvnnrFs"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> rate(ts("io.nwritten", source=${host} and module="zfs"))
@@ -359,9 +346,7 @@ numbers into bytes.
 `vminfo` looks at the `unix:0:vminfo` kstat, and converts the values it finds
 there, which are in pages, into bytes.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/wW9TBYyS8W/js" id="wavefront-embedded-wW9TBYyS8W"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> deriv(ts("memory.vminfo.*", source=${host}))
@@ -417,9 +402,7 @@ there's no need to process them further.
 
 This is their view of a machine booting:
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/n6nkZwswxH/js" id="wavefront-embedded-n6nkZwswxH"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> ts("memory.arcsize", source=${host})
@@ -449,9 +432,7 @@ name:   serv-dns                        class:    zone_memory_cap
 
 These are gauge metrics, so no need to process them further. Let's look at RSS:
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/RgB6GpCz6s/js" id="wavefront-embedded-RgB6GpCz6s"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> ts("memory.zone.rss", source=${host} and zone=${zone})
@@ -463,9 +444,7 @@ The network plugin tries to be at least a little smart. If you hover over this
 chart and look at the legend you'll see it's collecting network metrics for all
 VNICs, and attempting to add meaningful tags to them.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/kmCpMfQTBV/js" id="wavefront-embedded-kmCpMfQTBV"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> rate(ts("net.obytes64", source=${host} and zone != "global" and zone = "${zone}"))
@@ -494,9 +473,7 @@ setting, and then you just pick your kstat `fields` like all the other plugins.
 The NFS version is a tag. This chart aggregates my main global zone Telegraf
 with another which runs in a local NFS server zone.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/dlDGgMZsGj/js" id="wavefront-embedded-dlDGgMZsGj"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> rate(ts("nfs.server.*"))
@@ -508,9 +485,7 @@ This one is so dumb you can't even configure it. Its value is always one, but
 the tags might be useful for something. I "borrowed" it from Prometheus Node
 Exporter.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/by4g9qWbNt/js" id="wavefront-embedded-by4g9qWbNt" width="300" height="200"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```wql
 WQL> ts("os.release")
@@ -552,9 +527,7 @@ The `packages` plugin can refresh the package database on every run. This might
 be very heavy if you have a lot of zones, and if you have config management,
 that's probably already doing it. I don't use it myself.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/cqsqTl0jPN/js" id="wavefront-embedded-cqsqTl0jPN" width="700"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```wql
 WQL> ts("packages.upgradeable")
@@ -588,9 +561,7 @@ interval.
 
 Let's see what's consuming memory:
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/3YRLK2hxNP/js" id="wavefront-embedded-3YRLK2hxNP"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 I say "least useful" because, as with all tools of this nature, it's very easy
 for things to happen between collection intervals. It can still be useful for
@@ -601,9 +572,7 @@ leaks in long-running processes.
 WQL> ts("process.rssize")
 ```
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/N1k5Z9VggZ/js" id="wavefront-embedded-N1k5Z9VggZ"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```
 WQL> ts("process.pctcpu") / 100
@@ -625,9 +594,7 @@ look at my media server, from when it booted in the morning with a broken
 `minidlna` server to 5pm when tried to listen to some music, found it didn't
 work, and fixed it. Maybe I need an alert.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/63WPq20mWs/js" id="wavefront-embedded-63WPq20mWs"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```wql
 WQL> ts("smf.states", zone="serv-media")
@@ -656,9 +623,7 @@ Each point on these metric paths comes with a bunch of tags like brand, IP type
 and status. Filtering and grouping on these can turn up lots of useful and
 interesting data. Or you can just count zones.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/3SqBlyfrTl/js" id="wavefront-embedded-3SqBlyfrTl"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> count(ts("zones.uptime", source=${host}), brand)
@@ -669,9 +634,7 @@ WQL> count(ts("zones.uptime", source=${host}), brand)
 Zpool is another run-external-program cop-out. For starters it parses
 `zpool list`, and offers up the various fields as numbers.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/vkwVf62qL9/js" id="wavefront-embedded-vkwVf62qL9"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> ts("zpool.cap", source=${host})
@@ -687,16 +650,13 @@ a number. I put the mapping in my chart annotation:
 And I can alert off non-zero states.
 
 You can also turn on "status" metrics. This takes the output of
-`zpool status
--pv <pool>` and turns it into numbers. As well as counting the
+`zpool status -pv <pool>` and turns it into numbers. As well as counting the
 errors in each device of the pool, it also plots the time since the last
 successful scrub (for easy alerting off not-scrubbed-in-forever pools), and
 plots the time of a resilver scrub. The actual elapsed time probably isn't so
 useful, but it being non-zero certainly can be.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/5qrNjXX23K/js" id="wavefront-embedded-5qrNjXX23K"></script>
-</div>
+!!["broadcom deleted my account"](/i/deleted.png)
 
 ```sql
 WQL> ts("zpool.status.timeSinceScrub", host=${host})
@@ -720,5 +680,4 @@ you find bugs, or wish improvements that you aren't able to make yourself,
 and I'll have a look.
 
 [^1]: Actually, the first thing a lot of people seem to look for is load
-    average, but if you think that's a good way to monitor a system, look
-    elsewhere.
+average, but if you think that's a good way to monitor a system, look elsewhere.

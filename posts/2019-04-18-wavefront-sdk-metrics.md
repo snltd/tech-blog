@@ -189,7 +189,7 @@ metrics.close!
 
 Here's the output, showing the interleaving
 
-````cmd
+```cmd
 $ ./example_01
 I, [2019-03-18T15:41:09.222877 #3735]  INFO -- : gauge 1
 I, [2019-03-18T15:41:09.223297 #3735]  INFO -- : counter
@@ -232,12 +232,12 @@ I, [2019-03-18T15:41:54.276223 #3735]  INFO -- : mheg01.gauge 4 1601476900 sourc
 I, [2019-03-18T15:41:54.276983 #3735]  INFO -- : mheg01.gauge 8 1601476900.458564 source=box type="gauge" method="qq"
 I, [2019-03-18T15:41:54.277212 #3735]  INFO -- : mheg01.gauge 5 1601476910 source=box type="gauge" method="q"
 I, [2019-03-18T15:41:54.277380 #3735]  INFO -- : mheg01.gauge 10 1601476910.7705927 source=box type="gauge" method="qq"
-I, [2019-03-18T15:42:00.780483 #3735]  INFO -- : loops have finished. Shut down the mh``
+I, [2019-03-18T15:42:00.780483 #3735]  INFO -- : loops have finished. Shut down the helper
+```
 
 And here's a chart.
 
-<script src="https://metrics.wavefront.com/embedded/WCBKCMbBvN/js"
-id="wavefront-embedded-WCBKCMbBvN" width="700" height="300"></script>
+!["broadcom deleted my account"](/i/deleted.png)
 
 You can see all our counter increments went through as a single point. If I ran
 the script again, I might see two counter points. The final delta would be the
@@ -256,7 +256,7 @@ values, and they need to be told a bucket size. So:
 def q(path, interval, value, tags = nil)
 ..
 end
-````
+```
 
 A distribution can be written in two ways. Firstly, as an array of what
 Wavefront calls "centroids". They are pairs of numbers where the second number
@@ -279,7 +279,7 @@ and you'd get exactly the same thing.
 
 Let's have a look. This time we'll use the default flush interval.
 
-```
+```ruby
 #!/usr/bin/env ruby
 
 require 'wavefront-sdk/credentials'
@@ -332,21 +332,20 @@ SDK INFO: !M 1556269490 #2 0.0 #2 3.0 #2 2.0 #2 5.0 #1 4.0 #1 6.0 mg.eg.002 sour
 ```
 
 You can see in the SDK `INFO` messages that the raw arrays of numbers have been
-converted into Wavefront format centroids.
+converted into Wavefront format centroids. `
 
 Here's the chart, applying the `max()`, `avg()` and `min()` functions to those
 distributions.
 
-<script src="https://virunga.wavefront.com/embedded/r6NknF75Bx/js"
-id="wavefront-embedded-r6NknF75Bx" width="700" height="300"></script>
+!["broadcom deleted my account"](/i/deleted.png)
 
 ## Things Always Go Wrong
 
-What happens if the queue is full? That's up to you. By default, writes to Ruby
+What happens if the queue is full? That's up to you. By default, write to Ruby
 `SizedQueue`s, which do the real work, block. That is, if the queue is full and
-your thread tries to add something to it, your thread will block until the queue
-becomes available. Chances are, whatever your main thread is doing is more
-important than your metrics, so I decided to make all writes to the queue
+your thread tries to add something to it, your thread will block until the
+queueruby becomes available. Chances are, whatever your main thread is doing is
+more important than your metrics, so I decided to make all writes to the queue
 default to be _non blocking_. Ruby raises a `ThreadError` exception it makes a
 non-blocking call to an unavailable queue, and by default the SDK will also
 handle that for you, simply logging a warning.
@@ -396,7 +395,7 @@ Wavefront, and tag every point with an entirely pointless `global_tag`.
 ```ruby
 metrics = Wavefront::MetricHelper.new(creds.all,
                                       { verbose: true
-                                        writer:  :api,
+                                        writer:  :helper,
                                         tags:    { global_tag: 'yes!' }
                                       })
 ```
