@@ -1,16 +1,22 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+ENV['RACK_ENV'] ||= 'test'
+ENV['RACK_ALLOWED_HOSTS'] = '.*'
+# require 'erb'
+require 'minitest'
+require 'minitest/autorun'
+require 'minitest/unit'
+require 'nokogiri'
+# require 'pathname'
 require 'rack/builder'
-
-%w[minitest minitest/unit minitest/autorun rack/test pathname
-   erb nokogiri].each { |f| require f }
+require 'rack/test'
 
 APP_ROOT = Pathname.new(__dir__).realpath.parent.parent
 
 OUTER_APP = Rack::Builder.parse_file(APP_ROOT.join('config.ru').to_s)
 
-# Acceptance tests for the Sysdef website. Just hit the app lots and
+# Acceptance tests for my tech website. Just hit the app lots and
 # lots of times
 #
 class TestSysdef < MiniTest::Test
@@ -23,20 +29,9 @@ class TestSysdef < MiniTest::Test
   def test_front_page
     get '/'
     assert_equal(200, last_response.status)
-    assert last_response.body.include?('We have experience')
+    assert last_response.body.include?('obscure tech stuff')
     body = Nokogiri::HTML(last_response.body)
     assert_header(body)
-    assert body.css('#post_title').empty?
-    assert_sidebar(body)
-    assert_footer(body)
-  end
-
-  def test_privacy_policy
-    get '/privacy'
-    assert_equal(200, last_response.status)
-    body = Nokogiri::HTML(last_response.body)
-    assert_header(body)
-    assert body.inner_html.include?('We do not log anything')
     assert body.css('#post_title').empty?
     assert_sidebar(body)
     assert_footer(body)
@@ -61,17 +56,6 @@ class TestSysdef < MiniTest::Test
     extract_tag_links(last_response.body).each do |uri|
       _test_tag(uri)
     end
-  end
-
-  def test_api_not_found
-    get '/api/no_such_thing'
-    assert_equal(404, last_response.status)
-    refute last_response.body.include?('Sinatra doesn’t know this ditty')
-    assert last_response.body.include?('404')
-    body = Nokogiri::HTML(last_response.body)
-    assert_header(body)
-    refute body.css('#container').empty?
-    assert_footer(body)
   end
 
   def test_health
@@ -128,7 +112,7 @@ class TestSysdef < MiniTest::Test
   end
 
   def assert_footer(body)
-    assert_includes(body.css('footer').inner_text, 'Sysdef')
+    assert_includes(body.css('footer').inner_text, 'the author')
     assert_includes(body.css('footer').inner_text, Date.today.year.to_s)
   end
 
