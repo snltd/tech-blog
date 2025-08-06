@@ -2,19 +2,19 @@
 
 require_relative 'render_post'
 
-module Sysdef
+module Tech
   #
-  # Render an article. Much like a blog post
+  # render draft articles
   #
-  class RenderArticle < RenderPost
+  class RenderDraft < RenderPost
     private
 
     def dir
-      ARTICLE_DIR
+      DRAFT_DIR
     end
 
     def extra_metadata
-      { mtime: file.mtime }
+      { mtime: Time.now }
     end
   end
 end

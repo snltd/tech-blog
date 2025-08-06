@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-require_relative 'bin/sysdef'
-run Sysdef::WebApp
+require_relative 'bin/tech'
+run Tech::WebApp

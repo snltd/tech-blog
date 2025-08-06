@@ -19,7 +19,7 @@ OUTER_APP = Rack::Builder.parse_file(APP_ROOT.join('config.ru').to_s)
 # Acceptance tests for my tech website. Just hit the app lots and
 # lots of times
 #
-class TestSysdef < MiniTest::Test
+class TestTech < MiniTest::Test
   include Rack::Test::Methods
 
   def app
@@ -96,7 +96,7 @@ class TestSysdef < MiniTest::Test
   end
 
   def assert_header(body)
-    assert_includes(body.css('header').inner_text, '$ sysdef_')
+    assert_includes(body.css('header').inner_text, '$ write_')
   end
 
   def assert_body_copy(body)

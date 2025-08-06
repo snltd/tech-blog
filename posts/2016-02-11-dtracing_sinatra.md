@@ -5,43 +5,39 @@ date: 2016-02-11
 category: DTrace
 ---
 
-Though I'm far from an expert, I do enjoy programming in Ruby. Some
-time ago, I wrote a [stupid little Sinatra
-app](http://meetup.rdfisher.co.uk) which generated agendas for
-pretentious, fictional DevOps meetups. [The code is
-here](https://github.com/snltd/meetup-generator), and you can see
-it's extremely small. Because of its size, I thought it might make
-for a simple example of DTracing a Ruby application.
+Though I'm far from an expert, I do enjoy programming in Ruby. Some time ago, I
+wrote a [stupid little Sinatra app](http://meetup.rdfisher.co.uk) which
+generated agendas for pretentious, fictional DevOps meetups.
+[The code is here](https://github.com/snltd/meetup-generator), and you can see
+it's extremely small. Because of its size, I thought it might make for a simple
+example of DTracing a Ruby application.
 
-I'm interested in performance because, who isn't? I can't see much
-room for optimization in my own code (there's only about thirty
-lines of it for a start) but as Ruby devs we tend to pull in gems
-like crazy, without much thought of the quality or efficiency of the
-code they contain.
+I'm interested in performance because, who isn't? I can't see much room for
+optimization in my own code (there's only about thirty lines of it for a start)
+but as Ruby devs we tend to pull in gems like crazy, without much thought of the
+quality or efficiency of the code they contain.
 
 As of 2.0, Ruby has proper DTrace support. If you build on a 21st century
-operating system, pardon me, an operating system which supports DTrace
-(Solaris, Illumos, OS X, FreeBSD) you get it by default. I'm doing this on
-SmartOS with Ruby 2.2.3 [built as shown
-here](http://sysdef.xyz/post/2015-10-04-ruby-on-smartos).
+operating system, pardon me, an operating system which supports DTrace (Solaris,
+Illumos, OS X, FreeBSD) you get it by default. I'm doing this on SmartOS with
+Ruby 2.2.3
+[built as shown here](http://tech.id264.net/post/2015-10-04-ruby-on-smartos).
 
-As a first step, how about looking where the executing program
-spends most of its time?
+As a first step, how about looking where the executing program spends most of
+its time?
 
 [The probes available are documented
-here](http://ruby-doc.org/core-2.2.0/doc/dtrace_probes_rdoc.html),
-and it looks to me like `method-entry` is a good place to start.
-Here's its signature.
+here](http://ruby-doc.org/core-2.2.0/doc/dtrace_probes_rdoc.html), and it looks
+to me like `method-entry` is a good place to start. Here's its signature.
 
 ```
 ruby:::method-entry(classname, methodname, filename, lineno);
 ```
 
-The two arguments are the class and method names, so how about
-running a script which counts calls to each `class::method`, and
-prints them out? I'm doing this on a dev zone and I'm going to run
-my D script, `curl` an HTTP request, and kill the script to get
-output. Crude, but good enough for this use-case.
+The two arguments are the class and method names, so how about running a script
+which counts calls to each `class::method`, and prints them out? I'm doing this
+on a dev zone and I'm going to run my D script, `curl` an HTTP request, and kill
+the script to get output. Crude, but good enough for this use-case.
 
 ```dtrace
 ruby$1:::method-entry
@@ -50,21 +46,19 @@ ruby$1:::method-entry
 }
 ```
 
-The `method-entry` probe fires immediately before a method is
-entered.
+The `method-entry` probe fires immediately before a method is entered.
 
-The `$1` in the provider name is required because DTrace
-dynamically creates a provider for every running Ruby process. That
-provider's name is `ruby<pid>`, and DTrace will expand `$1` to the
-first argument given to the script. Therefore, invoking the above
-script with the PID of the Ruby program we wish to trace will have
-the desired effect.
+The `$1` in the provider name is required because DTrace dynamically creates a
+provider for every running Ruby process. That provider's name is `ruby<pid>`,
+and DTrace will expand `$1` to the first argument given to the script.
+Therefore, invoking the above script with the PID of the Ruby program we wish to
+trace will have the desired effect.
 
-We dynamically create an associative array called `time_arr`, and
-add elements whose name is that of the class owning the called
-method. Prefixing the array name with an `@` turns it into an
-aggregator, and in conjunction with the `count()` function, it will
-count up for us all the times a function in that class is called.
+We dynamically create an associative array called `time_arr`, and add elements
+whose name is that of the class owning the called method. Prefixing the array
+name with an `@` turns it into an aggregator, and in conjunction with the
+`count()` function, it will count up for us all the times a function in that
+class is called.
 
 ```cmd
 # dtrace -qs ruby\-example.d $(pgrep -f meetup) | tail -20 &; sleep 1; \
@@ -140,8 +134,8 @@ count up for us all the times a function in that class is called.
   Haml::Parser                         1085
 ```
 
-Gosh, HAML is busy, isn't it? Let's change the D to record the
-method name as well as the parent class.
+Gosh, HAML is busy, isn't it? Let's change the D to record the method name as
+well as the parent class.
 
 ```dtrace
 ruby$1:::method-entry
@@ -230,17 +224,16 @@ ruby$1:::method-entry
   Haml::Parser::Line        tabs                                  705
 ```
 
-We're using the `method_entry` probe here, which means we are only
-looking at pure Ruby methods. Switching to the `cmethod_entry` probe
-shows you calls to core class methods written in C. Things like
-`Kernel::is_a?` or `Hash::each`.
+We're using the `method_entry` probe here, which means we are only looking at
+pure Ruby methods. Switching to the `cmethod_entry` probe shows you calls to
+core class methods written in C. Things like `Kernel::is_a?` or `Hash::each`.
 
-But back to the output, and Look at all those HAML method calls. At
-this point, I had to get the big guns out. I pulled down
+But back to the output, and Look at all those HAML method calls. At this point,
+I had to get the big guns out. I pulled down
 [rb_flowtime.d](https://github.com/BrisRuby/meetups/blob/master/_posts/2013-04-22/dtrace/DTraceToolkit-Ruby/rb_flowtime.d)
-and made a minor modification, changing the `ruby*` providers to
-`ruby$1`, as there are a few Rubyish things running on this box that
-I don't want to trace. I ended up with this:
+and made a minor modification, changing the `ruby*` providers to `ruby$1`, as
+there are a few Rubyish things running on this box that I don't want to trace. I
+ended up with this:
 
 ```dtrace
 #pragma D option quiet
@@ -284,11 +277,10 @@ ruby$1:::method-return
 }
 ```
 
-The comments on the script tell you to be wary of processes
-switching CPU. That's surely of no concern at all in this exercise,
-but SmartOS has all Solaris' lovely processor-set stuff, so we might
-as well use it. To bind the meetup-generator process to VCPU 2 is as
-easy as:
+The comments on the script tell you to be wary of processes switching CPU.
+That's surely of no concern at all in this exercise, but SmartOS has all
+Solaris' lovely processor-set stuff, so we might as well use it. To bind the
+meetup-generator process to VCPU 2 is as easy as:
 
 ```cmd
 $ pbind -b 2 $(pgrep -f meetup)
@@ -318,18 +310,16 @@ $ sed -n 40,55p out
   2 54552226195   content_length.rb  20    -> Rack::ContentLength::call
   2 54552226211   chunked.rb         15      -> Rack::Chunked::call
   2 54552226226   base.rb            14        -> Rack::CommonLogger::call
-
 ```
 
-The first column is the VCPU the proces is on (showing the bind we just
-did, worked); the second is a timestamp; the third is the file
-containing the method being entered or exited; the fourth is the
-microsecond time delta between the current step and the previous
-one. Then we see an arrow denoting entry or return, and finally, the
-class and method.
+The first column is the VCPU the proces is on (showing the bind we just did,
+worked); the second is a timestamp; the third is the file containing the method
+being entered or exited; the fourth is the microsecond time delta between the
+current step and the previous one. Then we see an arrow denoting entry or
+return, and finally, the class and method.
 
-I'm interested in the fourth and final columns.  Let's get `awk` to
-sum the time spent in each class.
+I'm interested in the fourth and final columns. Let's get `awk` to sum the time
+spent in each class.
 
 ```perl
 # class_time.awk
@@ -359,14 +349,14 @@ $ awk -f class_time.awk <out | sort -nr
 0 CLASS
 ```
 
-There you can see that almost as much is being spent rendering a
-very simple HTML page from a very simple template than is being
-spent by the whole Sinatra and Thin webserver framework.
+There you can see that almost as much is being spent rendering a very simple
+HTML page from a very simple template than is being spent by the whole Sinatra
+and Thin webserver framework.
 
-I've heard that [Slim](https://github.com/slim-template/slim) is a
-faster templating system than HAML. I had a look at it, and I
-thought it looked nicer as well. A quick code change later, and
-re-running my DTrace and `awk` scripts tells me:
+I've heard that [Slim](https://github.com/slim-template/slim) is a faster
+templating system than HAML. I had a look at it, and I thought it looked nicer
+as well. A quick code change later, and re-running my DTrace and `awk` scripts
+tells me:
 
 ```cmd
 $ awk -f class_time.awk <out_slim | sort -nr
@@ -384,15 +374,13 @@ $ awk -f class_time.awk <out_slim | sort -nr
 0 CLASS
 ```
 
-According to that one trace, it's spending about 12% less time
-rendering. ([Temple](https://github.com/judofyr/temple) is the main
-dependency of Slim.)
+According to that one trace, it's spending about 12% less time rendering.
+([Temple](https://github.com/judofyr/temple) is the main dependency of Slim.)
 
-As a token gesture to not just pulling numbers out of my arse, I ran
-several traces against both versions of the code, and got very
-similar results each time. Still, I'm not going to pretend this in any way
-resembles a meaningful benchmark.
+As a token gesture to not just pulling numbers out of my arse, I ran several
+traces against both versions of the code, and got very similar results each
+time. Still, I'm not going to pretend this in any way resembles a meaningful
+benchmark.
 
-But benchmarking wasn't the point of the exercise. Hopefully I have
-succeeded in showing that DTracing Ruby is very easy, and pretty
-cool.
+But benchmarking wasn't the point of the exercise. Hopefully I have succeeded in
+showing that DTracing Ruby is very easy, and pretty cool.

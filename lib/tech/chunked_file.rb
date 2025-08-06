@@ -3,10 +3,10 @@
 require 'sinatra/base'
 require_relative 'chunk'
 
-module Sysdef
+module Tech
   #
   # Split a post file into chunks. Each chunk is an object of type
-  # Sysdef::Chunk.
+  # Tech::Chunk.
   #
   class ChunkedFile
     attr_reader :file, :chunks
@@ -26,7 +26,7 @@ module Sysdef
 
     def parse
       File.read(file, encoding: 'UTF-8').split(/^---$/, 2).map(&:strip)
-          .reject(&:empty?).map { |str| Sysdef::Chunk.new(file, str) }
+          .reject(&:empty?).map { |str| Tech::Chunk.new(file, str) }
     rescue StandardError
       LOG.error format('cannot read file %<file>s', file:)
       raise Sinatra::NotFound

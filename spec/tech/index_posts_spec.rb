@@ -2,15 +2,15 @@
 # frozen_string_literal: true
 
 require_relative '../spec_helper'
-require_relative '../../lib/sysdef/index_posts'
+require_relative '../../lib/tech/index_posts'
 
 # Tests
 #
-class SysdefIndexPostsTest < MiniTest::Test
+class TechIndexPostsTest < MiniTest::Test
   attr_reader :tu
 
   def setup
-    @tu = Sysdef::IndexPosts.new(POST_DIR)
+    @tu = Tech::IndexPosts.new(POST_DIR)
   end
 
   def test_file_list

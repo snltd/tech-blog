@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require 'pathname'
 require 'logger'
-require 'date'
 require 'minitest/autorun'
-require_relative '../lib/sysdef'
+require_relative '../lib/tech'
 
 unless defined?(ROOT)
   ROOT = Pathname.new(__dir__).parent

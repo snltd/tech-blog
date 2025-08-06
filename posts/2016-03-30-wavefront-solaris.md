@@ -262,7 +262,7 @@ you identify where things came from.
 
 I also only use the native Wavefront listener, disabling the OpenTSDB and
 Graphite ports. My metrics all go in via
-[a customized Diamond setup](http://sysdef.xyz/post/2016-04-19-diamond-solaris)
+[a customized Diamond setup](http://tech.id264.net/post/2016-04-19-diamond-solaris)
 which speaks native Wavefront. If you want to use, say, `collectd`, you'll have
 to use the Graphite listener. (Unless someone has written a Wavefront plugin,
 which they might have by the time you read this.)

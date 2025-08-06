@@ -5,15 +5,14 @@ require 'addressable'
 require 'sinatra/base'
 require 'slim'
 require 'logger'
-require 'pathname'
-require_relative '../lib/sysdef'
+require_relative '../lib/tech'
 
 ROOT          = Pathname.new(__dir__).parent.realpath.freeze
 POST_DIR      = ROOT.join('posts')
 DRAFT_DIR     = ROOT.join('drafts')
 ARTICLE_DIR   = ROOT.join('articles')
-POST_INDEX    = Sysdef::IndexPosts.new(POST_DIR)
-ARTICLE_INDEX = Sysdef::IndexArticles.new(ARTICLE_DIR)
+POST_INDEX    = Tech::IndexPosts.new(POST_DIR)
+ARTICLE_INDEX = Tech::IndexArticles.new(ARTICLE_DIR)
 LOG           = Logger.new($stdout)
 KRAMDOWN_OPTS = { input: 'GFM',
                   syntax_highlighter: 'rouge',
@@ -21,7 +20,7 @@ KRAMDOWN_OPTS = { input: 'GFM',
 
 Slim::Engine.set_options(pretty: true, sort_attrs: false)
 
-module Sysdef
+module Tech
   # Modularized application
   #
   class WebApp < Sinatra::Base
@@ -32,28 +31,18 @@ module Sysdef
       slim :front_page
     end
 
-    # Some blog posts have been promoted to permanent articles
-    #
-    get '/post/2017-07-26-wavefront-cli' do
-      redirect 'https://sysdef.xyz/article/wavefront-cli'
-    end
-
-    get '/post/2018-04-08-wavefront-writer' do
-      redirect 'https://sysdef.xyz/article/wavefront-writer'
-    end
-
     get '/post/:ident' do
-      @page = Sysdef::RenderPost.new(params[:ident]).render
+      @page = Tech::RenderPost.new(params[:ident]).render
       slim :post
     end
 
     get '/article/:ident' do
-      @page = Sysdef::RenderArticle.new(params[:ident]).render
+      @page = Tech::RenderArticle.new(params[:ident]).render
       slim :article
     end
 
     get '/_health' do # render a random page
-      @page = Sysdef::RenderPost.new(POST_INDEX.random_post).render
+      @page = Tech::RenderPost.new(POST_INDEX.random_post).render
       slim :post
     end
 
@@ -65,15 +54,9 @@ module Sysdef
     end
 
     get '/drafts/:ident' do
-      @page = Sysdef::RenderDraft.new(params[:ident]).render
+      @page = Tech::RenderDraft.new(params[:ident]).render
       slim :article
     end
-
-    #
-    #     get '/:year/?:month?/?:day?' do
-    #       @posts = POSTS.by_date(params[:year], params[:month], params[:day])
-    #       slim :post_list
-    #     end
 
     not_found do
       slim :'404'

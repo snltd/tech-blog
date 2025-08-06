@@ -5,11 +5,11 @@ require_relative '../spec_helper'
 
 # Tests for the article indexer
 #
-class SysdefIndexArticlesTest < MiniTest::Test
+class TechIndexArticlesTest < MiniTest::Test
   attr_reader :tu
 
   def setup
-    @tu = Sysdef::IndexArticles.new(ARTICLE_DIR).index
+    @tu = Tech::IndexArticles.new(ARTICLE_DIR).index
   end
 
   def test_index

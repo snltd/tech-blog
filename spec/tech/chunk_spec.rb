@@ -3,7 +3,7 @@
 
 require 'pathname'
 require_relative '../spec_helper'
-require_relative '../../lib/sysdef/chunk'
+require_relative '../../lib/tech/chunk'
 
 SAMPLE_POST = %(
 ---
@@ -21,11 +21,11 @@ SAMPLE_FILE = Pathname.new('/test/file')
 
 # Tests for Chunks
 #
-class SysdefChunkTest < MiniTest::Test
+class TechChunkTest < MiniTest::Test
   attr_reader :tu
 
   def setup
-    @tu = Sysdef::Chunk.new(SAMPLE_FILE, SAMPLE_POST)
+    @tu = Tech::Chunk.new(SAMPLE_FILE, SAMPLE_POST)
   end
 
   def test_raw

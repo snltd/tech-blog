@@ -255,8 +255,8 @@ these things -- is to write logs and have them turned into metrics with a
 Cloudwatch "Metric Filter".
 
 Long-time Wavefront fans may be familiar with the way the proxies do
-[log ingestion](https://sysdef.xyz/post/2017-02-13-filebeat-wavefront), and this
-is very similar.
+[log ingestion](https://tech.id264.net/post/2017-02-13-filebeat-wavefront), and
+this is very similar.
 
 Let's amend our `metric_lambda` Lambda so it logs its random value.
 

@@ -180,7 +180,7 @@ zones, and found matching exit codes for all my jobs.
 
 On the home straight now, I just needed to change the output to something
 Wavefront understands. Normally I'd
-[pipe this into the Wavefront CLI](https://sysdef.xyz/post/2018-04-08-wavefront-writer),
+[pipe this into the Wavefront CLI](https://tech.id264.net/post/2018-04-08-wavefront-writer),
 but that's written in Ruby, and my SmartOS global zones don't have Ruby. But
 they do have `nc(1)`, so I just had to construct a
 [Wavefront wire format](https://docs.wavefront.com/wavefront_data_format.html)
