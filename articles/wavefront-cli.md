@@ -1066,9 +1066,7 @@ should you need to, you can separate out the command output. In `event wrap`
 mode, `wf` exits whatever the wrapped command exited. Here's a chart showing the
 event. (You have to hover over the event to see it.)
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/5x65sBxg4N/js" id="wavefront-embedded-5x65sBxg4N" width="600" height="300"></script>
-</div>
+!["broadcom deleted my account"](/i/deleted.png)
 
 ```cmd
 $ wf event describe "1501109228938:pointless busy work"

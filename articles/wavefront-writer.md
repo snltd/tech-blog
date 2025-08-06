@@ -182,9 +182,7 @@ Here are the points we just sent. Hover over them and you'll see the tags. (If
 you can't see the chart, you'll have to enable third-party cookies for this
 page, because the embedded graphs use Typekit.)
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/nLCyXFWP8F/js" id="wavefront-embedded-nLCyXFWP8F" width="600" height="300"></script>
-</div>
+["broadcom deleted my account"](/i/deleted.png)
 
 I did not specify a proxy endpoint or port in any of the above examples. The
 `write` command respects the `.wavefront` config file, so I have my proxy stowed
@@ -297,9 +295,7 @@ SDK INFO: body: dev.cli.file1 172.0 1744075549 source=slim
 And here's the chart. Hover over the points and you'll see the values from the
 file.
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/zKCbDP0w76/js" id="wavefront-embedded-zKCbDP0w76" width="600" height="300"></script>
-</div>
+["broadcom deleted my account"](/i/deleted.png)
 
 The key part of the `wf write file` command is the `-F` option. This lets the
 user describe the format of the file they wish `wf` to parse. `t` stands for
@@ -365,9 +361,7 @@ SDK INFO: body: dev.cli.demo 6167.0 source=slim
 
 Producing:
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/d27nsRXYmP/js" id="wavefront-embedded-d27nsRXYmP" width="600" height="300"></script>
-</div>
+["broadcom deleted my account"](/i/deleted.png)
 
 That's fine, but you're more likely to want to plot the output of a command, so
 to illustrate that, here's a little script which generates the points for a
@@ -399,9 +393,7 @@ and a description of the file format.
 $ ./parabola.rb | wf write file -m dev.cli.demo -V -F tv -
 ```
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/2fkpZVrNlt/js" id="wavefront-embedded-2fkpZVrNlt" width="600" height="300"></script>
-</div>
+["broadcom deleted my account"](/i/deleted.png)
 
 [Back in a previous article, I wrote some Ruby to wire DTrace into
 Wavefront](/post/2016-06-26-dtrace-wavefront). Now, I can use the `write file`
@@ -436,9 +428,7 @@ SDK INFO: dev.cli.d1.2 2146.0 source=cube
 and, with the whole thing wrapped in a `deriv()` expression, to turn a counter
 into a gauge, I see:
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/gxb85y7SCr/js" id="wavefront-embedded-gxb85y7SCr" width="600" height="300"></script>
-</div>
+["broadcom deleted my account"](/i/deleted.png)
 
 How about kstats? Say I'd like to see a chart of network throughput when I do an
 NFS copy between a couple of machines. That's now a one-liner. (Or it would be
@@ -459,9 +449,7 @@ SDK INFO: uri: POST https://metrics.wavefront.com/report
 ...
 ```
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/wVnxg1jL2J/js" id="wavefront-embedded-wVnxg1jL2J" width="600" height="300"></script>
-</div>
+["broadcom deleted my account"](/i/deleted.png)
 
 That required no setting up, and nothing beyond a local installation of the
 `wavefront-cli` gem. Now you have no excuse for not putting everything in
@@ -502,9 +490,7 @@ SDK INFO: demo.cli.histogram_1 17687.0 source=box
 
 produces:
 
-<div class="chart">
-<script src="https://metrics.wavefront.com/embedded/chnrYjQStl/js" id="wavefront-embedded-chnrYjQStl" width="600" height="300"></script>
-</div>
+["broadcom deleted my account"](/i/deleted.png)
 
 Once the results are in Wavefront, you can view them with an `hs()` (as opposed
 to `ts()`) expression, and apply various statistical functions. The chart above
