@@ -1,6 +1,6 @@
 ---
-title: "Deciding to Write My Own Config Management"
-date: 2025-07-19
+title: "Deciding to Write My Own Config Management Tool"
+date: 2025-06-04
 tags: [OmniOS, Rust, Janet, Gurp]
 layout: post
 category: Gurp
@@ -49,13 +49,13 @@ going to run on illumos.
 
 [Janet](https://janet-lang.org) is a small, fast language which implements many
 of Clojure's good ideas in a zero start-up-time C VM. I did a few days of Advent
-of Code with it a while back, and liked it, so Janet got the nod.
+of Code with it a couple of years ago and liked it, so Janet got the nod.
 
-I wrote , in a non-existent DSL, what I thought a machine implementation should
-look like. I tweaked it, decided it was rubbish, binned it, started again,
-decided the new approach was too opaque, spent a lot of time thinking about
-efficiency, clarity, and ergonomics, started a couple more times, and eventually
-I had something I liked.
+I wrote, in an invented DSL, what I thought a host configuration should look
+like. I tweaked it, decided it was rubbish, binned it, started again, decided
+the new approach was too opaque, spent a lot of time thinking about efficiency,
+clarity, and ergonomics, started a couple more times, and eventually I had
+something I liked.
 
 There were more changes of plan as things proved too difficult to implement (the
 brain-bendingness of Lisp macro expansion!) or led to inflexibility, or simply
@@ -106,47 +106,45 @@ with
   (loop [pkg :in packages] (pkg/ensure pkg)))
 ```
 
-You can (and I do) thread variables through things, use helper functions for
-common tasks, and basically do whatever you like without nasty artificiality.
-Infrastructure as actual code.
+You can thread variables through things, write helper functions for common
+tasks, and basically do whatever you like without nasty artificiality.
+Infrastructure as actual code. It's the future.
 
 ## Business in the Back
 
 As I started to make my nice clean definitions correspond to actions, I hit
-problems. The first came from the somewhat limited flexibility of Janet's module
-system. To get things working I had to have an awful lot of `(import)`s, and it
-started to look like there would be nearly as much stuff to carry around as
-there was with Puppet and Ansible. Bad start.
+problems. First, the somewhat limited flexibility of Janet's module system.
+Building any kind of modularised configuration meant an awful lot of
+`(import)`s, and it started to look like there would be nearly as much stuff to
+carry around as there was with Puppet and Ansible.
 
-Janet lets you build native executables as well as what it calls "image files",
-and I always had in the back of my mind the idea that you'd have a "server"
-which would build the config management tool and all your config into a single
-unique binary, which it would push to the target machine and run. But when I
-tried this I found Janet's illumos support was less complete than it looked, and
-things didn't work as expected.
+Many Janet modules need a C-compiler, and the last thing I wanted was a heavy
+dependency chain. You can, however, compile native binaries, and what Janet
+calls "image files", which are binary captures of environments. (In Lisp this
+means a program plus the definitions around it.) I toyed with the idea of a
+"server" which would compile all your config into a single `.jimage`. I even
+considered compiling the toll and config into a single unique binary, which the
+server could push to the target machine and run. But I found that extra
+compilation phase, and the idea of debugging binary artifacts, offputting.
 
-I
-[fixed most of that](https://github.com/snltd/sysdef-extra/tree/main/build/janet)
-and made illumos a first-class citizen of Janet, but even when all it could do
-was install packages and make directories, my solution was far messier than I
-wanted.
-
-Secondly, because Janet is a very minimal language, doing simple things like
-changing a file's owner requires either shelling out (which I didn't want to do,
-despite
-[this absolutely brilliant module](https://github.com/andrewchambers/janet-sh))
-or writing C extensions which add new Janet functions.
+Janet is a very minimal language, which is not necessarily a bad thing, but I
+soon hit its edges. For instance, there's no way to natively change a file's
+owner. You have to shell out (which I didn't want to do, despite
+[this absolutely brilliant module](https://github.com/andrewchambers/janet-sh)),
+or you have to add new functions by either extending the core language or
+writing a C extension.
 
 I haven't written any C from scratch this century, but I've become quite the
-Rust fan lately, so I had a look around for bindings, and
-[found them](https://docs.rs/janetrs/latest/janetrs/). This meant I could write
-Rust modules for the bits native Janet couldn't cover. But then, why not write
-the main thing in Rust, and embed a Janet interpreter? That means very tight
+Rust fan lately, so I had a look around for Rust/Janet bindings, and
+[found them](https://docs.rs/janetrs/latest/janetrs/). I could certainly write
+Rust modules for the bits native Janet couldn't cover, but why not write the
+main thing in Rust, embedding a Janet interpreter? That would give me very tight
 system integration, speed, safety, static typing where it counts, and a single
-binary. No mess either, because with a single `include_str!()` I could embed my
-ever-growing Janet DSL inside the binary. Single-file deployment FTW.
+binary, which could even have my ever-growing Janet DSL embedded inside it.
 
-So that's the approach I chose, and these were my initial goals.
+As this was meant to be a fun side-project, I was happy to see what direction it
+went in and not plan it out too much. But I did make a little list of rules for
+myself.
 
 - Configuration is defined in a thin Janet DSL.
 - Rust will do all the work.
@@ -154,10 +152,12 @@ So that's the approach I chose, and these were my initial goals.
   Ansible config.
 - It is illumos-specific. It will not support any other OS, but it will
   integrate cleanly with things like SMF and ZFS.
-- It is as fast as it reasonably can be. (The bottleneck will always be the
-  painfully slow `pkg(8)`, and there's no way around that.)
-- It will be as simple and minimal as it reasonably can be. Features will be
-  added as they are needed. The road to hell is paved with "It might be nice
-  if...", and "one day I might want to...".
+- It is as fast as it reasonably can be.
+- It will be as simple and minimal as it reasonably can be.
 
-And I decided to call it `gurp`.
+The main one was the last one. Features will be added as they are needed. The
+road to hell is paved with "It might be nice if...", and "one day I might want
+to...".
+
+For reasons too silly to go into I decided to call it Gurp, and I
+[put it on Github](https://github.com/snltd/gurp),

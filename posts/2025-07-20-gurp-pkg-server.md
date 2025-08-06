@@ -1,5 +1,5 @@
 ---
-title: "Adventures in Gurp: `pkg` Server"
+title: "Adventures in Gurp: Building a pkg Server"
 date: 2025-07-20
 tags: [OmniOS, Rust, Janet, Gurp]
 layout: post

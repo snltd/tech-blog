@@ -1,16 +1,21 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-
+ENV['RACK_ENV'] ||= 'test'
+ENV['RACK_ALLOWED_HOSTS'] = '.*'
+# require 'erb'
+require 'minitest'
+require 'minitest/autorun'
+require 'minitest/unit'
+require 'nokogiri'
+# require 'pathname'
 require 'rack/builder'
-
-%w[minitest minitest/unit minitest/autorun rack/test pathname
-   erb nokogiri].each { |f| require f }
+require 'rack/test'
 
 APP_ROOT = Pathname.new(__dir__).realpath.parent.parent
 
 OUTER_APP = Rack::Builder.parse_file(APP_ROOT.join('config.ru').to_s)
 
-# Acceptance tests for the Sysdef website. Just hit the app lots and
+# Acceptance tests for my tech website. Just hit the app lots and
 # lots of times
 #
 class TestSysdef < MiniTest::Test
@@ -106,7 +111,7 @@ class TestSysdef < MiniTest::Test
   end
 
   def assert_footer(body)
-    assert_includes(body.css('footer').inner_text, 'Sysdef')
+    assert_includes(body.css('footer').inner_text, 'the author')
     assert_includes(body.css('footer').inner_text, Date.today.year.to_s)
   end
 
