@@ -16,20 +16,20 @@ CloudFormation, Fabric, Terraform, Ansible, and various Kubernetes-related
 YAML-wranglers, all with varying degrees of distaste and disappointment.
 
 These days, commercially, it's just Terraform: I haven't been paid to manage
-servers in a good while. But at home I have a couple of OmniOS boxes which run a
-couple of dozen zones providing various home- and hobby-related services.
+servers in a good while. But at home I have a couple of
+[OmniOS](https://omnios.org/) boxes which run a couple of dozen zones providing
+various home- and hobby-related services.
 
-I used to configure these with Puppet, using
+I used to configure everything with Puppet, using
 [my own illumos-specific fork](https://github.com/snltd/puppet-solaris_providers)
 of [Oracle's providers](https://github.com/oracle/puppet-solaris_providers), but
-keeping it running got to be more and more work, and when OmniOS eventually
-dropped support for the only OpenSSL version that worked with it, I couldn't be
-bothered any more, and I switched to Ansible.
+it was always a bit of a house of cards, and keeping it working took effort.
+When OmniOS dropped support for the only OpenSSL version that worked with it, I
+couldn't be bothered any more, and I switched to Ansible.
 
-I'm not the biggest Ansible fan. It works, and it has surprisingly reasonable
-support for illumos, but it made me think that perhaps it was finally time to
-scratch that itch I've always had, and write my own, insanely-specific, config
-management tool.
+Ansible works, and it has surprisingly complete support for illumos, but it made
+me think that perhaps it was finally time to scratch that itch I've always had,
+and write my own, insanely-specific, illumos config management tool.
 
 And rule #1: NO YAML.
 
@@ -42,14 +42,16 @@ I've always been interested in [Clojure](https://clojure.org/), and because it's
 JVM-based it will run on illumos. But I don't want to have to install a JVM and
 Clojure package on every zone I want to configure. The reason I stopped using
 Chef was because it wanted more memory than my zones were allowed to use, and a
-JVM isn't going to improve that. So no Clojure.
+JVM isn't going to improve that. So no Clojure, even though that's the flavour I
+know. (Scheme and Common Lisp are a bit of a mystery to me.)
 
-[Babashka](https://babashka.org/) is nice, but it uses GraalVM, so it's never
-going to run on illumos.
+[Babashka](https://babashka.org/) is a fast-startup Clojure, but built around
+GraalVM, which means it will never run on illumos.
 
 [Janet](https://janet-lang.org) is a small, fast language which implements many
-of Clojure's good ideas in a zero start-up-time C VM. I did a few days of Advent
-of Code with it a couple of years ago and liked it, so Janet got the nod.
+of Clojure's good ideas in a (close to) zero start-up-time C VM. I did a few
+days of Advent of Code with it a couple of years ago and liked it, so Janet got
+the nod.
 
 I wrote, in an invented DSL, what I thought a host configuration should look
 like. I tweaked it, decided it was rubbish, binned it, started again, decided
@@ -94,10 +96,12 @@ A role might look like this:
                :content "%sysadmin ALL=(ALL:ALL) ALL"))
 ```
 
-That, I think, is clear and elegant. Written this way it isn't all that
-different from the hated YAML, but it's a real language, so not only can you put
-spaces wherever you like, but if you wished you could install those packages
-with
+That, I think, is clear and elegant. It would be nice to not need the
+`(import)`s, but you've got to link files somehow.
+
+Written in such a simple way my config doesn't look all that different from the
+hated YAML, but it's a real language, so not only can you put spaces wherever
+you like, but if you wished you could install those packages with
 
 ```janet
 (def packages ["shell/zsh" "ooce/editor/helix" "ooce/text/ripgrep" "ooce/util/fd"])
@@ -112,20 +116,21 @@ Infrastructure as actual code. It's the future.
 
 ## Business in the Back
 
-As I started to make my nice clean definitions correspond to actions, I hit
-problems. First, the somewhat limited flexibility of Janet's module system.
-Building any kind of modularised configuration meant an awful lot of
-`(import)`s, and it started to look like there would be nearly as much stuff to
-carry around as there was with Puppet and Ansible.
+As I started to make my lean, clean definitions correspond to actions, I found
+myself restricted by the somewhat limited flexibility of Janet's module system.
+Building any kind of modularised configuration meant an awful lot of the kind of
+`(import)` boilerplate I was so keen to avoid.
 
-Many Janet modules need a C-compiler, and the last thing I wanted was a heavy
-dependency chain. You can, however, compile native binaries, and what Janet
-calls "image files", which are binary captures of environments. (In Lisp this
-means a program plus the definitions around it.) I toyed with the idea of a
-"server" which would compile all your config into a single `.jimage`. I even
-considered compiling the toll and config into a single unique binary, which the
-server could push to the target machine and run. But I found that extra
-compilation phase, and the idea of debugging binary artifacts, offputting.
+To try to get around this, I looked into what Janet calls "image files". These
+are binary captures of environments, which means a Lisp program plus the
+definitions around it. Bundling config and supporting libraries into a `.jimage`
+could certainly make distribution simpler.
+
+Going further, Janet programs can be compiled into native executables, and I
+toyed with the idea of a "server" which would build tool, libraries, and config
+into a single unique binary which could be pushed to a target and run. But I
+found that extra compilation phase, and the idea of debugging binary artifacts,
+offputting.
 
 Janet is a very minimal language, which is not necessarily a bad thing, but I
 soon hit its edges. For instance, there's no way to natively change a file's
@@ -136,11 +141,12 @@ writing a C extension.
 
 I haven't written any C from scratch this century, but I've become quite the
 Rust fan lately, so I had a look around for Rust/Janet bindings, and
-[found them](https://docs.rs/janetrs/latest/janetrs/). I could certainly write
-Rust modules for the bits native Janet couldn't cover, but why not write the
-main thing in Rust, embedding a Janet interpreter? That would give me very tight
-system integration, speed, safety, static typing where it counts, and a single
-binary, which could even have my ever-growing Janet DSL embedded inside it.
+[found them](https://docs.rs/janetrs/latest/janetrs/). I could write Rust
+modules for the bits native Janet couldn't cover, but why not flip things
+around, and use Rust for main program, embedding a Janet interpreter? That would
+give me very tight system integration, speed, safety, static typing where it
+counts, and a single binary, which could even have my ever-growing Janet DSL
+embedded inside it.
 
 As this was meant to be a fun side-project, I was happy to see what direction it
 went in and not plan it out too much. But I did make a little list of rules for
@@ -159,5 +165,11 @@ The main one was the last one. Features will be added as they are needed. The
 road to hell is paved with "It might be nice if...", and "one day I might want
 to...".
 
-For reasons too silly to go into I decided to call it Gurp, and I
+I've always felt the downfall of the likes of Puppet and friends was their
+relentless feature creep and huge, mostly stale, community ecosystems. You can
+accomplish a heck of a lot by dropping a file and restarting a service, so I
+decided, at least in its first iteration, do provide no mechanism for running
+arbitrary commands.
+
+For reasons too silly to go into I decided to call my program Gurp, and I
 [put it on Github](https://github.com/snltd/gurp),

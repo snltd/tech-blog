@@ -1,4 +1,4 @@
-app = 'tech'
+app = 'sysdef'
 primary_region = 'lhr'
 
 [build]
