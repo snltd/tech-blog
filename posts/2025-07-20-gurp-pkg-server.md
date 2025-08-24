@@ -7,8 +7,8 @@ category: Gurp
 ---
 
 I held off adding an "execute arbitrary command" feature to
-[`gurp`](https://github.com/snltd/gurp). I don't want it to be just another way
-to run stupid shell scripts. But, I needed to build a pkg repo (to host
+[Gurp](https://github.com/snltd/gurp). I don't want it to be just another way to
+run stupid shell scripts. But, I needed to build a pkg repo (to host
 [stuff I build myself](https://github.com/snltd/sysdef-extra), and to set up one
 of those you must run a couple of commands.
 
@@ -30,7 +30,7 @@ To install a service on Ansible, I had to copy in an XML manifest, check the
 current state of the service by shelling out to `svcs` and registering the
 stdout of the command, then inspect that stdout and run `svccfg import` (or
 not), and finally assert the state of the service. It was a pain, and I wanted
-to do better in `gurp`.
+to do better in Gurp.
 
 My approach ended up with three doers. `svc` simply asserts the state of a
 service.
@@ -47,17 +47,21 @@ service I use to start
 (smf/ensure "telegraf"
     :description "Run Telegraf agent"
     :fmri svc
-    :start-method
-      {:exec "/opt/site/lib/smf/method/telegraf start"
-       :timeout 60
-       :context
-          {:user "telegraf"
-           :group "daemon"
-           :privileges "basic,file_dac_search,sys_admin,proc_owner,proc_zone"}}))
+    (smf-method "start"
+      :exec "/opt/site/lib/smf/method/telegraf start"
+      :user "telegraf"
+      :group "daemon"
+      :privileges ["basic" "file_dac_search" "sys_admin" "proc_owner" "proc_zone"]))
 ```
 
-As usual, `gurp` has what I think are sensible defaults. For instance, if you
-don't provide a `stop-method`, you get the `:kill` one that most services use.
+I thought long and hard about `(smf-method)`. Originally I had all methods
+defined as structs, with the method context as a nested struct, and it felt only
+slightly better than writing the XML. With `(smf-method`) you put everything at
+the same level, and Gurp sorts it out for you. It can even fill in blanks. I
+haven't specified a timeout, so Gurp will put in a 60-second default.
+
+I haven't put in a `stop` method, but Gurp will give me one using the `:kill`
+feature that most services use.
 
 The `smf` doer was written to do only the things I needed, and at the time I
 didn't need transient services, so I added a `:duration` key. If you define
@@ -73,7 +77,7 @@ like this:
 Next problem. The pkg server runs as a named instance of the
 `svc:/application/pkg/server` service, in my case
 `svc:/application/pkg/server:sysdef`. You have to create that instance yourself,
-then set properties on it to make it work right. `gurp` absolutely could not do
+then set properties on it to make it work right. Gurp absolutely could not do
 this.
 
 As usual, I tried a couple of approaches. First I defined `:instances` in the
@@ -84,7 +88,7 @@ after `svcprop`.
 
 In the end I decided to make it automagic. A `svcprop` resource is defined with
 the instance name, in this case `svc:/application/pkg/server:sysdef`. If the
-`sysdef` instance does not exist, `gurp` will use `svccfg` to create it. Then it
+`sysdef` instance does not exist, Gurp will use `svccfg` to create it. Then it
 can create any property groups you defined, and the properties they contain.
 Finally it refreshes the service, and the `svc` doer asserts the state at the
 end of the run.
@@ -151,7 +155,7 @@ Now I can define my pkg server like this.
                   :fmri setup-svc
                   :description "transient service to create pkg repo"
                   :duration "transient"
-                  :start-method {:exec setup-method})
+                  (smf-method "start" :exec setup-method)
 
       (file/ensure setup-method
                    :mode "0755"

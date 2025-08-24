@@ -198,20 +198,19 @@ the user an `add` macro which appends its resources to `collector`. You'd write
 
 This reminded me of those pretend loops you get in things like Ansible and HCL,
 and actually felt worse than using `map`. Eventually and inevitably, with `add`
-being a macro, I even hit a weird edge case behaviour that gave incorrect
-results.
+being a macro, I hit a weird edge case that gave incorrect results.
 
 I played with various approaches using dynamic bindings, and even channels
 between "collector" and "aggregator" fibers, but all my solutions felt flaky, or
 burdened the user. The subtler the approaches got, the further they felt from
 being "right". Then one morning, the junior developer in me woke up and shouted
-"GLOBAL VARIABLE". And, I think, he was right.
+`$GLOBAL_VARIABLE`. And, I think, he was right.
 
 Now, at the top of the Gurp library, I define a `*collector*` struct with
 `:ensure` and `:remove` structs inside it, holding arrays for each resource
 type. Every `(ensure)` and `(remove)` call appends its resource to the right
 array in the collector, so no complicated collation is required, and it makes no
-difference if function is called inside a loop.
+difference if it is called any kind of control structure.
 
 I'm no happier with mutable global state than you are, and I tried everything I
 could to avoid it. Maybe, as I get a deeper understanding of Janet, I'll come up
@@ -222,4 +221,6 @@ But, we have to balance good taste with practicality. Using a single global
 state is extremely simple. It suits a very clean and thin DSL. And because every
 Gurp operation is a single-threaded one-and-done, there's nothing to cause
 unexpected behaviour. We simply append to lists, then pass the results to Rust
-and shut down the Janet interpreter. I can live with myself for that, can't I?
+and shut down the Janet interpreter.
+
+I don't have to hide Github from my family for that, do I?
