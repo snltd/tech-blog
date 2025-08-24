@@ -160,11 +160,12 @@ plugin: everything else is in a MySQL DB.)
 (import ../globals)
 (import ../secrets)
 
-(def zfs-mounter "/etc/init.d/zfs-mount")
 (def data-dir "/var/lib/grafana")
 (def grafana-init "/etc/init.d/grafana")
+(def zfs-mounter "/etc/init.d/zfs-mount")
 
 (role grafana
+      # No mountpoint property means it is not mounted at all
       (zfs/ensure (zfscat globals/fast-pool "zone" "grafana"))
 
       (zfs/ensure (zfscat globals/fast-pool "zone" "grafana" "data")
@@ -177,7 +178,6 @@ plugin: everything else is in a MySQL DB.)
                # happening.
                (indoc zfs-mount-script ```
                     #!/sbin/openrc-run
-
                     description="Mount delegated ZFS dataset"
 
                     depend()
@@ -222,42 +222,24 @@ plugin: everything else is in a MySQL DB.)
                                  :replace "127.0.0.1" :with "0.0.0.0")
 
                # Configure Grafana through a template. Again, you'd likely keep
-               # this in its own file.
+               # this in its own file. I've taken some stuff out to keep it short.
                (indoc grafana-ini-template ```
                     [paths]
                     data = {{ data-dir }}
                     logs = /var/log/grafana
                     plugins = {{ data-dir }}/plugins
-                    provisioning = conf/provisioning
-
-                    [server]
-                    protocol = http
-                    http_port = 3000
 
                     [database]
                     type = mysql
-                    host = {{ mysql-host }}:3306
+                    host = mysql:3306
                     name = grafana
                     user = grafana
-                    password = {{ mysql-password }}
-
-                    [log]
-                    mode = console file
-                    level = info
-
-                    [news]
-                    news_feed_enabled = false
-
-                    [metrics]
-                    enabled           = true
-                    ```)
+                    password = {{ passwd }}```)
 
                (file/ensure "/etc/grafana.ini"
-                            :content (
-                              template-out grafana-ini-template
-                                           {:data-dir data-dir
-                                            :mysql-host "mysql"
-                                            :mysql-password secrets/mysql-password}))))
+                            :content (template-out grafana-ini-template
+                                                   {:data-dir data-dir
+                                                    :passwd secrets/mysql-password}))))
 ````
 
 This doesn't actually start the `grafana` service, so I added a `:final-state`
