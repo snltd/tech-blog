@@ -161,7 +161,16 @@ repeatable test. Minimum effort, maximum satisfaction.
 
 The `($)` macro is extremely capable, and can handle flags, pipes, errors, and
 anything else you could wish for. So it's super easy to write targeted shell
-commands. Or if it's neater, I can capture output, parse it in Janet with
+commands.
+
+How about this, which asserts that `pkg list missing/package` fails, `false`
+dumping standard error to `/dev/null`.
+
+```janet
+(test ($? pkg list missing/package :> [stderr :null]) false))
+```
+
+Or if it's neater, I can capture output, parse it in Janet with
 [a PEG](https://janet-lang.org/docs/peg.html) or whatever, and assert on some
 aspect of that parsed output.
 
@@ -203,6 +212,7 @@ I write a skeleton test of all the things I want to check, like
 
 ```janet
 (deftest "test-zone"
+  # Janet's (os/stat) is too detailed, giving inodes and other info we'd have to drop
   (test ($< /bin/stat -c "%U:%G %A" /export/home/backup))
 
   (test ($< /bin/svcs -Ho state svc:/sysdef/telegraf:default)))
@@ -225,6 +235,3 @@ file becomes
 
 If the results look good, I'm done. The next time I `run-tests.sh` the tests
 will pass. Assuming Gurp works, of course.
-
-I like this solution so much I'm toying with the idea of writing a tiny
-ServerSpec style tool around it.

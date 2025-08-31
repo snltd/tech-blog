@@ -106,12 +106,12 @@ My original approach was to have the front-end "compile" the user configuration
 into a single `Janet` holding one big `JanetStruct`. I had functions which
 unpacked each resource type into appropriate Rust structures.
 
-This approach gave me complete control. I could check and adjust as needed,
-giving exact, clear messages about missing or incorrectly typed fields, and I
-liked that a lot. But it all felt wrong, with lots of similar code doing similar
-things, but just different enough that I couldn't nicely DRY it up. And whatever
-I did, at some point I had to return data across that Janet/Rust boundary, and I
-simply could not find a nice way to do that.
+This gave me complete control. I could check and adjust as needed, giving exact,
+clear messages about missing or incorrectly typed fields, and I liked that a
+lot. But it all felt wrong, with lots of similar code doing similar things, but
+just different enough that I couldn't nicely DRY it up. And whatever I did, at
+some point I had to return data across that Janet/Rust boundary, and I simply
+could not find a nice way to do that.
 
 I decided I needed weaker coupling between the front and the back. I wanted
 Janet to give me a single JSON object, which I could deserialize with Serde. So
@@ -128,15 +128,14 @@ I revisited the JSON approach, but this time I wanted the Janet front-end to
 produce the object, so the `Janet -> Janet` function would return a `Janet`
 wrapped `String`. this would be clean and simple.
 
-Janet has a utility library called Spork, which includes a great JSON
-serializer. But that's written in C and built with JPM, and building that into
-my binary would be messy at best. I found a couple of pure Janet JSON libraries,
-but neither worked very well. I ended up hacking one of them into shape, and
-bundling it in my binary. I did a big refactor, making Serde the centre of the
-Universe, and shed about a quarter of the codebase. My errors weren't as good as
-before, but I added some lints and checks to the Janet code, catching the
-likeliest user errors right at the start. The whole thing felt so much more
-_right_.
+Janet has a utility library called Spork, which includes a JSON serializer. But
+it's written in C and built with JPM, and building that into my binary would be
+messy at best. I found a couple of pure Janet JSON libraries, but neither worked
+very well. I hackedone of them into shape, and bundled it in my binary. Then a
+big refactor, making Serde the centre of the Universeand shed about a quarter of
+the codebase. My errors weren't as good as before, so I added some lints and
+checks to the Janet code, catching the likeliest user errors right at the start.
+The whole thing felt so much more _right_.
 
 After a little white I revisited the original Rust JSON encoder, smartened it
 up, fixed a couple of edge cases, and replaced the pure Janet version. This

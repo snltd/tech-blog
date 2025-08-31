@@ -88,20 +88,22 @@ a proper parser like [pest](https://pest.rs).
 Broadcom turned off my Wavefront account, which means I need some other way of
 collecting and graphing metrics. OmniOS provides a
 [VictoriaMetrics](https://victoriametrics.com/) package, but no Grafana. I had a
-quick look at building a native package, but it looked somewhere between loads
-of work and impossible. It should, however, run pretty easily in an LX Zone.
+quick look at building a native Grafana package, but it looked somewhere between
+"loads of work" and "impossible". It should, however, run pretty easily in an LX
+Zone.
 
 For those who don't know, an LX zone is an illumos container which converts
-system calls from the Linux to SunOS. This means that you can run the vast
-majority of Linux software with zero effort. Once you have the zone, that is.
+system calls from the Linux to the SunOS kernel. This means that you can run the
+vast majority of Linux software with zero effort. Once you have the zone, that
+is.
 
 Whereas native zones install by adding packages from a repo, LX zones install
-from a pre-baked image. The OmniOS project provides
+from a pre-baked image file. The OmniOS project provides
 [images for various Linux distributions](https://github.com/omniosorg/lx-images/releases),
 but I didn't want to have to get my `wget` on every time I wanted to build a
 zone. So I gave Gurp a helper which pulls images down and caches them in
-`/var/tmp`. It looks at the latest release in the lx-images Github which matches
-the pattern you give it. Say these are the latest releases:
+`/var/tmp`. It looks at the latest release in the `lx-images` Github which
+matches the pattern you give it. Say these are the latest releases:
 
 ```
 lx-alma-8-2025-04-10_13-01-56.tar.xz
@@ -148,9 +150,11 @@ needed to be done, but I didn't like it. It was cheating, and it wasn't config
 management, it was setting something up then leaving it alone, like Jumpstart
 in 1996.
 
-I chose to write a super-basic `apk` doer. It can install and remove packages.
-Nothing else. The `file` and `file-line` doers were capable enough to install my
-Grafana config and modify a couple of files.
+Like so many people, the first time my principles were challenged, I threw them
+out of the window, in this case, by writing a super-basic `apk` doer. It can
+install and remove packages. Nothing else. The `file` and `file-line` doers were
+capable enough to install my Grafana config and modify the couple of things that
+needede changing.
 
 Here's the full config, with annotations. I share a ZFS dataset from the global
 zone which holds persistent data. (In this case, just the VictoriaMetrics
@@ -242,6 +246,7 @@ plugin: everything else is in a MySQL DB.)
                                                     :passwd secrets/mysql-password}))))
 ````
 
-This doesn't actually start the `grafana` service, so I added a `:final-state`
-property to the `zone` doer that reboots the zone. The service starts on boot,
-and it's never a bad idea to reboot-test.
+This config doesn't actually start the `grafana` service. I drew the line at
+manaaging rc services, so I added a `:final-state` property to the `zone` doer
+that reboots the zone. The service starts on boot, and it's never a bad idea to
+reboot-test.
