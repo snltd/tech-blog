@@ -225,25 +225,27 @@ plugin: everything else is in a MySQL DB.)
                (file-line/ensure "/etc/conf.d/grafana"
                                  :replace "127.0.0.1" :with "0.0.0.0")
 
-               # Configure Grafana through a template. Again, you'd likely keep
-               # this in its own file. I've taken some stuff out to keep it short.
-               (indoc grafana-ini-template ```
-                    [paths]
-                    data = {{ data-dir }}
-                    logs = /var/log/grafana
-                    plugins = {{ data-dir }}/plugins
-
-                    [database]
-                    type = mysql
-                    host = mysql:3306
-                    name = grafana
-                    user = grafana
-                    password = {{ passwd }}```)
+               # Configure Grafana. Gurp will turn this struct into an ini file
+               (def grafana-config
+                 {:paths {:data data-dir
+                          :logs "/var/log/grafana"
+                          :plugins (pathcat data-dir "plugins")
+                          :provisioning "conf/provisioning"}
+                  :server {:protocol "http"
+                           :http_port 3000}
+                  :database {:type "mysql"
+                             :host "mysql"
+                             :name "grafana"
+                             :user "grafana"
+                             :password secrets/grafana-mysql-password}
+                  :log {:mode "file"
+                        :level "info"}
+                  :news {:news_feed_enabled false}
+                  :metrics {:enabled true}})
 
                (file/ensure "/etc/grafana.ini"
-                            :content (template-out grafana-ini-template
-                                                   {:data-dir data-dir
-                                                    :passwd secrets/mysql-password}))))
+                  :from-struct grafana-config
+                  :to-format "ini")))
 ````
 
 This config doesn't actually start the `grafana` service. I drew the line at
