@@ -252,3 +252,27 @@ This config doesn't actually start the `grafana` service. I drew the line at
 manaaging rc services, so I added a `:final-state` property to the `zone` doer
 that reboots the zone. The service starts on boot, and it's never a bad idea to
 reboot-test.
+
+I added a `(recreate)` function which makes it easy for me to recreate zones on demand.
+
+```janet
+(defn recreate?
+  "If GURP_RECREATE_ZONE is a zone name, recreate that zone. If it's all, do them all"
+  [zone-name]
+  (def env-val (os/getenv "GURP_RECREATE_ZONE"))
+    (if (or (= env-val "ALL") (= env-val zone-name)) 1 200))
+```
+
+If I want to just rebuild the package server zone:
+
+```cmd
+# GURP_RECREATE_ZONE=serv-pkg gurp apply zones.janet
+```
+
+will do it, and if I want to recreate all my zones, perhaps because I've changed the gold zone config:
+
+```cmd
+# GURP_RECREATE_ZONE=all gurp apply zones.janet
+```
+
+will do it. And there's a 1-in-200 chance any zone will be recreated on any Gurp run, just to keep things spicy.

@@ -6,9 +6,11 @@ layout: post
 category: Gurp
 ---
 
-When you're writing a tool whose sole purpose is to run as root and change
-things, you've got to be pretty confident it's going to do what you think it's
-going to do. This means tests. Loads of tests.
+When you're
+[writing a config management tool](https://tech.id264.net/post/2025-06-04-deciding-to-write-gurp)
+-- whose sole purpose is to run as root and change things -- you've got to be
+pretty confident it's going to do what you think it's going to do. This means
+tests. Loads of tests.
 
 ### Unit Tests for Vanity
 
@@ -19,46 +21,54 @@ As an absolute Rust novice I wrote a lot of unit tests. I was in the habit,
 having come from a Ruby background, and it helped me understand the basics of
 the language. But as I became more able, I found I had more confidence in my
 code than I've had with any other language. Unit tests seemed necessary only if
-I was implementing some hard-to-understand, complex logic.
+I was implementing some hard-to-understand, complex logic. Most of my Rust
+projects now only have integration, or even full end-to-end tests.
 
 If you look at
 [Gurp's Janet code](https://github.com/snltd/gurp/tree/main/janet_src), however,
-you'll find that pretty much every function and every macro has tests. I think
-behaviour has to be pinned down somehow, and a quick unit test is a good way to
-that. (I'm not strongly opinionated on static vs dynamic typing. They both have
-pros and cons, all of which are usually overstated.)
+you'll find that pretty much every function and every macro has unit tests. I
+think behaviour has to be pinned down somehow, and a quick
+assert-output-from-input is a good way to that. (I'm not strongly opinionated on
+static vs dynamic typing. They both have pros and cons, all of which are usually
+overstated.)
 
 ### Functional Tests for Sanity
 
-What Gurp lacked was strong functional tests.
+What Gurp lacked was strong functional tests, but different parts of it mandated
+different approaches.
 
-The `file-line` doer is pure Rust, and OS-agnostic, so you can test it
-thoroughly from `mod test{}`.
+The `file-line` doer is pure Rust. It calls no external commands, so it's
+OS-agnostic, and you can test it thoroughly from `mod test{}`, creating and
+manipulating real files with
+[`assert_fs`](https://docs.rs/assert_fs/latest/assert_fs/). It all works just
+fine on my illumos dev box, my Mac, and in Github actions.
 
-`file` and `directory` are harder because, even though they don't shell out,
-they can change file ownership which, running as a normal user, `cargo`
-(probably) can't do. Github actions lets us run things in containers, so we
-could run as root, and write tests that perform real actions on real files, then
-use [`assert_fs`](https://docs.rs/assert_fs/latest/assert_fs/) and a bit of
-metadata inspection to check things worked. But running as root is dirty. We're
-better than that.
+`file` and `directory` are harder because, even though they also don't shell
+out, they can change file ownership which, running as a normal user, `cargo`
+(probably) can't do.
 
-How about something like SMF? We can test that sensible-looking manifests are
-generated from user input, but how do we ensure that when those manifests are
-imported, they do the right thing? We can't run SMF in Docker, so the best we
-can do is assert the manifests Gurp generates, and the commands it runs. That
-introduces a lot of messy mocking, and it's never going to be the same as
-interacting with a real OS.
+I could do some `pfexec` chicanery on my dev box, and Github Actions lets us run
+things in containers. So we could let `cargo` take privileged actions, and write
+tests that perform real actions on real files then use a bit of metadata
+inspection to check things worked. But running as root is dirty. We're better
+than that.
+
+And how about something like SMF? We can test that sensible-looking manifests
+are generated from user input, but how do we ensure that when those manifests
+are imported, they do the right thing? We can't run SMF in Docker, or on a Mac,
+so the best we can do is assert the manifests Gurp generates, and the commands
+it runs. That introduces a lot of messy mocking, and it's never going to be the
+same as interacting with a real OS.
 
 Proper functional tests can only run on an illumos box. Fine. That's where I do
 90% of my development. Gurp itself can spin up a zone and run a command in that
 zone, so it seems like it could be used to test itself. But what should it run
 inside that zone?
 
-Gurp should be idempotent, so a simple test would be to run it once, then run it
-again and assert that it makes no changes. That proves some amount of the
-internal logic, but it does not prove it did what it said it would. It may have
-got `owner` and `group` the wrong way round on every file both times.
+Gurp's actions ought to be idempotent, so a simple test would be to run it once,
+then run it again and assert that it makes no changes. That proves some amount
+of the internal logic, but it does not prove it did what it said it would. It
+may have got `owner` and `group` the wrong way round on every file both times.
 
 The obvious approach is to write a tester, probably in Rust. But I know if I did
 that I'd end up re-using the code from Gurp itself, or at least taking a very
@@ -69,25 +79,25 @@ always set files to `2755` instead of `0755` on illumos? Admittedly it's a
 forced example, but I don't like the idea of using something to test itself. I
 need to look at another language.
 
-In the past I wrote a lot of ServerSpec. It's a decent tool but it's rather old,
-and it requires Ruby. Ruby is a big package, with a lot of files, and I don't
-want to have to drop it into my test zone every time. I could build a reference
-zone with Ruby and all the required gems, and have Gurp clone a fresh zone from
-that every time it wanted to run the tests, but ServerSpec is pretty old, and I
-don't know how good its illumos support might be.
+Once upon a time I wrote a lot of ServerSpec, and I quite liked it. But it's old
+now, and I have no idea how well it might support illumos. It also needs a full
+Ruby runtime, which means I'd have to build a reference zone with Ruby and all
+the required gems, then have Gurp clone a fresh zone from that every time it
+wanted to run the tests. That's not so painful, but there was something about
+polluting the test environment that put me off.
 
 I like Ruby, and I considered a from-scratch Ruby checker, but there's no way
-around that Ruby runtime. I even thought about Crystal, but the illumos support
-for it was extremely sketchy the last time I looked.
+around that runtime. I even thought about Crystal, but the illumos support for
+it was extremely sketchy the last time I looked.
 
 Through gritted teeth, I looked at the YAML-driven
 [goss](https://github.com/goss-org/goss). It fell at the first hurdle, having
 dependencies that don't build on illumos, and even if I got it working, I'd have
 to implement support for things like `svcprop` myself.
 
-So why not write something a little like `goss` myself, in Go? Well, this is
-supposed to be a fun project, which rules Go out completely. And, again, I don't
-want to write TWO config management tools.
+So why not write something a little like `goss`, in Go? Well, this is supposed
+to be a fun project, which rules Go out completely. And, again, I don't want to
+write TWO config management tools.
 
 When I set down my requirements:
 
@@ -110,7 +120,7 @@ Say you put this in a file:
 ```janet
 (use judge)
 
-(test (-> ["P" "R" "U" "G"] (reverse) (string/join) (string/ascii-upper)))
+(test (-> ["p" "r" "u" "g"] (reverse) (string/join) (string/ascii-upper)))
 ```
 
 and run `judge`, you see
@@ -118,8 +128,8 @@ and run `judge`, you see
 ```
 # a.janet
 
-(test (-> ["P" "R" "U" "G"] (reverse) (string/join) (string/ascii-upper)))
-(test (-> ["P" "R" "U" "G"] (reverse) (string/join) (string/ascii-upper)) "GURP")
+(test (-> ["p" "r" "u" "g"] (reverse) (string/join) (string/ascii-upper)))
+(test (-> ["p" "r" "u" "g"] (reverse) (string/join) (string/ascii-upper)) "GURP")
 
 0 passed 1 failed
 ```
@@ -128,7 +138,7 @@ Notice that Judge has filled in the second half of the comparison. And if you
 run `judge -a`, it will write that value into the file. If you are happy with
 the value, leave it there (you can of course put the value in yourself), and
 when you re-run `judge`, the test will pass. Given that collecting the values
-for the assertions was going to be half the work, this is a big win.
+for the assertions is half the work, this is a big win.
 
 ### janet-sh
 
@@ -141,10 +151,10 @@ shell scripting just about as nice as shell scripting can be.
 ```
 
 Does exactly what you think it will. And `($< ls /etc | grep pass)` will capture
-stdout, allowing you to use it in scripts.
+stdout.
 
 Putting the two together, let's say I want to test that my publisher got added
-as it should.
+as it should. You list publishers with `pkg publisher`.
 
 ```janet
 (use judge)
@@ -176,11 +186,11 @@ aspect of that parsed output.
 
 ## Implementation
 
-I made a new project, called Merp. It is in my home directory, which is
+I made a new project, called Merp. It sits in my home directory, which is
 accessible from my main dev zone and also from the global zone of the machine
-which hosts it. From the dev zone, which has Janet installed, I run a script
-which copies in the `janet` binary, and uses `jpm` (the Janet package manager)
-to install the `judge` and `sh` modules.
+which hosts it. From the Janet-equipped dev zone, I run a script which copies in
+the `janet` binary, and uses `jpm` (the Janet package manager) to install the
+`judge` and `sh` modules.
 
 In the global zone, I run a script `setup.sh`, which installs a clean zone and
 copies into it `janet` and the aforementioned modules.
