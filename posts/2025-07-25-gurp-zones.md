@@ -253,7 +253,18 @@ manaaging rc services, so I added a `:final-state` property to the `zone` doer
 that reboots the zone. The service starts on boot, and it's never a bad idea to
 reboot-test.
 
-I added a `(recreate)` function which makes it easy for me to recreate zones on demand.
+Note that though Grafana is configured by an INI file, we do so here with a Janet struct. This was suggested 
+by a friend, who I think got it from Nix. The `file` doer can take a 
+`:from-struct` parameter, in which you define configuration as, obviously, a 
+struct. You then supply a `:to-format` value which, at time of writing, can be 
+`json`, `yaml`, `toml`, `ini`, or `kvp`. The first three can hold any struct, 
+so you're guaranteed to get what you ask for. INI files are more limited, so 
+you must write a struct that will fit into one. `kvp` is key-value-pair, so 
+you just need a flat struct for that. This, I believe, is far more civilised 
+than templating YAML files from other YAML files template from a YAML file.
+
+Back to zone management though and, as I was doing a lot of testing, I found it 
+convenient to make a  `(recreate)` helper function to recreate zones on demand.
 
 ```janet
 (defn recreate?
@@ -261,6 +272,15 @@ I added a `(recreate)` function which makes it easy for me to recreate zones on 
   [zone-name]
   (def env-val (os/getenv "GURP_RECREATE_ZONE"))
     (if (or (= env-val "ALL") (= env-val zone-name)) 1 200))
+```
+
+It sits in the same file as the zone definitions which call it thusly:
+
+```janet
+(zone/ensure "serv-ws"
+             :brand "lipkg"
+             :recreate (recreate? "serv-ws")
+             ...   
 ```
 
 If I want to just rebuild the package server zone:

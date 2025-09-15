@@ -15,8 +15,8 @@ scripts and we left it at that.) Since then I've been paid to use Chef, Puppet,
 CloudFormation, Fabric, Terraform, Ansible, and various Kubernetes-related
 YAML-wranglers, all with varying degrees of distaste and disappointment.
 
-These days, commercially, it's just Terraform: I haven't been paid to manage
-servers in a good while. But at home I have a couple of
+These days, for paying the bills, it's just Terraform: I haven't been paid to manage
+servers in a good while. But at home I have a some 
 [OmniOS](https://omnios.org/) boxes which run a couple of dozen zones providing
 various home- and hobby-related services.
 
@@ -135,12 +135,12 @@ offputting.
 Janet is a very minimal language, which is not necessarily a bad thing, but I
 soon hit its edges. For instance, there's no way to natively change a file's
 owner. You have to shell out (which I didn't want to do, despite
-[this absolutely brilliant module](https://github.com/andrewchambers/janet-sh)),
-or you have to add new functions by either extending the core language or
-writing a C extension.
+[this brilliant module](https://github.com/andrewchambers/janet-sh)), or you
+have to add new functions by either extending the core language or writing a C
+extension.
 
-I haven't written any C from scratch this century, but I've become quite the
-Rust fan lately, so I had a look around for Rust/Janet bindings, and
+I haven't written any C from scratch this century, but as I've become quite the
+Rust fan lately, I had a look around for Rust/Janet bindings, and
 [found them](https://docs.rs/janetrs/latest/janetrs/). I could write Rust
 modules for the bits native Janet couldn't cover, but why not flip things
 around, and use Rust for main program, embedding a Janet interpreter? That would
@@ -156,8 +156,10 @@ myself.
 - Rust will do all the work.
 - "Done" means it can rebuild all my systems with the exact same results as my
   Ansible config.
-- It is illumos-specific. It will not support any other OS, but it will
-  integrate cleanly with things like SMF and ZFS.
+- It is illumos-specific. In fact, OmniOS specific. It will not support any
+  other OS.
+- It will integrate cleanly with things like SMF and ZFS, abstracting their
+  config a consistent DSL.
 - It is as fast as it reasonably can be.
 - It will be as simple and minimal as it reasonably can be.
 
@@ -165,11 +167,11 @@ The main one was the last one. Features will be added as they are needed. The
 road to hell is paved with "It might be nice if...", and "one day I might want
 to...".
 
-I've always felt the downfall of the likes of Puppet and friends was their
-relentless feature creep and huge, mostly stale, community ecosystems. You can
+I've always felt part of the problem of the likes of Puppet and friends was their
+relentless all-things-to-all-people feature creep and huge, mostly stale, community ecosystems. [I wrote about this ten years ago](/post/2015-11-16-do-it-yourself) when I was at the coal-face of config management, and I haven't changed my opinion. You can
 accomplish a heck of a lot by dropping a file and restarting a service, so I
-decided, at least in its first iteration, do provide no mechanism for running
+decided, at least in its first iteration, to provide no mechanism for running
 arbitrary commands.
 
-For reasons too silly to go into I decided to call my program Gurp, and I
+For reasons too silly to go into I called my program Gurp. Then I
 [put it on Github](https://github.com/snltd/gurp),
