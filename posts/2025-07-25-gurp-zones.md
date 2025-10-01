@@ -253,18 +253,19 @@ manaaging rc services, so I added a `:final-state` property to the `zone` doer
 that reboots the zone. The service starts on boot, and it's never a bad idea to
 reboot-test.
 
-Note that though Grafana is configured by an INI file, we do so here with a Janet struct. This was suggested 
-by a friend, who I think got it from Nix. The `file` doer can take a 
-`:from-struct` parameter, in which you define configuration as, obviously, a 
-struct. You then supply a `:to-format` value which, at time of writing, can be 
-`json`, `yaml`, `toml`, `ini`, or `kvp`. The first three can hold any struct, 
-so you're guaranteed to get what you ask for. INI files are more limited, so 
-you must write a struct that will fit into one. `kvp` is key-value-pair, so 
-you just need a flat struct for that. This, I believe, is far more civilised 
-than templating YAML files from other YAML files template from a YAML file.
+Note that though Grafana is configured by an INI file, we do so here with a
+Janet struct. This was suggested by a friend, who I think got it from Nix. The
+`file` doer can take a `:from-struct` parameter, in which you define
+configuration as, obviously, a struct. You then supply a `:to-format` value
+which, at time of writing, can be `json`, `yaml`, `toml`, `ini`, or `kvp`. The
+first three can hold any struct, so you're guaranteed to get what you ask for.
+INI files are more limited, so you must write a struct that will fit into one.
+`kvp` is key-value-pair, so you just need a flat struct for that. This, I
+believe, is far more civilised than templating YAML files from other YAML files
+template from a YAML file.
 
-Back to zone management though and, as I was doing a lot of testing, I found it 
-convenient to make a  `(recreate)` helper function to recreate zones on demand.
+Back to zone management though and, as I was doing a lot of testing, I found it
+convenient to make a `(recreate)` helper function to recreate zones on demand.
 
 ```janet
 (defn recreate?
@@ -280,7 +281,7 @@ It sits in the same file as the zone definitions which call it thusly:
 (zone/ensure "serv-ws"
              :brand "lipkg"
              :recreate (recreate? "serv-ws")
-             ...   
+             ...
 ```
 
 If I want to just rebuild the package server zone:
@@ -289,10 +290,153 @@ If I want to just rebuild the package server zone:
 # GURP_RECREATE_ZONE=serv-pkg gurp apply zones.janet
 ```
 
-will do it, and if I want to recreate all my zones, perhaps because I've changed the gold zone config:
+will do it, and if I want to recreate all my zones, perhaps because I've changed
+the gold zone config:
 
 ```cmd
 # GURP_RECREATE_ZONE=all gurp apply zones.janet
 ```
 
-will do it. And there's a 1-in-200 chance any zone will be recreated on any Gurp run, just to keep things spicy.
+will do it. And there's a 1-in-200 chance any zone will be recreated on any Gurp
+run, just to keep things spicy.
+
+## v1.1 update
+
+I'm not sure if it's good form to go back and update blog-posty things, but I
+reckon worse things are going on on the Internet today, so here's news.
+
+As of v1.1.0, Gurp can create (and, obviously, destroy) `bhyve` zones. Bhyve
+zones run a single process (other than the zone scheduler), which provides
+standard virtualization via BSD's [bhyve](https://omnios.org/info/bhyve)
+hypervisor. (I say BSD, but you'll find it everywhere now, not least as
+[Oxide's hypervisor](https://docs.oxide.computer/guides/architecture/os-hypervisor-storage).)
+
+```cmd
+# ps -fz gurp-bhyve
+     UID   PID  PPID   C    STIME TTY         TIME CMD
+    root 22897     1   0 12:26:47 ?           0:00 zsched
+    root 22979 22897   0 12:26:47 ?           3:32 bhyve-gurp-bhyve -k /etc/bhyve.cfg
+```
+
+Bhyve has a ton of options, the vast majority of which I've never had to deal
+with, and the zone brand puts a simple shim around the ones you need to get
+things going. Gurp puts a hopefully even simpler shim around that. Here's Just
+Enough Gurp to create a bhyve zone.
+
+```janet
+(def zone-name "bhyve-example-1")
+(def zone-addr "192.168.1.61/24")
+(def zone-disk (zfscat "rpool/test" zone-name))
+
+(host "serv"
+      (zfs/ensure zone-disk :size "10G")
+
+      (zone/ensure zone-name
+                   :brand "bhyve"
+                   (zone-network "bhyve1_net0"
+                                 :defrouter "192.168.1.1"
+                                 :allowed-address zone-addr)
+                   (zone-bhyve
+                     :vcpus 4
+                     :ram "2G"
+                     :image-url "https://dl-cdn.alpinelinux.org/.../generic_alpine-3.22.1-x86_64-uefi-cloudinit-r0.qcow2"
+                     :boot-volume zone-disk)))
+```
+
+The first difference from a native zone is that bhyve needs a boot disk, which
+is why we do that `(zfs/ensure)` with a volume size. The other difference is
+that `(zone-bhyve)` function, here shown with its four mandatory arguments. We
+need to know how much resource to give the zone, and we need to know where that
+boot disk is, and what's going on it. A Bhyve zone could be anything: Linux,
+Windows, BSD, Solaris, or something properly weird: all you have to do is write
+an image to the disk.
+
+You can define that image, like here, as a URL, which Gurp will download to, and
+cache in, `/var/tmp` (Predictable filename! Security alert!).
+
+```cmd
+# gurp apply bhyve-1.janet
+2025-09-29T15:38:32.773392Z  INFO doers::host: Configuring host: serv
+2025-09-29T15:38:32.899375Z  INFO doers::zfs: creating filesystem: rpool/test/bhyve-example-1
+2025-09-29T15:38:32.964795Z  INFO doers::zone::doer: Must create zone bhyve-example-1
+2025-09-29T15:38:34.061336Z  INFO doers::zone::doer: installing bhyve-example-1 [bhyve]
+2025-09-29T15:38:34.686614Z  INFO doers::zone::bhyve: Waiting for zone to be ready
+2025-09-29T15:38:34.698758Z  INFO doers::zone::bhyve: Logging console output to /var/tmp/gurp-c2d9beeb-d6e9-449a-9e33-f036f2cfd3f3.log
+2025-09-29T15:40:38.587242Z  INFO commands::apply: Run time: 125.849s
+2025-09-29T15:40:38.587360Z  INFO commands::apply: resources: 2  changes: 2
+# zlogin -C bhyve-example-1
+[Connected to zone 'bhyve-example-1' console]
+
+Welcome to Alpine Linux 3.22
+Kernel 6.12.38-0-virt on x86_64 (/dev/ttyS0)
+
+localhost login:
+```
+
+Now you can manually log in and configure it. How about not doing that though?
+Gurp doesn't work on Linux, we've talked about that before, but it can get
+started on configuring your new VM, via the "magic" of cloud-init.
+
+```janet
+(import ./globals)
+(def zone-name "bhyve-example-2")
+(def zone-addr "192.168.1.62/24")
+(def zone-disk (zfscat "rpool/test" zone-name))
+(def router-ip "192.168.1.1")
+
+(host "serv"
+      (zfs/ensure zone-disk :size "10G")
+
+      (zone/ensure zone-name
+                   :brand "bhyve"
+                   (zone-bhyve
+                     :vcpus 4
+                     :ram "2G"
+                     :image-url "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+                     :image-format "qcow2"
+                     :boot-volume zone-disk
+                     :cloudinit-files [(config-file "cloud-init/user-data")]
+                     :cloudinit-struct
+                     {:meta-data (cloudinit-meta-data zone-name)
+
+                      :network-config
+                      {:network {:version 2
+                                 :ethernets
+                                 {:enp0s6 {:addresses [zone-addr]
+                                           :mtu 1500
+                                           :nameservers {:search [globals/local-domain]
+                                                         :addresses globals/dns-servers}
+                                           :routes [{:to "0.0.0.0/0"
+                                                     :via router-ip}]}}}}})
+
+                   (zone-network "bhyve_net0" :allowed-address zone-addr)))
+```
+
+Gurp makes a temporary directory of cloud-init config which it turns into an ISO
+image with `mkisofs`. This is mounted inside the zone, masquerading as a CD-ROM.
+(Ask your dad.) Cloud-init sees this, looks for a `user-data` file inside it,
+and uses same. As soon as the zone starts to boot, Gurp removes all of this from
+the zone config, so it isn't there after a reboot.
+
+You can copy local files into the image with `:cloudinit-files`. Here, we've
+used the `(config-file)` helper to refer to files in `../files/` relative to our
+config dir. `:cloudinit-files` is good for static policy type things that are
+the same across all your VMs.
+
+We also have a `:cloudinit-struct`. This struct's top-level keys are the names
+of the files which will be created, and their values are a Janet struct which
+will be converted to YAML. This suits dynamic content like the network config
+here. In real life I abstract this away in a helper function, but I wanted to
+show you the real-deal here. `(cloudinit-meta-data)` is a built-in Gurp library
+function which creates a `meta-data` file to set the host name of the VM.
+
+Debugging cloudinit can be a real pain. To help with this, Gurp streams the
+console log into a local file, which has a random name, in `/var/tmp`. You can
+see it mentioned in the output from earlier. It is also possible to have Gurp
+exit as soon as it tries to boot the zone, by setting `:wait-for-boot false`,
+and this can be useful in conjunction with `zlogin -C` if you're having problems
+getting an image to work.
+
+I have a Kubernetes cluster built on bhyve zones, and I managed to get most of
+the configuration done with cloud-init, leaving only a couple of manual
+operations. Maybe Gurp's bhyve support will be useful for you too.
