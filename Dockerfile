@@ -1,4 +1,4 @@
-FROM ruby:3.4-alpine as build
+FROM ruby:3.4-alpine AS build
 COPY . /app
 WORKDIR /app
 RUN apk update -U
@@ -8,7 +8,7 @@ RUN bundle config set without development
 RUN bundle config set deployment true 
 RUN bundle package 
 
-FROM ruby:3.4-alpine as deploy
+FROM ruby:3.4-alpine AS deploy
 RUN apk update -U
 COPY --from=build /app /app
 WORKDIR /app

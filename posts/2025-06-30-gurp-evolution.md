@@ -173,8 +173,8 @@ The problem is,
     (thing/ensure/name)))
 ```
 
-gave you `{nil}` (because that's what `loop` returns) and a puzzled user show
-can't understand why `abc` and `def` are missing from their host.
+gave you `{nil}` (because that's what `loop` returns) and a puzzled user can't
+understand why `abc` and `def` are missing from their host.
 
 If you know how Gurp works, you might realise that you can iterate with `map`.
 (Or you could once I made Gurp flatten the role's output array.)
