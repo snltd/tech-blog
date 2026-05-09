@@ -262,7 +262,7 @@ first three can hold any struct, so you're guaranteed to get what you ask for.
 INI files are more limited, so you must write a struct that will fit into one.
 `kvp` is key-value-pair, so you just need a flat struct for that. This, I
 believe, is far more civilised than templating YAML files from other YAML files
-template from a YAML file.
+templated from a YAML file.
 
 Back to zone management though and, as I was doing a lot of testing, I found it
 convenient to make a `(recreate)` helper function to recreate zones on demand.

@@ -121,7 +121,7 @@ module Rouge
       desc 'put commands in bold. Assumes you begin a command line with a hash
             or dollar, but handles \ escaped continuations, PS2 sub-prompts.
             Also works for Sun OBP "ok" prompts, interactive use of Solaris
-            zonecfg, and SCCLI prompts'
+            zonecfg, Janet REPL, and SCCLI prompts'
       numbered_ok_prompt_regex = Regexp.new('^{\d+}\s+ok.*')
       ok_prompt_regex = Regexp.new('^ok .*')
 
@@ -133,6 +133,7 @@ module Rouge
         rule(/^[>#$] .*/, Generic::Strong)
         rule(/^zonecfg.*>.*/, Generic::Strong)
         rule(/^root@.*# .*/, Generic::Strong)
+        rule(/^repl:.*:> .*/, Generic::Strong)
         rule(/^\[[\w\-]+\][#$] .*/, Generic::Strong)
         rule(numbered_ok_prompt_regex, Generic::Strong)
         rule(ok_prompt_regex, Generic::Strong)
