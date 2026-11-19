@@ -11,7 +11,7 @@ end
 
 # Tests for blog post rendering
 #
-class TechRenderPostTest < MiniTest::Test
+class TechRenderPostTest < Minitest::Test
   def test_render
     r = Tech::RenderPost.new('2015-05-05-why-i-hate-devops').render
     assert_instance_of(Hash, r)

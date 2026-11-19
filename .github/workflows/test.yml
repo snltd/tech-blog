@@ -1,18 +1,27 @@
-name: Test Ruby
+name: Test
+permissions:
+  contents: read
 
 on:
   push:
+    branches:
+      "*"
+    tags-ignore:
+      - '\d+.\d+.\d+'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ruby-version: 3.2
-          bundler-cache: true
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0 # 1.342.0
+        with:
+          ruby-version: "4.0"
+          bundler-cache: false
       - name: Install dependencies
         run: bundle install
       - name: Run tests

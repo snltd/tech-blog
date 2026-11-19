@@ -111,7 +111,7 @@ module Tech
 
     def all_tags
       tags = index.map { |i| i[:tags] }.flatten
-      counted_tags = tags.each_with_object(Hash.new(0)) { |i, h| h[i] += 1 }
+      counted_tags = tags.tally
       counted_tags.sort_by { |_k, v| v }.reverse
     end
   end

@@ -5,7 +5,7 @@ require_relative '../spec_helper'
 
 # Tests for the article indexer
 #
-class TechIndexArticlesTest < MiniTest::Test
+class TechIndexArticlesTest < Minitest::Test
   attr_reader :tu
 
   def setup

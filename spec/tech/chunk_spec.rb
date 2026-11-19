@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'pathname'
 require_relative '../spec_helper'
 require_relative '../../lib/tech/chunk'
 
@@ -21,7 +20,7 @@ SAMPLE_FILE = Pathname.new('/test/file')
 
 # Tests for Chunks
 #
-class TechChunkTest < MiniTest::Test
+class TechChunkTest < Minitest::Test
   attr_reader :tu
 
   def setup

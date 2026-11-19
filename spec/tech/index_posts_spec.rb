@@ -6,7 +6,7 @@ require_relative '../../lib/tech/index_posts'
 
 # Tests
 #
-class TechIndexPostsTest < MiniTest::Test
+class TechIndexPostsTest < Minitest::Test
   attr_reader :tu
 
   def setup

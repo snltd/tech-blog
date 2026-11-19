@@ -89,7 +89,7 @@ module Rouge
         rule(/=/, Punctuation)
         rule(/^\w+/, Keyword)
         rule(/[\d.]+/, Num)
-        rule(/[\w\-]+/, Str)
+        rule(/[\w-]+/, Str)
         rule(/\s/, Text)
       end
 
@@ -134,11 +134,11 @@ module Rouge
         rule(/^zonecfg.*>.*/, Generic::Strong)
         rule(/^root@.*# .*/, Generic::Strong)
         rule(/^repl:.*:> .*/, Generic::Strong)
-        rule(/^\[[\w\-]+\][#$] .*/, Generic::Strong)
+        rule(/^\[[\w-]+\][#$] .*/, Generic::Strong)
         rule(numbered_ok_prompt_regex, Generic::Strong)
         rule(ok_prompt_regex, Generic::Strong)
         rule(/^sccli>.*/, Generic::Strong)
-        rule(/^\[[\-\w]+\]$/, Comment)
+        rule(/^\[[-\w]+\]$/, Comment)
         rule(/\.\.\./, Comment)
       end
 

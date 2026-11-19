@@ -1,20 +1,18 @@
-FROM ruby:3.4-alpine AS build
-COPY . /app
+FROM docker.io/ruby:4.0-slim AS build
+ENV BUNDLE_WITHOUT=development BUNDLE_DEPLOYMENT=true
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends build-essential \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-RUN apk update -U
-RUN apk add ruby-dev build-base 
-RUN gem install bundler 
-RUN bundle config set without development 
-RUN bundle config set deployment true 
-RUN bundle package 
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+COPY . .
 
-FROM ruby:3.4-alpine AS deploy
-RUN apk update -U
-COPY --from=build /app /app
+FROM docker.io/ruby:4.0-slim
+ENV BUNDLE_WITHOUT=development BUNDLE_DEPLOYMENT=true
 WORKDIR /app
-RUN bundle config set --local deployment true
-RUN bundle config set without development 
-RUN bundle install 
+COPY --from=build /usr/local/bundle /usr/local/bundle
+COPY --from=build /app /app
 EXPOSE 8080
 USER nobody
 CMD ["bundle", "exec", "rackup", "--host", "0.0.0.0", "-p", "8080"]
