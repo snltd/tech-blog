@@ -34,7 +34,7 @@ most Linux stuff works perfectly and seamlessly. You also get
 `/native`, which lets you run proper, grown-up things like
 `dtrace(1)` and the proper versions of the ptools.
 
-## A DTrace Srcipt
+## A DTrace Script
 
 I wanted this process to be completely external to the normal
 bootstrapping and Puppetizing process. That is, I didn't want to
@@ -304,7 +304,7 @@ $ awk -f sum.awk < out  | sort -nr | grep apt-get | sed 10q
 5.36272 /usr/bin/apt-get -q -y -o DPkg::Options::=--force-confold install ssh
 ```
 
-The fluentd (`td-agent`) pacakge takes a good while to install
+The fluentd (`td-agent`) package takes a good while to install
 (unless you compare it to any package installed, ever, with IPS). I
 don't know why we even install `mailutils`.  We'd already trimmed
 out packages with heavy dependency lists (check out the dependencies

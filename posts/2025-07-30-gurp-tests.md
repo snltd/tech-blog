@@ -168,7 +168,7 @@ as it should. You list publishers with `pkg publisher`.
 ```
 
 I run `judge -a`, and it inserts into the `(test)` call the stdout of the
-`pkg publisher` command. I eyeball it, it looks good, and I have an infintely
+`pkg publisher` command. I eyeball it, it looks good, and I have an infinitely
 repeatable test. Minimum effort, maximum satisfaction.
 
 The `($)` macro is extremely capable, and can handle flags, pipes, errors, and

@@ -356,7 +356,7 @@ zonecfg:shark-wavefront> ^D
 # zoneadm -z shark-wavefront reboot
 ```
 
-When the zone comes back up `/var` is writeable, but everything else is
+When the zone comes back up `/var` is writable, but everything else is
 read-only. Again, this is something I've adopted as standard practice. If you
 have a thing that you don't expect to change, make it so that it **can't**
 change.

@@ -174,7 +174,7 @@ called `wf_report_tags`. This must be an array.
 
 I've had trouble accessing Hiera from a reporter.
 
-I expected that Puppet would expose the caclulated Hiera state for the reporter
+I expected that Puppet would expose the calculated Hiera state for the reporter
 to access, but I couldn't find it. Moving on, I expected Puppet to expose the
 options with which it was invoked, from which I could retrieve the path to
 `hiera.yaml`. But everything related to internal state seems to be a private
@@ -202,7 +202,7 @@ with pathnames if they're `Pathname`s. They must be `String`s.
 
 With the Hiera config loaded, we can do a `lookup`. To do this we must provide
 sufficient "scope" for Hiera to home in on the value we want. I assume that
-simply knowing the envionment will be enough to do that. It is in my world. If
+simply knowing the environment will be enough to do that. It is in my world. If
 it is not in yours, and you have to be more specific, then you must modify the
 `SCOPE`. The second argument in the `lookup` call is a default value which will
 be returned if said lookup fails.

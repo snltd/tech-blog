@@ -52,5 +52,5 @@ hadn't been included in the `flar` I made of the original Solaris 10 VBOX.
 # init 6
 ```
 
-And everthing is happy. Another pointless, annoying linux-ism bites me in
+And everything is happy. Another pointless, annoying linux-ism bites me in
 the arse. Thanks.

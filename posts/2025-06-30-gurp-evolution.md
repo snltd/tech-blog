@@ -47,7 +47,7 @@ file above as
 The initial reference implementation worked fine until I wanted to refer to
 files. The `/` separator I'd chosen didn't play nicely, and nothing else felt
 right. So, I converted slashes to underscores in the name part of the reference.
-But that meant you could end up with unweildy references like
+But that meant you could end up with unwieldy references like
 `:/role/file/_etc_opt_ooce_default_application_config_file.conf/owner`. To make
 life easier, I added a new `:label` property. If you write
 

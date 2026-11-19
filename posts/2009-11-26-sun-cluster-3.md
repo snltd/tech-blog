@@ -226,7 +226,7 @@ booting the cluster will give you an error of the form
 ```
 WARNING - Unable to mount one or more of the following filesystem(s):
         /global/.devices/node@2
-If this is not repaired, global devices will be unavalilable.
+If this is not repaired, global devices will be unavailable.
 ```
 
 Though we will be using Veritas Volume Manager for cluster filesystems,
@@ -239,7 +239,7 @@ Sun Cluster, which I'm not going to go into.
 
 ## Post Install
 
-Obiously it's always a good idea to fully patch your fresh install. Use
+Obviously it's always a good idea to fully patch your fresh install. Use
 [PCA](http://www.par.univie.ac.at/solaris/pca/), not the junk that Sun
 supply. Because we're going to use a 3510 we need FC drivers, which for
 Solaris 9 (and earlier) are in the SAN package.
@@ -401,7 +401,7 @@ Cluster software.
 First you have to install Sun Web Console. As a minimal systems nut,
 I've always been uncomfortable with the amount of junk that Sun Cluster
 depends on. Surely if there were ever a case for a hardened minimal
-system, it's on a cluster? Apparantly not. Installint Web Console is as
+system, it's on a cluster? Apparently not. Installing Web Console is as
 simple as `cd`ing to the `sun_web_console/2.1` directory and running
 
 ```cmd
@@ -536,7 +536,7 @@ You'll see the `scinstall` command that is going to be run. In my case it's
 Pretty simple eh? That's what I like about Sun Cluster - nothing ever
 seems any more complicated than it needs to be. `-C` sets the cluster
 name; `-F` says this is the first node in the cluster; `-T` lists the
-nodes that will form the cluster, and they authentiction used when
+nodes that will form the cluster, and they authentication used when
 members join (system, because we declined the DES encrypted option);
 `-A` lists the cluster transport interconnects, and specifies the DLPI
 protocol will be used; `-B` is used to list transport junctions, and we
@@ -872,7 +872,7 @@ scalable applications, like Apache, which run simultaneously on both
 nodes, or failover applications, like NFS, which run on one node, and
 migrate to another should that node fail. Both nodes can see the same
 storage but, if we were running a service on one node, we wouldn't want
-the other node to have access to its storage - somethng bad could
+the other node to have access to its storage - something bad could
 happen.
 
 So, we put disks into groups, using either VxVM or SVM, and import and
@@ -1129,7 +1129,7 @@ command,and you can create filesystems on the new volumes:
 We now have to put these filesystems in the `vfstab` on both nodes. How
 you do it is up to you. Remember, NFS is a failover service, so it can
 only run on one node at a time. You may feel it's sensible to only have
-the filsystems mounted on the host currently running the service. If you
+the filesystems mounted on the host currently running the service. If you
 do, set up your `vfstab` like this:
 
 ```

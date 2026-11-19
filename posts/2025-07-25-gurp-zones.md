@@ -249,7 +249,7 @@ plugin: everything else is in a MySQL DB.)
 ````
 
 This config doesn't actually start the `grafana` service. I drew the line at
-manaaging rc services, so I added a `:final-state` property to the `zone` doer
+managing rc services, so I added a `:final-state` property to the `zone` doer
 that reboots the zone. The service starts on boot, and it's never a bad idea to
 reboot-test.
 

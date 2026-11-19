@@ -15,7 +15,7 @@ To get rid of the hardware mirroring:
 # raidctl -d c1t0d0
 ```
 
-Then I set the follwing boot paths. I always use `disk0` and
+Then I set the following boot paths. I always use `disk0` and
 `disk1` as my disk names. That's logical, isn't it?
 
 ```cmd

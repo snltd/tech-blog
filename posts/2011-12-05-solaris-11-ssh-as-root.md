@@ -15,7 +15,7 @@ So, I opened `/etc/ssh/sshd_config` and changed `PermitRootLogin` to
 as root, and it wouldn't let me.
 
 The `sshd_config` man page told me I had to comment the `CONSOLE` line
-out of `/etc/default/login`, just like yout had to do for `telnet` in
+out of `/etc/default/login`, just like you had to do for `telnet` in
 the old days. So I did that, and still no dice.
 
 I cranked up the `sshd` logging, and saw that:

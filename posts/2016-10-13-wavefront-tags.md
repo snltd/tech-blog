@@ -52,7 +52,7 @@ options and subcommands get magically populated.)
 
 The general principle of the `source` command is to have the things you
 are setting (tags and descriptions) be arguments, and the things you are
-setting them on (hosts, or, techinically, "sources"), options. This way
+setting them on (hosts, or, technically, "sources"), options. This way
 you can set multiple tags on multiple hosts with a single command.
 
 If, when manipulating a tag or description, you don't specify a source
@@ -123,7 +123,7 @@ brackets) will only show data for the physical host. Zones will be
 ignored. Sources can have as many tags as you want, so you can
 create all manner of ways to cross-reference.
 
-We incorporate our host's product, enviroment, and role into our
+We incorporate our host's product, environment, and role into our
 metric paths, but you might feel tagging is a better way to do that.
 Also tag by AZ, instance-type and it's trivial to pull out JVM stats
 just for t2-medium Cassandra boxes in the eu-west-1 production

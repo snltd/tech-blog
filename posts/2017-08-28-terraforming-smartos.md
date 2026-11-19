@@ -14,7 +14,7 @@ I loved that. For context, the team we worked in had been mired in pointless,
 circular bikeshedding about what tools we should use to deploy and configure our
 platforms. At one point we were standing up boxes with Fabric, raw
 Cloudformation, CFNDSL, shell scripts, a home-grown Boto wrapper (which, to my
-satisfaction, pre-empted some of the big features in Boto 3), and Footman, an
+satisfaction, preempted some of the big features in Boto 3), and Footman, an
 in-house, supposedly cloud-agnostic tool whose lasting legacy seems to be the
 fact that a successful operation would be reported as `error: undefined error`.
 Configuration management was a little better, with warring limited to two main
@@ -85,7 +85,7 @@ all shells are `bash`. This can mean that running modern tooling on SmartOS is
 more "interesting" than you might expect.
 
 Terraform, like anything with SRE pretensions, is written in Go, and I was
-pleasantly suprised to see that
+pleasantly surprised to see that
 [you can download a readymade
 Solaris executable](https://www.terraform.io/downloads.html). To date I've found
 that Go programs built on Solaris always work on SmartOS and vice-versa, so I
@@ -276,7 +276,7 @@ The `target` in that block is a pre-existing alert target which uses a webhook
 to write to a Slack channel. You can (and obviously should!) create alert
 targets with the provider. Just make a resource and define it with HCL.
 
-We're cooking now: stack, alerts, dashboards, everything. This is brillant,
+We're cooking now: stack, alerts, dashboards, everything. This is brilliant,
 right? Zero effort!
 
 ## Hang On, this is Harder than I Thought
@@ -531,7 +531,7 @@ terraform {
 }
 ```
 
-Obivious, right? And like most obvious things, it doesn't work.
+Obvious, right? And like most obvious things, it doesn't work.
 
 ```cmd
 $ terraform plan

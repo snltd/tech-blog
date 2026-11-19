@@ -69,7 +69,7 @@ executable text + executable data + uninitialized data =
 * **stack space**
   when the program calls a function information is stored which
   allows the program to resume after the function returns. (The
-  address at which to resume excution etc.)
+  address at which to resume execution etc.)
 
 * **anonymous page**
   is memory not associated with a file - so it is that used for heap
@@ -141,12 +141,12 @@ really faults, and definitely not errors. There are a few kinds:
 
 * **copy-on-write fault/COW fault**
   When a process spawns a child, the child can use the same
-  exectuable text segment as the parent. Initially it may also use
+  executable text segment as the parent. Initially it may also use
   the same data segment. But if the child changes the data segment,
   its own private copy is created, raising a COW fault, and firing
   the `cow_fault` probe.
 
-* **segmenation fault/invalid page fault**
+* **segmentation fault/invalid page fault**
   an error which occurs when a program tries to access memory at an
   address which is not mapped in any of the above segments.
 
@@ -167,7 +167,7 @@ tell us about.
   system clock, and when a CPU gets one, it temporarily stops what
   it's doing ("pins" the process) to deal with whatever the
   interrupting object had to say. Once its done that, execution of
-  the orignal thread resumes.  Interrupts have different priority
+  the original thread resumes.  Interrupts have different priority
   levels, so a higher priority interrupt thread can pin a lower one.
   You can disable interrupts to particular processors with processor
   sets, so workloads aren't interrupted. `intrstat` shows you which
@@ -255,5 +255,5 @@ tell us about.
 The main stuff in the `sysinfo` provider is looking at `fork`s and
 `exec`s, but you can also (perhaps surprisingly?) get quite a lot of I/O
 info through the `bread` and `bwrite` probes which are used for buffered
-reading and writng. There's also some UFS stuff in there but hey, who's
+reading and writing. There's also some UFS stuff in there but hey, who's
 using UFS these days? (In fact, who's using Solaris these days...?)

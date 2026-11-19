@@ -232,7 +232,7 @@ in a couple of cases, which I'll come back to.)
 
 I resource-capped all non-global zones, on CPU and memory. Initial
 limits were educated guesses, but I watched usage closely, and didn't
-have to make many adjustements. The shared IP meant that, theoretically,
+have to make many adjustments. The shared IP meant that, theoretically,
 a single zone could consume all available bandwidth, but there wasn't
 much I could do about that, given the limits of the technology.
 
@@ -260,7 +260,7 @@ this eventually ended up in [s-audit](https://github.com/snltd/s-audit).
 This meant a first, clean Solaris 10 install with Sun Studio and just
 enough tools to build the Open Source software I wanted to use. I hated
 the "install everything" approach the previous sys-admins had used, and
-I knew that with the amount of legacy we had to accomodate, I couldn't
+I knew that with the amount of legacy we had to accommodate, I couldn't
 rely on Sun's provided packages of things like Apache, MySQL and PHP.  I
 never like the third-party freeware options, with their dependency
 rabbit-holes and weird filesystem layouts. Better, I thought, to do it

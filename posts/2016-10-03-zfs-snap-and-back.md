@@ -78,7 +78,7 @@ $ du -sh /export/mp3*
 Well, it's not much, but it's still 64Gb/month I don't need to pay for.
 
 (The `cut` test is necessary because I only want to remove
-directories which are albums: they're all at a cetain depth.)
+directories which are albums: they're all at a certain depth.)
 
 When the sync is done, it's quick and easy to clean up:
 

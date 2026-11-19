@@ -312,7 +312,7 @@ $ sed -n 40,55p out
   2 54552226226   base.rb            14        -> Rack::CommonLogger::call
 ```
 
-The first column is the VCPU the proces is on (showing the bind we just did,
+The first column is the VCPU the process is on (showing the bind we just did,
 worked); the second is a timestamp; the third is the file containing the method
 being entered or exited; the fourth is the microsecond time delta between the
 current step and the previous one. Then we see an arrow denoting entry or

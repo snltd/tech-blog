@@ -87,7 +87,7 @@ online         14:25:09 svc:/ldoms/ldmd:default
 ```
 
 The `vntsd` service shouldn't be up yet. In fact, if you try to start
-it, it will fall into maintenence state, and you'll get a line in
+it, it will fall into maintenance state, and you'll get a line in
 `messages` to the effect of
 
 ```
@@ -336,7 +336,7 @@ then tell the domain that's the boot disk.
 ```
 
 If that looks familiar, good. Each LDOM has its own OBP, and `ldm
-set-variable` is analagous to `eeprom`. While we're about it, we can
+set-variable` is analogous to `eeprom`. While we're about it, we can
 also set the domain to auto-boot, just like we would with a physical
 server.
 
