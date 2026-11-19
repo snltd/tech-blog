@@ -11,7 +11,7 @@ end
 
 # Tests for article rendering
 #
-class TechRenderArticleTest < MiniTest::Test
+class TechRenderArticleTest < Minitest::Test
   def test_render
     r = Tech::RenderArticle.new('wavefront-cli').render
     assert_instance_of(Hash, r)

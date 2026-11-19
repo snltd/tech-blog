@@ -3,12 +3,9 @@
 
 ENV['RACK_ENV'] ||= 'test'
 ENV['RACK_ALLOWED_HOSTS'] = '.*'
-# require 'erb'
 require 'minitest'
 require 'minitest/autorun'
-require 'minitest/unit'
 require 'nokogiri'
-# require 'pathname'
 require 'rack/builder'
 require 'rack/test'
 
@@ -19,7 +16,7 @@ OUTER_APP = Rack::Builder.parse_file(APP_ROOT.join('config.ru').to_s)
 # Acceptance tests for my tech website. Just hit the app lots and
 # lots of times
 #
-class TestTech < MiniTest::Test
+class TestTech < Minitest::Test
   include Rack::Test::Methods
 
   def app
