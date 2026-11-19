@@ -157,7 +157,7 @@ io:::start
    * start, command, and mypid are associative arrays, and an element will
    * be added to each array whenever the probe fires. We have to store the
    * execname and pid now, because when the corresponding 'done' probe
-   * fires, that infomation won't be available.
+   * fires, that information won't be available.
    *
    * The thing you can't work out for yourself here is that args[0] refers
    * to the buf structure. ('man buf' will tell  you all about it.) We

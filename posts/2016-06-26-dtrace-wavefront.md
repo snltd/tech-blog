@@ -144,10 +144,10 @@ here.
 # dtrace2wf.rb
 # ------------
 #
-# Pull DTrace aggragated data out of a FIFO and turn it into basic
+# Pull DTrace aggregated data out of a FIFO and turn it into basic
 # Wavefront metrics. I chose to use a FIFO rather than STDIN as it
 # gives a nice separation between privileged collector and
-# unpriviliged aggretator/forwarder. The coupling can even be
+# unprivileged aggretator/forwarder. The coupling can even be
 # across zones with a correctly shared filesystems for the named
 # pipe.
 #

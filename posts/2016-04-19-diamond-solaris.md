@@ -13,7 +13,7 @@ metrics into it.
 
 For a long time, `collectd` has been the standard way of collecting
 telemetry and pushing to an endpoint, usually Graphite.  Wavefront can
-intepret the Graphite wire format, so that should the be path of least
+interpret the Graphite wire format, so that should the be path of least
 resistance.
 
 Oracle do not provide us with a conveniently installable Collectd
@@ -26,7 +26,7 @@ package.)
 Collectd 5.5 builds easily enough on Solaris though, and I soon had it
 up and running, sending data to my Wavefront proxy in Graphite
 format. You'll get all the basics: CPU, memory usage, disk
-consumption and throughput, network packets sent and recieved. It
+consumption and throughput, network packets sent and received. It
 works perfectly well.
 
 Collectd feels, I think, a bit old, clunky, and arcane. It has real
@@ -204,7 +204,7 @@ cmdk:2:cmdk2:writes     1488526
 Others, like `cpu_info:0:cpu_info0:chip_id` are constants, and
 things like `cmdkerror:0:cmdk0,error:Model` are constant strings.  All
 of this is fine, and makes good sense, but it's not possible to
-programatically tell which kstat is of which datatype, and sometimes
+programmatically tell which kstat is of which datatype, and sometimes
 difficult to work it out from man pages and source code.
 
 I also, at the time of writing, am ambivalent about the correct way to
@@ -254,7 +254,7 @@ that:
 so, good luck converting your kstat `snaptime`s to anything meaningful.
 
 It's not ideal for our particular application, but I can see why
-things were done this way. Calulating a rate since `crtime` gives
+things were done this way. Calculating a rate since `crtime` gives
 you a (probably pointless) "since boot" type summary, like the first
 line of `vmstat` output. Clearly kstats and their `snaptimes` were
 implemented with things like `vmstat` and `mpstat` in mind: accurate
@@ -294,7 +294,7 @@ wanted a better way of knowing which disk was on the blink when my
 In among the `cmdkerr` or `sderr` kstat bundle is the serial number
 of the disk. "Wouldn't it be nice", I thought (knowing full well
 most tech disasters begin with just those words), to tag the points
-so you can more easily idenfity the errant disk? Which brings us to:
+so you can more easily identify the errant disk? Which brings us to:
 
 ## Problem 4: Diamond does not Understand Point Tags
 
@@ -378,7 +378,7 @@ looking at now.
 
 Solaris's introspection goes very deep: it's always been a very
 observable platform, and it's a lot of fun feeding all those numbers
-into Wavefront. I've always been interested in system interals, and
+into Wavefront. I've always been interested in system internals, and
 it's quite exciting to be able to properly visualize things like
 latency, saturation, paging, batching of writes and anything else
 that I can think of. I like to stick a bunch of different metrics on

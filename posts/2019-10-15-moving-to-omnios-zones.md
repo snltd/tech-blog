@@ -64,7 +64,7 @@ Or, at least, the bits of it I needed.
 Originally I called it `ozone`, but there was already a gem called that, and
 there are two 'o's in 'OmniOS', so I renamed it `oozone`. I like to use a
 rising inflection on the long 'oo', sort of like you're pleasantly surprised,
-but feel free to make that inital syllable annoyed, owl-ish, or comically
+but feel free to make that initial syllable annoyed, owl-ish, or comically
 erotic. That's the beauty of open source. It's up to you.
 
 I appreciate that Ruby is not a native OmniOS thing. Python is there (for
@@ -188,7 +188,7 @@ I was interested by something I'd seen on the `brands(5)` man page.
 +--------+-------------------------------------------------------+
 ```
 
-`illumos` brand zones, which I presume are analagous to Solaris's `solaris-kz`
+`illumos` brand zones, which I presume are analogous to Solaris's `solaris-kz`
 "kernel" zones, are made to let you run something like SmartOS or Tribblix in
 a zone. I wondered whether that level of virtualization might accommodate
 an NFS server. So, I made one.
@@ -259,7 +259,7 @@ but you're kidding yourself.
 
 But Solaris 11 lets you make zones that are *genuinely* immutable. Inside one,
 you cannot change *anything*. This is managed by the global zone's kernel, and
-it's non-negotiable unless the global zone adminstrator turns it off, or
+it's non-negotiable unless the global zone administrator turns it off, or
 sneaks into the zone via the trusted path. (You can also configure zones which
 allow modification of files under, say, `/var`, should you need to perform
 such 20th century actions as logging to disk.)
@@ -390,7 +390,7 @@ rarely, and always under supervision, that I'll take a deep breath and let it
 go. We just need the Puppet server to be up, and it probably takes less than a
 second. Yes, `sleep` is awful, but OmniOS doesn't offer `watch(1)` [UPDATE: it
 does now] and I don't have a great deal of love for the idea of embedding
-shell loops in a YAML file to later be exectued by Ruby.
+shell loops in a YAML file to later be executed by Ruby.
 
 Next I built the DNS zone, with an additional command to temporarily pop
 `puppet.localnet` into `/etc/hosts` so it will always find the Puppet server.

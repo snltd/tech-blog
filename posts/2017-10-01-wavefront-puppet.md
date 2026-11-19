@@ -86,7 +86,7 @@ asked Wavefront for anything filesystem-related disk usage, I/O rate, stuff like
 that.
 
 Normalizing multiple metrics on one chart can be a great way to spot
-corellations, so I wrapped the query in a `normalize()`, and it was immediately
+correlations, so I wrapped the query in a `normalize()`, and it was immediately
 obvious the amount of data in `/var` was growing at pretty much the same rate as
 the `file_time`. Extracting those two metrics and removing the `normalize()`
 gave me something very much like this:

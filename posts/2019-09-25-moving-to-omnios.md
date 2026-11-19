@@ -65,7 +65,7 @@ I expect these things are going to be an issue.
   ones I use.
 - RBAC. I'm very big on minimal-privilege, and RBAC has changed over the last
   few Solaris releases. I'm expecting to run into a couple of issues.
-- Puppet. Solaris 11.4 has pretty nice Puppet integration. Things shoud still
+- Puppet. Solaris 11.4 has pretty nice Puppet integration. Things should still
   work once Puppet's up and running, but I may have to do some heavy lifting to
   get to that point.
 - IPS. It's a matter of public record that I do not like IPS. I find it
@@ -210,8 +210,8 @@ only exists in Solaris. In fact, I think it only exists in Solaris 11.4. Let's
 drop it. We can, I suppose, build it into OmniOS's profile list should we
 require it later, but we probably won't. For now, at least, I'll be using the
 `Primary Administrator` role, which lets me do anything as root simply by
-prefixing a command wich `pfexec`. (Oracle have removed `Primary Administrator`
-from Solaris; a decision which initially annoyed be greatly, but which I now
+prefixing a command with `pfexec`. (Oracle have removed `Primary Administrator`
+from Solaris; a decision which initially annoyed me greatly, but which I now
 think was probably wise.)
 
 The next twenty or so errors were:

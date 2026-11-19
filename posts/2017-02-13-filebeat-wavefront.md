@@ -13,7 +13,7 @@ rules to match lines and extract data, generating metrics from what it finds.
 
 After processing, the logs are discarded, so Wavefront doesn't replace something
 like Splunk, ELK or Graylog, but I think there is a great deal of value in its
-approach to statisically analyzing flows of logs. (I actually feel retention of
+approach to statistically analyzing flows of logs. (I actually feel retention of
 logs is as good as worthless, from a technical standpoint. There's an article in
 there somewhere...)
 

@@ -41,7 +41,7 @@ HP-UX on F15Ks and Superdomes became Linux running on PCs. People had far lower
 expectations of reliability and maintenance for these, which other people duly
 met. Skilled sys-admins still, of course, had jobs, but they became grossly
 outnumbered by "the HOWTO generation". These people built and ran their machines
-from recipies. They got things to work, but frequently didn't entirely
+from recipes. They got things to work, but frequently didn't entirely
 understand _why_ it worked, why it worked poorly, or how (or even _that_) it
 could work better. Bad practice proliferated around the world, made lore by
 cargo-cult administration. Alta Vista replaced the `man` page, Google in turn
@@ -54,7 +54,7 @@ valued every day.
 
 Change control, most necessary of evils, reached out across the industry, then
 ITIL and friends sucked out whatever fun was left in the job. On-call became
-more prevelant, with the Ops team expected to fix whatever went wrong, even
+more prevelent, with the Ops team expected to fix whatever went wrong, even
 though it was almost never the operating system. Which, as I've said, was pretty
 much all we still had control of.
 
@@ -125,7 +125,7 @@ In DevOps, one size fits all. Are you a selling a single product via a small,
 mostly static website? Then you should _definitely_ be doing whatever Uber do.
 Got six employees? If you aren't deploying with the same tech as Google, you'll
 be eaten alive. (The choice of technology behind the deployment tooling is
-always made out to be more important to the success of the comapany than the
+always made out to be more important to the success of the company than the
 product being sold, or how it is marketed. This is because all true IT ninjas
 draw their strength from the knowledge that everyone else in the company is an
 idiot whose job they could do in their sleep, were it not beneath them.)
@@ -256,7 +256,7 @@ And all of this stuff will change. You'll get new versions and new features out
 of the blue. You'll get a service that does, with one click in the console (and
 a shitload of $$$, but don't worry about that -- no one does) exactly what the
 thing it took you a month to build does, right out of nowhere. And everything
-you learn is completely, utterly, non-transferrable. Your entire career becomes
+you learn is completely, utterly, non-transferable. Your entire career becomes
 wrestling with freshly smoked-up APIs and DSLs based on hastily made decisions
 and provision of an MVP. You'll drown under announcements and NDA roadmaps and
 paranoia that the way you're doing everything isn't the best way, or that if it
@@ -303,8 +303,8 @@ Agile culture from which it grew, seems to me to be about validating weakness
 and avoiding responsibility.
 
 One of the favourite mantras right now is "fail fast" or "fail often" or both.
-Why do DevOps fail so fast and so often? Becuase, by and large, they don't know,
-or particuarly care, what they're doing. They're more interested in shoehorning
+Why do DevOps fail so fast and so often? Because, by and large, they don't know,
+or particularly care, what they're doing. They're more interested in shoehorning
 in the new tool, or speaking at the next meetup, or having the CV to get the
 higher rate, or finding an excuse to try the new language, than in understanding
 the problem and solving it elegantly. Because understanding the problem is

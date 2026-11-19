@@ -389,7 +389,7 @@ Let's go.
 ```
 
 The first thing to learn about are the "group packages", or
-"metaclusters". These are analagous to Jumpstart's install clusters
+"metaclusters". These are analogous to Jumpstart's install clusters
 (remember `SUNWCreq`, `SUNWCuser` and friends?).
 
 The group packages define lists of IPS packages which will be installed
@@ -437,7 +437,7 @@ hangover from the old days of slicing up disks, but primarily so that
 if, somehow, the O/S gets utterly hosed, I can reinstall it from
 scratch, preserving the data on the slices holding the `space` zpool.
 
-I happen to know that my VitualBox is assigning the its virtual disk as
+I happen to know that my VirtualBox is assigning the its virtual disk as
 `c7t0d0`, so I can request that disk be carved up like so.
 
 ```xml

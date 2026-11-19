@@ -88,7 +88,7 @@ $ triton instance get wavefront-proxy | json 'dns_names'
 ]
 ```
 
-(A nice feature of `triton` is that you can refer to intances by
+(A nice feature of `triton` is that you can refer to instances by
 either the name you give them, or the unique start of their UUID.)
 
 You can see the instance has automatically been given six DNS names,

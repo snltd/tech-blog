@@ -425,7 +425,7 @@ $ mls -l ~~/public/pkgsrc
 ## Manta is a Package Repository
 
 Now that is neat. Time to see if it actually worked. (I've cheated
-here, and temporarily disabled checking GPG singatures -- my
+here, and temporarily disabled checking GPG signatures -- my
 packages weren't being signed at this point.)
 
 ```cmd

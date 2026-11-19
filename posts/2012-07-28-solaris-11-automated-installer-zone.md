@@ -59,7 +59,7 @@ zonecfg:tap-install> commit
 
 Here's a pro-tip. The first time I tried to do this, none of my clients
 could get a DHCP address. I cranked up the logging by editing
-`/etc/inet/dhcpd4.conf` and configuring an appropriate syslog facilty,
+`/etc/inet/dhcpd4.conf` and configuring an appropriate syslog facility,
 and it told me
 
 ```

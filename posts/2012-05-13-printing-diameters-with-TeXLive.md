@@ -13,7 +13,7 @@ that it does is for no reason. It's deeply logical and consistent, and
 if something isn't working right, you know it's your fault. There's not
 a lot of software like that.
 
-I use TeX for all kinds of things. What little paper correspondance I do
+I use TeX for all kinds of things. What little paper correspondence I do
 now is always in TeX, and I even typeset my wedding invitations with it.
 I use it [in my artwork](http://rdfisher.co.uk/piece/series/1-116/101) too,
 which I was doing today. I needed to print a diameter symbol, and all my
@@ -50,6 +50,6 @@ I couldn't be bothered to properly typeset TeX, but [someone else has
 put a lot of effort into doing
 so](http://edward.oconnor.cx/2007/08/tex-poshlet). Check it out.
 
-In case you're wondering, 7.24 -0/+0.09mm is the diameter and tolerence
+In case you're wondering, 7.24 -0/+0.09mm is the diameter and tolerance
 for the hole in the middle of a record according to the [BS1928-1965
 standard](http://www7a.biglobe.ne.jp/~yosh/standards_table.htm).

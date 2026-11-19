@@ -106,8 +106,8 @@ rpool/zoneroot/newzone/rpool/export            /export                     on
 rpool/zoneroot/newzone/rpool/export/home       /export/home                on
 ```
 
-Note the strong use of `zoned` datasets. This means the zone completeley
-owns them, so snaphots and datasets, can be created from the zone, and
+Note the strong use of `zoned` datasets. This means the zone completely
+owns them, so snapshots and datasets, can be created from the zone, and
 any other ZFS operation carried out there as well.  The mountpoint shown
 above refers to the mountpoint inside the zone.  Zoned datasets are
 still visible from the global zone, under the zone's mountpoint,
@@ -195,7 +195,7 @@ good.  I'm fairy sure that pretty much every kind of resource control
 was covered in the later Solaris 10 releases, so there wasn't a whole
 lot to add to this.
 
-`max-proceses` is new however: it's pretty much an extension of the old
+`max-processes` is new however: it's pretty much an extension of the old
 `max-lwps` global and caps, as you would expect, the number of processes
 that can be in the zone's process table at any one time.
 
@@ -208,7 +208,7 @@ systems, it wasn't quite good enough. Now we have `zonestat`.
 
 `zonestat` runs in intervals, like `mpstat` or `vmstat`, an by default
 it prints  a row for each zone informing us how much CPU, physical
-memory, virtual memory, and netowrk bandwidth that zone has consumed
+memory, virtual memory, and network bandwidth that zone has consumed
 over the previous interval.
 
 I won't just regurgitate the man page, read it for yourself, but a
@@ -273,7 +273,7 @@ tap-ws
      620
 ```
 
-The mis-match there is mostly down to not having the `fbt` provider in a
+The mismatch there is mostly down to not having the `fbt` provider in a
 zone, but even with the probes that are enabled, I've been continually
 frustrated trying to DTrace in zones.  (Solaris 10 had fewer probes,
 around 400.)
